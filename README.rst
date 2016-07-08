@@ -50,38 +50,38 @@ Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your projec't ``con
 Directive options
 ------------------
 
-``alt``: determines the image's alternate text for HTML output.  If not given, the alternate text defaults to the mermaid code.
+``:alt:``: determines the image's alternate text for HTML output.  If not given, the alternate text defaults to the mermaid code.
 
-``align``: determines the image's position. Valid options are ``'left'``, ``'center'``, ``'right'``
+``:align:``: determines the image's position. Valid options are ``'left'``, ``'center'``, ``'right'``
 
-``caption``: can be used to give a caption to the diagram.
+``:caption:``: can be used to give a caption to the diagram.
 
 
 Config values
 -------------
 
 
-.. confval:: mermaid_cmd
+``mermaid_cmd``
 
    The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mermaid'``; you may need to set this to a full path if it's not in the executable
    search path.
 
-.. confval:: mermaid_phantom_path
+``mermaid_phantom_path``
 
     The mermaid command requires PhantomJS (version ^1.9.0) to be installed and available in your $PATH, or you can specify it's location with in this config variable.
 
-.. confval:: mermaid_output_format
+``mermaid_output_format``
 
    The output format for Mermaid when building HTML files.  This must be either
    ``'png'`` or ``'svg'``; the default is ``'png'``. Note ``'svg'`` support is very experimental in mermaid.
 
 
-.. confval:: mermaid_sequence_config
+``mermaid_sequence_config``
 
     Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **should be a normal python dictionary**
     Check options in the `documentation <http://knsv.github.io/mermaid/#sequence-diagram-configuration>`_
 
-.. confval:: mermaid_verbose
+``mermaid_verbose``
 
     Use the verbose mode when call mermaid-cli, and show its output in the building
     process.
@@ -90,4 +90,4 @@ Config values
 Acknowledge
 -----------
 
-Most of the code
+Much of the code is based on `sphinx.ext.graphviz <http://www.sphinx-doc.org/en/stable/ext/graphviz.html>`_. Thanks to its authors and other Sphinx contributors for such amazing tool.
