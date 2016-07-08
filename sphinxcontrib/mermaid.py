@@ -28,7 +28,7 @@ import sphinx
 from sphinx.errors import SphinxError
 from sphinx.locale import _
 from sphinx.util.i18n import search_image_for_language
-from sphinx.util.osutil import ensuredir, ENOENT, EPIPE, EINVAL
+from sphinx.util.osutil import ensuredir, ENOENT
 from sphinx.util.compat import Directive
 
 
@@ -74,7 +74,6 @@ class Mermaid(Directive):
     option_spec = {
         'alt': directives.unchanged,
         'align': align_spec,
-        'inline': directives.flag,
         'caption': directives.unchanged,
     }
 
@@ -181,15 +180,6 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     return relfn, outfn
 
 
-def warn_for_deprecated_option(self, node):
-    if hasattr(self.builder, '_mermaid_warned_inline'):
-        return
-
-    if 'inline' in node:
-        self.builder.warn(':inline: option for mermaid is deprecated since version 1.4.0.')
-        self.builder._mermaid_warned_inline = True
-
-
 def render_mm_html(self, node, code, options, prefix='mermaid',
                     imgcls=None, alt=None):
     format = self.builder.config.mermaid_output_format
@@ -226,7 +216,6 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
 
 
 def html_visit_mermaid(self, node):
-    warn_for_deprecated_option(self, node)
     render_mm_html(self, node, node['code'], node['options'])
 
 
@@ -261,7 +250,6 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
 
 
 def latex_visit_mermaid(self, node):
-    warn_for_deprecated_option(self, node)
     render_mm_latex(self, node, node['code'], node['options'])
 
 
@@ -277,12 +265,10 @@ def render_mm_texinfo(self, node, code, options, prefix='mermaid'):
 
 
 def texinfo_visit_mermaid(self, node):
-    warn_for_deprecated_option(self, node)
     render_mm_texinfo(self, node, node['code'], node['options'])
 
 
 def text_visit_mermaid(self, node):
-    warn_for_deprecated_option(self, node)
     if 'alt' in node.attributes:
         self.add_text(_('[graph: %s]') % node['alt'])
     else:
@@ -291,7 +277,6 @@ def text_visit_mermaid(self, node):
 
 
 def man_visit_mermaid(self, node):
-    warn_for_deprecated_option(self, node)
     if 'alt' in node.attributes:
         self.body.append(_('[graph: %s]') % node['alt'])
     else:
