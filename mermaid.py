@@ -13,9 +13,11 @@
 import re
 import codecs
 import posixpath
+import json
 from os import path
 from subprocess import Popen, PIPE
 from hashlib import sha1
+from tempfile import _get_default_tempdir, NamedTemporaryFile
 
 from six import text_type
 from docutils import nodes
@@ -63,7 +65,7 @@ def align_spec(argument):
 
 class Mermaid(Directive):
     """
-    Directive to insert arbitrary mm markup.
+    Directive to insert arbitrary Mermaid markup.
     """
     has_content = True
     required_arguments = 0
@@ -74,7 +76,6 @@ class Mermaid(Directive):
         'align': align_spec,
         'inline': directives.flag,
         'caption': directives.unchanged,
-        'mermaid_mm': directives.unchanged,
     }
 
     def run(self):
@@ -104,45 +105,6 @@ class Mermaid(Directive):
         node = mermaid()
         node['code'] = mmcode
         node['options'] = {}
-        if 'mermaid_mm' in self.options:
-            node['options']['mermaid_mm'] = self.options['mermaid_mm']
-        if 'alt' in self.options:
-            node['alt'] = self.options['alt']
-        if 'align' in self.options:
-            node['align'] = self.options['align']
-        if 'inline' in self.options:
-            node['inline'] = True
-
-        caption = self.options.get('caption')
-        if caption:
-            node = figure_wrapper(self, node, caption)
-
-        return [node]
-
-
-class MermaidSimple(Directive):
-    """
-    Directive to insert arbitrary mermaid markup.
-    """
-    has_content = True
-    required_arguments = 1
-    optional_arguments = 0
-    final_argument_whitespace = False
-    option_spec = {
-        'alt': directives.unchanged,
-        'align': align_spec,
-        'inline': directives.flag,
-        'caption': directives.unchanged,
-        'mermaid_mm': directives.unchanged,
-    }
-
-    def run(self):
-        node = mermaid()
-        node['code'] = '%s %s {\n%s\n}\n' % \
-                       (self.name, self.arguments[0], '\n'.join(self.content))
-        node['options'] = {}
-        if 'mermaid_mm' in self.options:
-            node['options']['mermaid_mm'] = self.options['mermaid_mm']
         if 'alt' in self.options:
             node['alt'] = self.options['alt']
         if 'align' in self.options:
@@ -159,20 +121,20 @@ class MermaidSimple(Directive):
 
 def render_mm(self, code, options, format, prefix='mermaid'):
     """Render mermaid code into a PNG or PDF output file."""
-    mermaid_mm = options.get('mermaid_mm', self.builder.config.mermaid_mm)
-    hashkey = (code + str(options) + str(mermaid_mm) +
-               str(self.builder.config.mermaid_mm_args)).encode('utf-8')
+    mermaid_cmd = self.builder.config.mermaid_cmd
+    verbose = self.builder.config.mermaid_verbose
+    hashkey = (code + str(options) +
+               str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
-    fname = '%s-%s.%s' % (prefix, sha1(hashkey).hexdigest(), format)
+    basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
+    fname = '%s.%s' % (basename, format)
     relfn = posixpath.join(self.builder.imgpath, fname)
-    outfn = path.join(self.builder.outdir, self.builder.imagedir, fname)
+    outdir = path.join(self.builder.outdir, self.builder.imagedir)
+    outfn = path.join(outdir, fname)
+    tmpfn = path.join(_get_default_tempdir(), basename)
 
     if path.isfile(outfn):
         return relfn, outfn
-
-    if (hasattr(self.builder, '_mermaid_warned_mm') and
-       self.builder._mermaid_warned_mm.get(mermaid_mm)):
-        return None, None
 
     ensuredir(path.dirname(outfn))
 
@@ -180,38 +142,41 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     if isinstance(code, text_type):
         code = code.encode('utf-8')
 
-    mm_args = [mermaid_mm]
-    mm_args.extend(self.builder.config.mermaid_mm_args)
-    mm_args.extend(['-T' + format, '-o' + outfn])
+    with open(tmpfn, 'w') as t:
+        t.write(code)
+
+    mm_args = [mermaid_cmd, tmpfn, '-o', outdir]
+    if verbose:
+        mm_args.extend(['-v'])
+    if self.builder.config.mermaid_phantom_path:
+        mm_args.extend(['--phantomPath', self.builder.config.mermaid_phantom_path])
+    if self.builder.config.mermaid_sequence_config:
+        with NamedTemporaryFile(delete=False) as seq:
+            json.dump(self.builder.config.mermaid_sequence_config, seq)
+        mm_args.extend(['--sequenceConfig', seq.name])
     if format == 'png':
-        mm_args.extend(['-Tcmapx', '-o%s.map' % outfn])
+        mm_args.extend(['-p'])
+    else:
+        mm_args.extend(['-s'])
+        self.builder.warn('Mermaid SVG support is experimental')
     try:
         p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('mm command %r cannot be run (needed for mermaid '
-                          'output), check the mermaid_mm setting' % mermaid_mm)
-        if not hasattr(self.builder, '_mermaid_warned_mm'):
-            self.builder._mermaid_warned_mm = {}
-        self.builder._mermaid_warned_mm[mermaid_mm] = True
+        self.builder.warn('command %r cannot be run (needed for mermaid '
+                          'output), check the mermaid_cmd setting' % mermaid_cmd)
         return None, None
-    try:
-        # Mermaid may close standard input when an error occurs,
-        # resulting in a broken pipe on communicate()
-        stdout, stderr = p.communicate(code)
-    except (OSError, IOError) as err:
-        if err.errno not in (EPIPE, EINVAL):
-            raise
-        # in this case, read the standard output and standard error streams
-        # directly, to get the error message(s)
-        stdout, stderr = p.stdout.read(), p.stderr.read()
-        p.wait()
+
+    stdout, stderr = p.communicate(code)
+    if verbose:
+        self.builder.info(stdout)
+
     if p.returncode != 0:
-        raise MermaidError('mm exited with error:\n[stderr]\n%s\n'
+        raise MermaidError('Mermaid exited with error:\n[stderr]\n%s\n'
                             '[stdout]\n%s' % (stderr, stdout))
     if not path.isfile(outfn):
-        raise MermaidError('mm did not produce an output file:\n[stderr]\n%s\n'
+        raise MermaidError('Mermaid did not produce an output file:\n[stderr]\n%s\n'
                             '[stdout]\n%s' % (stderr, stdout))
     return relfn, outfn
 
@@ -251,18 +216,9 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
             if 'align' in node:
                 self.body.append('<div align="%s" class="align-%s">' %
                                  (node['align'], node['align']))
-            with open(outfn + '.map', 'rb') as mapfile:
-                imgmap = mapfile.readlines()
-            if len(imgmap) == 2:
-                # nothing in image map (the lines are <map> and </map>)
-                self.body.append('<img src="%s" alt="%s" %s/>\n' %
-                                 (fname, alt, imgcss))
-            else:
-                # has a map: get the name of the map and connect the parts
-                mapname = mapname_re.match(imgmap[0].decode('utf-8')).group(1)
-                self.body.append('<img src="%s" alt="%s" usemap="#%s" %s/>\n' %
-                                 (fname, alt, mapname, imgcss))
-                self.body.extend([item.decode('utf-8') for item in imgmap])
+            # nothing in image map (the lines are <map> and </map>)
+            self.body.append('<img src="%s" alt="%s" %s/>\n' %
+                             (fname, alt, imgcss))
             if 'align' in node:
                 self.body.append('</div>\n')
 
@@ -351,9 +307,9 @@ def setup(app):
                  text=(text_visit_mermaid, None),
                  man=(man_visit_mermaid, None))
     app.add_directive('mermaid', Mermaid)
-    app.add_directive('graph', MermaidSimple)
-    app.add_directive('digraph', MermaidSimple)
-    app.add_config_value('mermaid_mm', 'mm', 'html')
-    app.add_config_value('mermaid_mm_args', [], 'html')
+    app.add_config_value('mermaid_cmd', 'mermaid', 'html')
     app.add_config_value('mermaid_output_format', 'png', 'html')
+    app.add_config_value('mermaid_verbose', False, 'html')
+    app.add_config_value('mermaid_phantom_path', None, 'html')
+    app.add_config_value('mermaid_sequence_config', None, 'html')
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
