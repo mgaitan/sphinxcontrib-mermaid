@@ -22,9 +22,6 @@ It adds a directive to embed mermaid markup. For example::
 The code will be rendered to a PNG (default) or SVG image (experimental)
 (see :confval:`mermaid_output_format`) using `mermaid-cli <http://knsv.github.io/mermaid/#mermaid-cli>`_.
 
-.. attention:: mermaid-cli
-
-
 You can also embed external mermaid files, by giving the file name as an
 argument to the directive and no additional content::
 
@@ -32,6 +29,23 @@ argument to the directive and no additional content::
 
 As for all file references in Sphinx, if the filename is absolute, it is
 taken as relative to the source directory.
+
+Installation
+------------
+
+You can install it using pip
+
+::
+
+    pip install sphinxcontrib-mermaid
+
+Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your projec't ``conf.py``::
+
+    extensions = [
+        ...,
+        'sphinxcontrib.mermaid'
+    ]
+
 
 Directive options
 ------------------
@@ -71,3 +85,9 @@ Config values
 
     Use the verbose mode when call mermaid-cli, and show its output in the building
     process.
+
+
+Acknowledge
+-----------
+
+Most of the code
