@@ -141,7 +141,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     if isinstance(code, text_type):
         code = code.encode('utf-8')
 
-    with open(tmpfn, 'w') as t:
+    with open(tmpfn, 'wb') as t:
         t.write(code)
 
     mm_args = [mermaid_cmd, tmpfn, '-o', outdir]
