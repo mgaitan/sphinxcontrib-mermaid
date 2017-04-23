@@ -1,6 +1,3 @@
-sphinxcontrib-mermaid
-=====================
-
 This extension allows you to embed `Mermaid <http://knsv.github.io/mermaid/>`_ graphs in your documents, including general flowcharts, sequence and gantt diagrams.
 
 It adds a directive to embed mermaid markup. For example::
@@ -20,7 +17,22 @@ It adds a directive to embed mermaid markup. For example::
         Bob-->John: Jolly good!
 
 The code will be rendered to a PNG (default) or SVG image (experimental)
-(see :confval:`mermaid_output_format`) using `mermaid-cli <http://knsv.github.io/mermaid/#mermaid-cli>`_.
+(see ``mermaid_output_format``) using `mermaid-cli <http://knsv.github.io/mermaid/#mermaid-cli>`_.
+
+.. mermaid::
+
+   sequenceDiagram
+      participant Alice
+      participant Bob
+      Alice->John: Hello John, how are you?
+      loop Healthcheck
+          John->John: Fight against hypochondria
+      end
+      Note right of John: Rational thoughts <br/>prevail...
+      John-->Alice: Great!
+      John->Bob: How about you?
+      Bob-->John: Jolly good!
+
 
 You can also embed external mermaid files, by giving the file name as an
 argument to the directive and no additional content::
@@ -29,6 +41,17 @@ argument to the directive and no additional content::
 
 As for all file references in Sphinx, if the filename is absolute, it is
 taken as relative to the source directory.
+
+
+In addition, you can use mermaid to automatically generate a diagram to show the inheritance of classes
+for a given module using the directive ``autoclasstree``. This receive the module, and optionally the relative namespace. Obviously, the module need to be importable to be represented.
+
+For example::
+
+    .. autoclasstree:: moviepy.editor moviepy
+
+.. autoclasstree:: moviepy.editor moviepy
+
 
 Installation
 ------------

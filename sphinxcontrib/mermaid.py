@@ -30,7 +30,7 @@ from sphinx.locale import _
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir, ENOENT
 from sphinx.util.compat import Directive
-
+from .autoclassdiag import ClassDiagram
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 
@@ -77,8 +77,9 @@ class Mermaid(Directive):
         'caption': directives.unchanged,
     }
 
-    def run(self):
+    def get_mm_code(self):
         if self.arguments:
+            # try to load mermaid code from an external file
             document = self.state.document
             if self.content:
                 return [document.reporter.warning(
@@ -96,13 +97,18 @@ class Mermaid(Directive):
                     'External Mermaid file %r not found or reading '
                     'it failed' % filename, line=self.lineno)]
         else:
+            # inline mermaid code
             mmcode = '\n'.join(self.content)
             if not mmcode.strip():
                 return [self.state_machine.reporter.warning(
                     'Ignoring "mermaid" directive without content.',
                     line=self.lineno)]
+        return mmcode
+
+    def run(self):
+
         node = mermaid()
-        node['code'] = mmcode
+        node['code'] = self.get_mm_code()
         node['options'] = {}
         if 'alt' in self.options:
             node['alt'] = self.options['alt']
@@ -116,6 +122,16 @@ class Mermaid(Directive):
             node = figure_wrapper(self, node, caption)
 
         return [node]
+
+
+class MermaidClassDiagram(Mermaid):
+
+    has_content = False
+    required_arguments = 1
+    optional_arguments = 1
+
+    def get_mm_code(self):
+        return u'{}'.format(ClassDiagram(*self.arguments))
 
 
 def render_mm(self, code, options, format, prefix='mermaid'):
@@ -292,6 +308,7 @@ def setup(app):
                  text=(text_visit_mermaid, None),
                  man=(man_visit_mermaid, None))
     app.add_directive('mermaid', Mermaid)
+    app.add_directive('autoclasstree', MermaidClassDiagram)
     app.add_config_value('mermaid_cmd', 'mermaid', 'html')
     app.add_config_value('mermaid_output_format', 'png', 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
