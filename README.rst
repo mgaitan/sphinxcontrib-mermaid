@@ -92,22 +92,21 @@ Directive options
 Config values
 -------------
 
-
-``mermaid_cmd``
-
-   The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mermaid'``; you may need to set this to a full path if it's not in the executable
-   search path.
-
-``mermaid_phantom_path``
-
-    The mermaid command requires PhantomJS (version ^1.9.0) to be installed and available in your $PATH, or you can specify it's location with in this config variable.
-
 ``mermaid_output_format``
 
    The output format for Mermaid when building HTML files.  This must be either ``'raw'``
-   ``'png'`` or ``'svg'``; the default is ``'raw'``
+   ``'png'`` or ``'svg'``; the default is ``'raw'``. ``mermaid-cli`` is required if it's not ``raw``
 
-   Note ``'svg'`` support is very experimental in mermaid.
+   Also note ``'svg'`` support is very experimental in mermaid.
+
+
+``mermaid_cmd``
+
+   The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mermaid'``; you may need to set this to a full path if it's not in the executable search path.
+
+``mermaid_phantom_path``
+
+    PhantomJS (version ^1.9.0) to be installed and available in your $PATH, or you can specify it's location with in this config variable.
 
 
 ``mermaid_sequence_config``
