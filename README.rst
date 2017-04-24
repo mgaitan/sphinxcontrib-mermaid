@@ -16,8 +16,15 @@ It adds a directive to embed mermaid markup. For example::
         John->Bob: How about you?
         Bob-->John: Jolly good!
 
-The code will be rendered to a PNG (default) or SVG image (experimental)
-(see ``mermaid_output_format``) using `mermaid-cli <http://knsv.github.io/mermaid/#mermaid-cli>`_.
+
+By default, the HTML builder will simply render this as a ``div`` tag with
+``class="mermaid"``, injecting the external javascript, css and initialization code to
+make mermaid works.
+
+For other builders (or if ``mermaid_output_format`` config variable is set differently), the extension
+will use `mermaid-cli <http://knsv.github.io/mermaid/#mermaid-cli>`_ to render as
+to a PNG or SVG image, and then used in the proper code.
+
 
 .. mermaid::
 
@@ -48,7 +55,9 @@ for a given module using the directive ``autoclasstree``. This receive the modul
 
 For example::
 
+
     .. autoclasstree:: moviepy.editor moviepy
+
 
 .. autoclasstree:: moviepy.editor moviepy
 
@@ -95,8 +104,10 @@ Config values
 
 ``mermaid_output_format``
 
-   The output format for Mermaid when building HTML files.  This must be either
-   ``'png'`` or ``'svg'``; the default is ``'png'``. Note ``'svg'`` support is very experimental in mermaid.
+   The output format for Mermaid when building HTML files.  This must be either ``'raw'``
+   ``'png'`` or ``'svg'``; the default is ``'raw'``
+
+   Note ``'svg'`` support is very experimental in mermaid.
 
 
 ``mermaid_sequence_config``

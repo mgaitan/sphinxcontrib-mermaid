@@ -18,7 +18,6 @@ from os import path
 from subprocess import Popen, PIPE
 from hashlib import sha1
 from tempfile import _get_default_tempdir, NamedTemporaryFile
-
 from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import directives
@@ -136,6 +135,10 @@ class MermaidClassDiagram(Mermaid):
 
 def render_mm(self, code, options, format, prefix='mermaid'):
     """Render mermaid code into a PNG or PDF output file."""
+
+    if format == 'raw':
+        format = 'png'
+
     mermaid_cmd = self.builder.config.mermaid_cmd
     verbose = self.builder.config.mermaid_verbose
     hashkey = (code + str(options) +
@@ -196,13 +199,51 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     return relfn, outfn
 
 
+def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
+                   imgcls=None, alt=None):
+
+    VERSION = '7.0.0'
+    BASE_URL = 'https://cdn.rawgit.com/knsv/mermaid/{}/dist'.format(VERSION)
+    js = '{}/mermaid.min.js'.format(BASE_URL)
+    css = '{}/mermaid.css'.format(BASE_URL)
+    if js not in self.builder.script_files:
+        self.builder.script_files.append(js)
+    if css not in self.builder.css_files:
+        self.builder.css_files.append(css)
+
+    self.builder.script_files
+
+    init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
+    if init_js not in self.body:
+        self.body.append(init_js)
+
+    if 'align' in node:
+        tag_template = """<div align="{align}" class="mermaid align-{align}">
+            {code}
+        </div>
+        """
+    else:
+        tag_template = """<div class="mermaid">
+            {code}
+        </div>"""
+
+    self.body.append(tag_template.format(align=node.get('align'), code=self.encode(code)))
+    raise nodes.SkipNode
+
+
 def render_mm_html(self, node, code, options, prefix='mermaid',
-                    imgcls=None, alt=None):
+                   imgcls=None, alt=None):
+
     format = self.builder.config.mermaid_output_format
+    if format == 'raw':
+        return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
+                   imgcls=None, alt=None)
+
     try:
         if format not in ('png', 'svg'):
-            raise MermaidError("mermaid_output_format must be one of 'png', "
+            raise MermaidError("mermaid_output_format must be one of 'raw', 'png', "
                                 "'svg', but is %r" % format)
+
         fname, outfn = render_mm(self, code, options, format, prefix)
     except MermaidError as exc:
         self.builder.warn('mermaid code %r: ' % code + str(exc))
@@ -222,7 +263,7 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
             if 'align' in node:
                 self.body.append('<div align="%s" class="align-%s">' %
                                  (node['align'], node['align']))
-            # nothing in image map (the lines are <map> and </map>)
+
             self.body.append('<img src="%s" alt="%s" %s/>\n' %
                              (fname, alt, imgcss))
             if 'align' in node:
@@ -309,8 +350,10 @@ def setup(app):
                  man=(man_visit_mermaid, None))
     app.add_directive('mermaid', Mermaid)
     app.add_directive('autoclasstree', MermaidClassDiagram)
+
+    #
     app.add_config_value('mermaid_cmd', 'mermaid', 'html')
-    app.add_config_value('mermaid_output_format', 'png', 'html')
+    app.add_config_value('mermaid_output_format', 'raw', 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_phantom_path', None, 'html')
     app.add_config_value('mermaid_sequence_config', None, 'html')
