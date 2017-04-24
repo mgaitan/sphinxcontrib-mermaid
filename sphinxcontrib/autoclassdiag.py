@@ -53,4 +53,4 @@ class ClassDiagram(object):
         )
 
 if __name__ == "__main__":
-    print(ClassDiagram('moviepy.editor', 'moviepy'))
+    print(ClassDiagram('sphinx.util', 'sphinx'))

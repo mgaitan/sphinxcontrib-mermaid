@@ -56,10 +56,10 @@ for a given module using the directive ``autoclasstree``. This receive the modul
 For example::
 
 
-    .. autoclasstree:: moviepy.editor moviepy
+    .. autoclasstree:: sphinx.util sphinx
 
 
-.. autoclasstree:: moviepy.editor moviepy
+.. autoclasstree:: sphinx.util sphinx
 
 
 Installation
