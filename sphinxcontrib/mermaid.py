@@ -212,7 +212,7 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
         # workaround for https://github.com/knsv/mermaid/issues/527
         self.body.append("""
             <style>
-            .body .section {
+            .section {
                 opacity: 1.0 !important;
             }
             </style>
