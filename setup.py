@@ -4,6 +4,7 @@ import io
 from setuptools import setup, find_packages
 
 readme = io.open('README.rst', encoding="utf-8").read()
+changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
 version = '0.2.1'
 
 setup(
@@ -15,7 +16,7 @@ setup(
     author=u'Martín Gaitán',
     author_email='gaitan@gmail.com',
     description='Mermaid diagrams in yours Sphinx powered docs',
-    long_description=readme,
+    long_description='{}\n\n{}'.format(readme, changes),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
