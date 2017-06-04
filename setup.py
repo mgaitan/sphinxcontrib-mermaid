@@ -4,7 +4,7 @@ import io
 from setuptools import setup, find_packages
 
 readme = io.open('README.rst', encoding="utf-8").read()
-version = '0.1.1'
+version = '0.2.1'
 
 setup(
     name='sphinxcontrib-mermaid',
@@ -30,6 +30,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Documentation',
