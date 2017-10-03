@@ -36,7 +36,7 @@ mapname_re = re.compile(r'<map id="(.*?)"')
 VERSION = '7.1.0'
 BASE_URL = 'https://unpkg.com/mermaid@{}/dist'.format(VERSION)
 JS_URL = '{}/mermaid.min.js'.format(BASE_URL)
-CSS_URL = '{}/mermaid.css'.format(BASE_URL)
+CSS_URL = None # css is contained in the js bundle
 
 
 class MermaidError(SphinxError):
@@ -209,16 +209,18 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
 
     if JS_URL not in self.builder.script_files:
         self.builder.script_files.append(JS_URL)
-    if CSS_URL not in self.builder.css_files:
+    if CSS_URL and CSS_URL not in self.builder.css_files:
+        self.builder.css_files.append(CSS_URL)
+    if "mermaid issue 527 workaround" not in self.body:
         # workaround for https://github.com/knsv/mermaid/issues/527
         self.body.append("""
             <style>
+            /* mermaid issue 527 workaround */
             .section {
                 opacity: 1.0 !important;
             }
             </style>
             """)
-        self.builder.css_files.append(CSS_URL)
     init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
     if init_js not in self.body:
         self.body.append(init_js)
