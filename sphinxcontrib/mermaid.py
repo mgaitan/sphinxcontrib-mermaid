@@ -33,8 +33,8 @@ from .autoclassdiag import ClassDiagram
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 
-VERSION = '7.0.0'
-BASE_URL = 'https://cdn.rawgit.com/knsv/mermaid/{}/dist'.format(VERSION)
+VERSION = '7.1.0'
+BASE_URL = 'https://unpkg.com/mermaid@{}/dist'.format(VERSION)
 JS_URL = '{}/mermaid.min.js'.format(BASE_URL)
 CSS_URL = '{}/mermaid.css'.format(BASE_URL)
 
