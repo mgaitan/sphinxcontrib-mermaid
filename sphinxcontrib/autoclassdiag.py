@@ -7,6 +7,7 @@ Check https://github.com/mgaitan/sphinxcontrib-mermaid/issues/5
 Original code by Zulko: https://gist.github.com/Zulko/e0910cac1b27bcc3a1e6585eaee60121
 
 """
+from __future__ import print_function
 import inspect
 from sphinx.util import import_object
 
