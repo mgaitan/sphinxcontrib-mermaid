@@ -112,7 +112,7 @@ Config values
 ``mermaid_sequence_config``
 
     Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **should be a normal python dictionary**
-    Check options in the `documentation <http://knsv.github.io/mermaid/#sequence-diagram-configuration>`_
+    Check options in the `documentation <https://mermaidjs.github.io/sequenceDiagram.html#configuration>`_
 
 ``mermaid_verbose``
 
