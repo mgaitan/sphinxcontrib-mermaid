@@ -33,6 +33,11 @@ from .autoclassdiag import ClassDiagram
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 
+VERSION = '7.0.0'
+BASE_URL = 'https://cdn.rawgit.com/knsv/mermaid/{}/dist'.format(VERSION)
+JS_URL = '{}/mermaid.min.js'.format(BASE_URL)
+CSS_URL = '{}/mermaid.css'.format(BASE_URL)
+
 
 class MermaidError(SphinxError):
     category = 'Mermaid error'
@@ -202,13 +207,9 @@ def render_mm(self, code, options, format, prefix='mermaid'):
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
 
-    VERSION = '7.0.0'
-    BASE_URL = 'https://cdn.rawgit.com/knsv/mermaid/{}/dist'.format(VERSION)
-    js = '{}/mermaid.min.js'.format(BASE_URL)
-    css = '{}/mermaid.css'.format(BASE_URL)
-    if js not in self.builder.script_files:
-        self.builder.script_files.append(js)
-    if css not in self.builder.css_files:
+    if JS_URL not in self.builder.script_files:
+        self.builder.script_files.append(JS_URL)
+    if CSS_URL not in self.builder.css_files:
         # workaround for https://github.com/knsv/mermaid/issues/527
         self.body.append("""
             <style>
@@ -217,7 +218,7 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
             }
             </style>
             """)
-        self.builder.css_files.append(css)
+        self.builder.css_files.append(CSS_URL)
     init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
     if init_js not in self.body:
         self.body.append(init_js)
