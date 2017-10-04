@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.3 (Oct 4, 2017)
++++++++++++++++++++
+
+- several improves and bugfixes contributed by `Alberto Berti <https://github.com/azazel75>`_
+
 0.2.1 (Jun 4, 2017)
 +++++++++++++++++++
 
