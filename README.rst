@@ -102,7 +102,7 @@ Config values
 
 ``mermaid_cmd``
 
-   The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mermaid'``; you may need to set this to a full path if it's not in the executable search path.
+   The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mmdc'``; you may need to set this to a full path if it's not in the executable search path.
 
 ``mermaid_phantom_path``
 
