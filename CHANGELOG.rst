@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.3.1 (Nov 22, 2017)
++++++++++++++++++++
+
+- Support the new Mermaid CLI by `Bastian Luettig <https://github.com/bastiedotorg>`_
+
+
 0.3 (Oct 4, 2017)
 +++++++++++++++++++
 
