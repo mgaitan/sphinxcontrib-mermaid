@@ -167,7 +167,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     with open(tmpfn, 'wb') as t:
         t.write(code)
 
-    mm_args = [mermaid_cmd, tmpfn, '-o', outdir]
+    mm_args = [mermaid_cmd, '-i', tmpfn, '-o', outfn]
     if verbose:
         mm_args.extend(['-v'])
     if self.builder.config.mermaid_phantom_path:
@@ -176,10 +176,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
         with NamedTemporaryFile(delete=False) as seq:
             json.dump(self.builder.config.mermaid_sequence_config, seq)
         mm_args.extend(['--sequenceConfig', seq.name])
-    if format == 'png':
-        mm_args.extend(['-p'])
-    else:
-        mm_args.extend(['-s'])
+    if format != 'png':
         self.builder.warn('Mermaid SVG support is experimental')
     try:
         p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
@@ -359,7 +356,7 @@ def setup(app):
     app.add_directive('autoclasstree', MermaidClassDiagram)
 
     #
-    app.add_config_value('mermaid_cmd', 'mermaid', 'html')
+    app.add_config_value('mermaid_cmd', 'mmdc', 'html')
     app.add_config_value('mermaid_output_format', 'raw', 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_phantom_path', None, 'html')
