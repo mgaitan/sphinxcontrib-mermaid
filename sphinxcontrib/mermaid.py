@@ -144,7 +144,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
         format = 'png'
 
     mermaid_cmd = self.builder.config.mermaid_cmd
-    hashkey = (code + str(options)).encode('utf-8')
+    hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
     basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
     fname = '%s.%s' % (basename, format)
