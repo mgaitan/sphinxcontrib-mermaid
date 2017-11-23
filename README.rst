@@ -95,7 +95,7 @@ Config values
 ``mermaid_output_format``
 
    The output format for Mermaid when building HTML files.  This must be either ``'raw'``
-   ``'png'`` or ``'svg'``; the default is ``'raw'``. ``mermaid-cli`` is required if it's not ``raw``
+   ``'png'`` or ``'svg'``; the default is ``'raw'``. ```` is required if it's not ``raw``
 
    Also note ``'svg'`` support is very experimental in mermaid.
 
@@ -104,21 +104,19 @@ Config values
 
    The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mmdc'``; you may need to set this to a full path if it's not in the executable search path.
 
-``mermaid_phantom_path``
+``mermaid_params``
 
-    PhantomJS (version ^1.9.0) to be installed and available in your $PATH, or you can specify it's location with in this config variable.
+   For individual parameters, a list of parameters can be added. Refer to <https://github.com/mermaidjs/mermaid.cli#options>_.
+   Examples::
+      mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
+   
+   This will render the mermaid diagram with theme forest, 600px width and transparent background.
 
-
-``mermaid_sequence_config``
-
-    Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **should be a normal python dictionary**
-    Check options in the `documentation <https://mermaidjs.github.io/sequenceDiagram.html#configuration>`_
 
 ``mermaid_verbose``
 
     Use the verbose mode when call mermaid-cli, and show its output in the building
     process.
-
 
 Acknowledge
 -----------
