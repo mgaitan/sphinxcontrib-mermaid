@@ -167,6 +167,8 @@ def render_mm(self, code, options, format, prefix='mermaid'):
 
     mm_args = [mermaid_cmd, '-i', tmpfn, '-o', outfn]
     mm_args.extend(self.builder.config.mermaid_params)
+    if self.builder.config.mermaid_sequence_config:
+       mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
     if format != 'png':
         self.builder.warn('Mermaid SVG support is experimental')
@@ -352,4 +354,6 @@ def setup(app):
     app.add_config_value('mermaid_output_format', 'raw', 'html')
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
+    app.add_config_value('mermaid_sequence_config', False, 'html')
+
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}

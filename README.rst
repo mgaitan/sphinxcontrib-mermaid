@@ -112,6 +112,10 @@ Config values
    
    This will render the mermaid diagram with theme forest, 600px width and transparent background.
 
+``mermaid_sequence_config``
+
+    Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **needs to be a json file**
+    Check options in the `documentation <https://mermaidjs.github.io/sequenceDiagram.html#configuration>`_
 
 ``mermaid_verbose``
 
