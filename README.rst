@@ -95,7 +95,7 @@ Config values
 ``mermaid_output_format``
 
    The output format for Mermaid when building HTML files.  This must be either ``'raw'``
-   ``'png'`` or ``'svg'``; the default is ``'raw'``. ```` is required if it's not ``raw``
+   ``'png'`` or ``'svg'``; the default is ``'raw'``. ``mermaid-cli`` is required if it's not ``raw``
 
    Also note ``'svg'`` support is very experimental in mermaid.
 
