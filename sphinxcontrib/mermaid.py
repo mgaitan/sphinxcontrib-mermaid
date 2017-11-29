@@ -296,7 +296,7 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
             elif node['align'] == 'right':
                 self.body.append('{\\hspace*{\\fill}')
                 post = '}'
-        self.body.append('%s\\includegraphics{%s}%s' %
+        self.body.append('%s\\sphinxincludegraphics{%s}%s' %
                          (para_separator, fname, para_separator))
         if post:
             self.body.append(post)
