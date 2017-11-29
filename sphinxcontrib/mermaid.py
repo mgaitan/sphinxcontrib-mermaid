@@ -14,7 +14,7 @@ import re
 import codecs
 import posixpath
 import json
-from os import path
+import os
 from subprocess import Popen, PIPE
 from hashlib import sha1
 from tempfile import _get_default_tempdir, NamedTemporaryFile
@@ -149,14 +149,14 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
     fname = '%s.%s' % (basename, format)
     relfn = posixpath.join(self.builder.imgpath, fname)
-    outdir = path.join(self.builder.outdir, self.builder.imagedir)
-    outfn = path.join(outdir, fname)
-    tmpfn = path.join(_get_default_tempdir(), basename)
+    outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
+    outfn = os.path.join(outdir, fname)
+    tmpfn = os.path.join(_get_default_tempdir(), basename)
 
-    if path.isfile(outfn):
+    if os.path.isfile(outfn):
         return relfn, outfn
 
-    ensuredir(path.dirname(outfn))
+    ensuredir(os.path.dirname(outfn))
 
     # mermaid expects UTF-8 by default
     if isinstance(code, text_type):
@@ -188,7 +188,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     if p.returncode != 0:
         raise MermaidError('Mermaid exited with error:\n[stderr]\n%s\n'
                             '[stdout]\n%s' % (stderr, stdout))
-    if not path.isfile(outfn):
+    if not os.path.isfile(outfn):
         raise MermaidError('Mermaid did not produce an output file:\n[stderr]\n%s\n'
                             '[stdout]\n%s' % (stderr, stdout))
     return relfn, outfn
@@ -281,6 +281,29 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
         self.builder.warn('mm code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
+    if self.builder.config.mermaid_pdfcrop != '':
+        mm_args = [self.builder.config.mermaid_pdfcrop, outfn]
+        try:
+            p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        except OSError as err:
+            if err.errno != ENOENT:   # No such file or directory
+                raise
+            self.builder.warn('command %r cannot be run (needed to crop pdf), check the mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
+            return None, None
+
+        stdout, stderr = p.communicate()
+        if self.builder.config.mermaid_verbose:
+            self.builder.info(stdout)
+
+        if p.returncode != 0:
+            raise MermaidError('PdfCrop exited with error:\n[stderr]\n%s\n'
+                                '[stdout]\n%s' % (stderr, stdout))
+        if not os.path.isfile(outfn):
+            raise MermaidError('PdfCrop did not produce an output file:\n[stderr]\n%s\n'
+                                '[stdout]\n%s' % (stderr, stdout))
+
+        fname = os.path.splitext(fname)[0] + "-crop" + os.path.splitext(fname)[1]
+
     is_inline = self.is_inline(node)
     if is_inline:
         para_separator = ''
@@ -351,6 +374,7 @@ def setup(app):
 
     #
     app.add_config_value('mermaid_cmd', 'mmdc', 'html')
+    app.add_config_value('mermaid_pdfcrop', '', 'html')
     app.add_config_value('mermaid_output_format', 'raw', 'html')
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
