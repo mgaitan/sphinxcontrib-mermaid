@@ -302,7 +302,7 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
             raise MermaidError('PdfCrop did not produce an output file:\n[stderr]\n%s\n'
                                 '[stdout]\n%s' % (stderr, stdout))
 
-        fname = os.path.splitext(fname)[0] + "-crop" + os.path.splitext(fname)[1]
+        fname = '{filename[0]}-crop{filename[1]}'.format(filename=os.path.splitext(fname))
 
     is_inline = self.is_inline(node)
     if is_inline:
