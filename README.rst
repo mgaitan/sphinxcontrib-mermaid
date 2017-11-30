@@ -122,6 +122,11 @@ Config values
     Use the verbose mode when call mermaid-cli, and show its output in the building
     process.
 
+``mermaid_pdfcrop``
+
+    If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
+    State binary name to use this extra function.
+
 Acknowledge
 -----------
 
