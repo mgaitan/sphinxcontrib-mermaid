@@ -4,12 +4,14 @@ defined in a given module
 
 Check https://github.com/mgaitan/sphinxcontrib-mermaid/issues/5
 
-Original code by Zulko: https://gist.github.com/Zulko/e0910cac1b27bcc3a1e6585eaee60121
+Original code by Zulko:
+  https://gist.github.com/Zulko/e0910cac1b27bcc3a1e6585eaee60121
 
 """
 from __future__ import print_function
 import inspect
 from sphinx.util import import_object
+
 
 def class_name(cls):
     """Return a string representing the class"""
@@ -33,7 +35,7 @@ class ClassDiagram(object):
 
         cls_name = class_name(cls)
         if (cls_name not in self.module_classes and
-            cls.__module__.startswith(self.base_module)):
+           cls.__module__.startswith(self.base_module)):
                 self.module_classes.add(cls_name)
                 for base in cls.__bases__:
                     if class_name(base) == 'object':
@@ -52,6 +54,7 @@ class ClassDiagram(object):
                 for a, b in self.inheritances
             ]
         )
+
 
 if __name__ == "__main__":
     print(ClassDiagram('sphinx.util', 'sphinx'))

@@ -13,11 +13,10 @@
 import re
 import codecs
 import posixpath
-import json
 import os
 from subprocess import Popen, PIPE
 from hashlib import sha1
-from tempfile import _get_default_tempdir, NamedTemporaryFile
+from tempfile import _get_default_tempdir
 from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
@@ -35,7 +34,7 @@ mapname_re = re.compile(r'<map id="(.*?)"')
 VERSION = '8.0.0-rc.8'
 BASE_URL = 'https://unpkg.com/mermaid@{}/dist'.format(VERSION)
 JS_URL = '{}/mermaid.min.js'.format(BASE_URL)
-CSS_URL = None # css is contained in the js bundle
+CSS_URL = None  # css is contained in the js bundle
 
 
 class MermaidError(SphinxError):
@@ -144,9 +143,10 @@ def render_mm(self, code, options, format, prefix='mermaid'):
         format = 'png'
 
     mermaid_cmd = self.builder.config.mermaid_cmd
-    hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
+    hashkey = (code + str(options) +
+               str(self.builder.config.mermaid_sequence_config))
 
-    basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
+    basename = '%s-%s' % (prefix, sha1(hashkey.encode('utf-8')).hexdigest())
     fname = '%s.%s' % (basename, format)
     relfn = posixpath.join(self.builder.imgpath, fname)
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
@@ -168,7 +168,8 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     mm_args = [mermaid_cmd, '-i', tmpfn, '-o', outfn]
     mm_args.extend(self.builder.config.mermaid_params)
     if self.builder.config.mermaid_sequence_config:
-       mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
+        mm_args.extend('--configFile',
+                       self.builder.config.mermaid_sequence_config)
 
     if format != 'png':
         self.builder.warn('Mermaid SVG support is experimental')
@@ -177,8 +178,9 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('command %r cannot be run (needed for mermaid '
-                          'output), check the mermaid_cmd setting' % mermaid_cmd)
+        self.builder.warn(
+            'command %r cannot be run (needed for mermaid '
+            'output), check the mermaid_cmd setting' % mermaid_cmd)
         return None, None
 
     stdout, stderr = p.communicate(code)
@@ -186,16 +188,18 @@ def render_mm(self, code, options, format, prefix='mermaid'):
         self.builder.info(stdout)
 
     if p.returncode != 0:
-        raise MermaidError('Mermaid exited with error:\n[stderr]\n%s\n'
-                            '[stdout]\n%s' % (stderr, stdout))
+        raise MermaidError(
+            'Mermaid exited with error:\n[stderr]\n%s\n'
+            '[stdout]\n%s' % (stderr, stdout))
     if not os.path.isfile(outfn):
-        raise MermaidError('Mermaid did not produce an output file:\n[stderr]\n%s\n'
-                            '[stdout]\n%s' % (stderr, stdout))
+        raise MermaidError(
+            'Mermaid did not produce an output file:\n[stderr]\n%s\n'
+            '[stdout]\n%s' % (stderr, stdout))
     return relfn, outfn
 
 
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
-                   imgcls=None, alt=None):
+                        imgcls=None, alt=None):
 
     if JS_URL not in self.builder.script_files:
         self.builder.script_files.append(JS_URL)
@@ -225,7 +229,8 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
             {code}
         </div>"""
 
-    self.body.append(tag_template.format(align=node.get('align'), code=self.encode(code)))
+    self.body.append(tag_template.format(
+        align=node.get('align'), code=self.encode(code)))
     raise nodes.SkipNode
 
 
@@ -235,12 +240,13 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
     format = self.builder.config.mermaid_output_format
     if format == 'raw':
         return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
-                   imgcls=None, alt=None)
+                                   imgcls=None, alt=None)
 
     try:
         if format not in ('png', 'svg'):
-            raise MermaidError("mermaid_output_format must be one of 'raw', 'png', "
-                                "'svg', but is %r" % format)
+            raise MermaidError(
+                "mermaid_output_format must be one of 'raw', 'png', "
+                "'svg', but is %r" % format)
 
         fname, outfn = render_mm(self, code, options, format, prefix)
     except MermaidError as exc:
@@ -288,7 +294,9 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
         except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
-            self.builder.warn('command %r cannot be run (needed to crop pdf), check the mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
+            self.builder.warn(
+                'command %r cannot be run (needed to crop pdf), check the '
+                'mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
             return None, None
 
         stdout, stderr = p.communicate()
@@ -296,13 +304,16 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
             self.builder.info(stdout)
 
         if p.returncode != 0:
-            raise MermaidError('PdfCrop exited with error:\n[stderr]\n%s\n'
-                                '[stdout]\n%s' % (stderr, stdout))
+            raise MermaidError(
+                'PdfCrop exited with error:\n[stderr]\n%s\n'
+                '[stdout]\n%s' % (stderr, stdout))
         if not os.path.isfile(outfn):
-            raise MermaidError('PdfCrop did not produce an output file:\n[stderr]\n%s\n'
-                                '[stdout]\n%s' % (stderr, stdout))
+            raise MermaidError(
+                'PdfCrop did not produce an output file:\n[stderr]\n%s\n'
+                '[stdout]\n%s' % (stderr, stdout))
 
-        fname = '{filename[0]}-crop{filename[1]}'.format(filename=os.path.splitext(fname))
+        fname = '{filename[0]}-crop{filename[1]}'.format(
+            filename=os.path.splitext(fname))
 
     is_inline = self.is_inline(node)
     if is_inline:
