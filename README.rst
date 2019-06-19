@@ -108,8 +108,9 @@ Config values
 
    For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaidjs/mermaid.cli#options>`_.
    Examples::
+
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
-   
+
    This will render the mermaid diagram with theme forest, 600px width and transparent background.
 
 ``mermaid_sequence_config``
@@ -126,6 +127,14 @@ Config values
 
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
+
+``mermaid_js_url``
+
+    Change the default location of mermaid.js. The default is ``https://unpkg.com/mermaid@8.0.0-rc.8/dist/mermaid.min.js``. 
+
+``mermaid_css_url``
+
+    Change the default CSS location of mermaid.js. CSS should be contained in the js bundle for the latest version of mermaid.js. The default is ``None``.
 
 Acknowledge
 -----------

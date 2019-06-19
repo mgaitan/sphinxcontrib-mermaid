@@ -197,10 +197,13 @@ def render_mm(self, code, options, format, prefix='mermaid'):
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
 
-    if JS_URL not in self.builder.script_files:
-        self.builder.script_files.append(JS_URL)
-    if CSS_URL and CSS_URL not in self.builder.css_files:
-        self.builder.css_files.append(CSS_URL)
+    mermaid_js_url = self.builder.config.mermaid_js_url
+    mermaid_css_url = self.builder.config.mermaid_css_url
+
+    if mermaid_js_url and mermaid_js_url not in self.builder.script_files:
+        self.builder.script_files.append(mermaid_js_url)
+    if mermaid_css_url and mermaid_css_url not in self.builder.css_files:
+        self.builder.css_files.append(mermaid_css_url)
     if "mermaid issue 527 workaround" not in self.body:
         # workaround for https://github.com/knsv/mermaid/issues/527
         self.body.append("""
@@ -379,5 +382,7 @@ def setup(app):
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
+    app.add_config_value('mermaid_js_url', JS_URL , 'html')
+    app.add_config_value('mermaid_css_url', CSS_URL , 'html')
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}

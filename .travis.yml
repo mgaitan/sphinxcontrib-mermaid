@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.6"
+  - "3.5"
+  - "3.4"
+
+sudo: false
+cache: pip
+install:
+ - pip install -r docs/requirements.txt
+script:
+ - sphinx-build -nWT -b html docs _build/html

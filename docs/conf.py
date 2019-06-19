@@ -154,6 +154,3 @@ texinfo_documents = [
      author, 'Sphinxcontrib-mesmaiddemo', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
