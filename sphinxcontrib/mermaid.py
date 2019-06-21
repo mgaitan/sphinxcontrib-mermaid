@@ -28,7 +28,10 @@ from sphinx.errors import SphinxError
 from sphinx.locale import _
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir, ENOENT
+from sphinx.util import logging
 from .autoclassdiag import ClassDiagram
+
+logger = logging.getLogger(__name__)
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 
@@ -171,19 +174,19 @@ def render_mm(self, code, options, format, prefix='mermaid'):
        mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
     if format != 'png':
-        self.builder.warn('Mermaid SVG support is experimental')
+        logger.warning('Mermaid SVG support is experimental')
     try:
         p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
-        self.builder.warn('command %r cannot be run (needed for mermaid '
-                          'output), check the mermaid_cmd setting' % mermaid_cmd)
+        logger.warning('command %r cannot be run (needed for mermaid '
+                       'output), check the mermaid_cmd setting' % mermaid_cmd)
         return None, None
 
     stdout, stderr = p.communicate(code)
     if self.builder.config.mermaid_verbose:
-        self.builder.info(stdout)
+        logger.info(stdout)
 
     if p.returncode != 0:
         raise MermaidError('Mermaid exited with error:\n[stderr]\n%s\n'
@@ -244,7 +247,7 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
 
         fname, outfn = render_mm(self, code, options, format, prefix)
     except MermaidError as exc:
-        self.builder.warn('mermaid code %r: ' % code + str(exc))
+        logger.warning('mermaid code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
     if fname is None:
@@ -278,7 +281,7 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
     try:
         fname, outfn = render_mm(self, code, options, 'pdf', prefix)
     except MermaidError as exc:
-        self.builder.warn('mm code %r: ' % code + str(exc))
+        logger.warning('mm code %r: ' % code + str(exc))
         raise nodes.SkipNode
 
     if self.builder.config.mermaid_pdfcrop != '':
@@ -288,12 +291,12 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
         except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
-            self.builder.warn('command %r cannot be run (needed to crop pdf), check the mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
+            logger.warning('command %r cannot be run (needed to crop pdf), check the mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
             return None, None
 
         stdout, stderr = p.communicate()
         if self.builder.config.mermaid_verbose:
-            self.builder.info(stdout)
+            logger.info(stdout)
 
         if p.returncode != 0:
             raise MermaidError('PdfCrop exited with error:\n[stderr]\n%s\n'
@@ -335,7 +338,7 @@ def render_mm_texinfo(self, node, code, options, prefix='mermaid'):
     try:
         fname, outfn = render_mm(self, code, options, 'png', prefix)
     except MermaidError as exc:
-        self.builder.warn('mm code %r: ' % code + str(exc))
+        logger.warning('mm code %r: ' % code + str(exc))
         raise nodes.SkipNode
     if fname is not None:
         self.body.append('@image{%s,,,[mermaid],png}\n' % fname[:-4])
