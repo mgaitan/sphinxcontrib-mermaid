@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 
-VERSION = '8.0.0'
-BASE_URL = 'https://unpkg.com/mermaid@{}/dist'.format(VERSION)
+VERSION = '8.4.4'
+BASE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/{}'.format(VERSION)
 JS_URL = '{}/mermaid.min.js'.format(BASE_URL)
 CSS_URL = None # css is contained in the js bundle
 
