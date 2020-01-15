@@ -1,4 +1,5 @@
-This extension allows you to embed `Mermaid <http://knsv.github.io/mermaid/>`_ graphs in your documents, including general flowcharts, sequence and gantt diagrams.
+This extension allows you to embed `Mermaid <https://mermaid-js.github.io/mermaid>`_ graphs in your
+documents, including general flowcharts, sequence and gantt diagrams.
 
 It adds a directive to embed mermaid markup. For example::
 
@@ -115,7 +116,7 @@ Config values
 ``mermaid_sequence_config``
 
     Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **needs to be a json file**
-    Check options in the `documentation <https://mermaidjs.github.io/sequenceDiagram.html#configuration>`_
+    Check options in the `documentation <https://mermaid-js.github.io/mermaid/#/mermaidAPI?id=configuration>`_
 
 ``mermaid_verbose``
 
