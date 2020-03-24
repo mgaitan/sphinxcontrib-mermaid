@@ -100,6 +100,9 @@ Config values
 
    Also note ``'svg'`` support is very experimental in mermaid.
 
+``mermaid_version``
+
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid@8.0.0/. The default version is 8.0.0.
 
 ``mermaid_cmd``
 
