@@ -110,6 +110,7 @@ Config values
 
    For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaidjs/mermaid.cli#options>`_.
    Examples::
+
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
 
    This will render the mermaid diagram with theme forest, 600px width and transparent background.

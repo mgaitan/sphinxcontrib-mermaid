@@ -18,7 +18,7 @@ Unreleased
 
 
 0.3.1 (Nov 22, 2017)
-+++++++++++++++++++
+++++++++++++++++++++
 
 - Support the new Mermaid CLI by `Bastian Luettig <https://github.com/bastiedotorg>`_
 
