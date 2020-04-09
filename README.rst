@@ -47,7 +47,7 @@ argument to the directive and no additional content::
 
    .. mermaid:: path/to/mermaid-gantt-code.mmd
 
-As for all file references in Sphinx, if the filename is absolute, it is
+As for all file references in Sphinx, if the filename is not absolute, it is
 taken as relative to the source directory.
 
 
