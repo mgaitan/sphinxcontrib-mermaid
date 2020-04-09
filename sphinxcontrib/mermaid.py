@@ -379,6 +379,6 @@ def setup(app):
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
-    app.add_config_value('mermaid_version', '8.0.0', 'html')
+    app.add_config_value('mermaid_version', '8.4.8', 'html')
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
