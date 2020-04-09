@@ -98,8 +98,6 @@ Config values
    The output format for Mermaid when building HTML files.  This must be either ``'raw'``
    ``'png'`` or ``'svg'``; the default is ``'raw'``. ``mermaid-cli`` is required if it's not ``raw``
 
-   Also note ``'svg'`` support is very experimental in mermaid.
-
 ``mermaid_version``
 
   The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. Currently, the default version is 8.4.8.

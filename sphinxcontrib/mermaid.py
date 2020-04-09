@@ -169,8 +169,6 @@ def render_mm(self, code, options, format, prefix='mermaid'):
     if self.builder.config.mermaid_sequence_config:
        mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
-    if format != 'png':
-        logger.warning('Mermaid SVG support is experimental')
     try:
         p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     except OSError as err:
