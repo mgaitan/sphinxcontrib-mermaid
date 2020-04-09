@@ -13,11 +13,10 @@
 import re
 import codecs
 import posixpath
-import json
 import os
 from subprocess import Popen, PIPE
 from hashlib import sha1
-from tempfile import _get_default_tempdir, NamedTemporaryFile
+from tempfile import _get_default_tempdir
 from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
