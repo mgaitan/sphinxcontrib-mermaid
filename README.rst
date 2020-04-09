@@ -102,7 +102,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid@8.0.0/. The default version is 8.0.0.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. Currently, the default version is 8.4.8.
 
 ``mermaid_cmd``
 
@@ -113,7 +113,7 @@ Config values
    For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaidjs/mermaid.cli#options>`_.
    Examples::
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
-   
+
    This will render the mermaid diagram with theme forest, 600px width and transparent background.
 
 ``mermaid_sequence_config``
