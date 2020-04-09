@@ -200,16 +200,6 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
         self.builder.script_files.append(self._mermaid_js_url)
     if CSS_URL and CSS_URL not in self.builder.css_files:
         self.builder.css_files.append(CSS_URL)
-    if "mermaid issue 527 workaround" not in self.body:
-        # workaround for https://github.com/knsv/mermaid/issues/527
-        self.body.append("""
-            <style>
-            /* mermaid issue 527 workaround */
-            .section {
-                opacity: 1.0 !important;
-            }
-            </style>
-            """)
     init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
     if init_js not in self.body:
         self.body.append(init_js)
