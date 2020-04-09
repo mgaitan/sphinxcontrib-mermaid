@@ -1,6 +1,22 @@
 Changelog
 ---------
 
+Unreleased
+++++++++++
+
+- (nothing yet)
+
+0.4.0 (April 9, 2020)
++++++++++++++++++++++
+
+- Added `mermaid_params`
+- Added config file option
+- Improved latex integration
+- Added the `pdfcrop` functionality
+- Mermaid version is configurable
+- Several cleanups in the code
+
+
 0.3.1 (Nov 22, 2017)
 +++++++++++++++++++
 
