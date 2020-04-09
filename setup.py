@@ -7,6 +7,26 @@ readme = io.open('README.rst', encoding="utf-8").read()
 changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
 version = '0.4.0'
 
+
+def long_description():
+    """
+    return readme + changes, removing directive blocks that are only valid in the context
+    of sphinx doc"""
+
+    def remove_block(text, token, margin=0):
+        input_lines = text.splitlines()
+        for i, l in enumerate(input_lines):
+            if l.startswith(token):
+                break
+        start = i
+        end = input_lines.index("", start + margin)
+        return "\n".join(input_lines[:start] + input_lines[end:])
+
+    readme_ = remove_block(readme, ".. mermaid::", margin=2)
+    readme_ = remove_block(readme_, ".. autoclasstree::")
+    return "{}\n\n{}".format(readme_, changes)
+
+
 setup(
     name='sphinxcontrib-mermaid',
     version=version,
@@ -16,7 +36,7 @@ setup(
     author=u'Martín Gaitán',
     author_email='gaitan@gmail.com',
     description='Mermaid diagrams in yours Sphinx powered docs',
-    long_description='{}\n\n{}'.format(readme, changes),
+    long_description=long_description(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
