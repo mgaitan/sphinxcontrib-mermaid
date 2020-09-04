@@ -6,7 +6,7 @@
     Allow mermaid diagramas to be included in Sphinx-generated
     documents inline.
 
-    :copyright: Copyright 2016 by Martín Gaitán and others, see AUTHORS.
+    :copyright: Copyright 2016-2020 by Martín Gaitán and others, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
 
@@ -20,15 +20,16 @@ from tempfile import _get_default_tempdir
 from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
+from docutils.parsers.rst.directives import flag
 from docutils.statemachine import ViewList
 
 import sphinx
-from sphinx.errors import SphinxError
 from sphinx.locale import _
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir, ENOENT
 from sphinx.util import logging
-from .autoclassdiag import ClassDiagram
+from .exceptions import MermaidError
+from .autoclassdiag import class_diagram
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +38,6 @@ mapname_re = re.compile(r'<map id="(.*?)"')
 CSS_URL = None # css is contained in the js bundle
 
 
-class MermaidError(SphinxError):
-    category = 'Mermaid error'
 
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
@@ -130,10 +129,12 @@ class MermaidClassDiagram(Mermaid):
 
     has_content = False
     required_arguments = 1
-    optional_arguments = 1
+    optional_arguments = 100
+    option_spec = Mermaid.option_spec.copy()
+    option_spec.update({"full": flag})
 
     def get_mm_code(self):
-        return u'{}'.format(ClassDiagram(*self.arguments))
+        return class_diagram(*self.arguments, full="full" in self.options)
 
 
 def render_mm(self, code, options, format, prefix='mermaid'):
