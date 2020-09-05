@@ -51,8 +51,12 @@ As for all file references in Sphinx, if the filename is not absolute, it is
 taken as relative to the source directory.
 
 
-In addition, you can use mermaid to automatically generate a diagram to show the inheritance of one or more classes using the directive ``autoclasstree``. If the attribute `:full:` is given,
-it will show the complete hierarchie to the class.
+In addition, you can use mermaid to automatically generate a diagram to show the class inheritance using the directive ``autoclasstree``. It accepts one or more fully qualified
+names to a class or a module. In the case of a module, all the class found will be included.
+
+Of course, these objects need to be importable to make its diagram.
+
+If an optional attribute ``:full:`` is given, it will show the complete hierarchie of each class.
 
 For example::
 
@@ -61,6 +65,14 @@ For example::
 
 .. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
    :full:
+
+
+Or directly the module::
+
+   .. autoclasstree:: sphinx.util
+
+
+.. autoclasstree:: sphinx.util
 
 
 Installation

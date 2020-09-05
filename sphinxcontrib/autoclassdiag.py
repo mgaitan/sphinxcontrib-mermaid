@@ -1,9 +1,26 @@
 import inspect
-from sphinx.util import import_object
+from sphinx.util import import_object, ExtensionError
+from .exceptions import MermaidError
 
 
+def expand_namespace(*cls_or_modules):
+    for cls_or_module in cls_or_modules:
+        try:
+            obj = import_object(cls_or_module)
+        except ExtensionError as e:
+            raise MermaidError(str(e))
 
-def class_diagram(*cls_names, full=False):
+        if inspect.isclass(obj):
+            yield obj
+        elif inspect.ismodule(obj):
+            for obj_ in obj.__dict__.values():
+                if inspect.isclass(obj_):
+                    yield obj_
+        else:
+            raise MermaidError("%s is not an class nor a module" % cls_or_module)
+
+
+def class_diagram(*cls_or_modules, full=False):
     inheritances = set()
 
     def get_tree(cls):
@@ -14,13 +31,7 @@ def class_diagram(*cls_names, full=False):
             if full:
                 get_tree(base)
 
-    for cls_name in cls_names:
-
-        cls = import_object(cls_name)
-        if not inspect.isclass(cls):
-            from .exceptions import MermaidError
-            raise MermaidError("%s is not a class" % cls_name)
-
+    for cls in expand_namespace(*cls_or_modules):
         get_tree(cls)
 
     return "classDiagram\n" + "\n".join(
