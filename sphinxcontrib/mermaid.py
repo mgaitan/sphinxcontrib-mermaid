@@ -20,7 +20,6 @@ from tempfile import _get_default_tempdir
 from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
-from docutils.parsers.rst.directives import flag
 from docutils.statemachine import ViewList
 
 import sphinx
@@ -131,10 +130,19 @@ class MermaidClassDiagram(Mermaid):
     required_arguments = 1
     optional_arguments = 100
     option_spec = Mermaid.option_spec.copy()
-    option_spec.update({"full": flag})
+    option_spec.update({
+        "full": directives.flag,
+        "namespace": directives.unchanged,
+        "strict": directives.flag,
+    })
 
     def get_mm_code(self):
-        return class_diagram(*self.arguments, full="full" in self.options)
+        return class_diagram(
+            *self.arguments,
+            full="full" in self.options,
+            strict="strict" in self.options,
+            namespace=self.options.get("namespace")
+        )
 
 
 def render_mm(self, code, options, format, prefix='mermaid'):

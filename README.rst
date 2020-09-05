@@ -58,6 +58,11 @@ Of course, these objects need to be importable to make its diagram.
 
 If an optional attribute ``:full:`` is given, it will show the complete hierarchie of each class.
 
+The option ``:namespace: <value>`` limits to the base classes that belongs to this namespace.
+Meanwhile, the flag ``:strict:`` only process the classes that are strictly defined in the given
+module (ignoring classes imported from other modules).
+
+
 For example::
 
     .. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
@@ -69,7 +74,7 @@ For example::
 
 Or directly the module::
 
-   .. autoclasstree:: sphinx.util
+    .. autoclasstree:: sphinx.util
 
 
 .. autoclasstree:: sphinx.util
