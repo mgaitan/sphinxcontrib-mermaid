@@ -44,7 +44,6 @@ def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
     for cls in get_classes(*cls_or_modules, strict=strict):
         get_tree(cls)
 
-    import ipdb; ipdb.set_trace()
     return "classDiagram\n" + "\n".join(
             "  %s <|-- %s" % (a, b)
                 for a, b in inheritances
