@@ -1,57 +1,76 @@
-"""
-generate mermaid code that represent the inheritance of classes
-defined in a given module
-
-Check https://github.com/mgaitan/sphinxcontrib-mermaid/issues/5
-
-Original code by Zulko: https://gist.github.com/Zulko/e0910cac1b27bcc3a1e6585eaee60121
-
-"""
-from __future__ import print_function
 import inspect
-from sphinx.util import import_object
-
-def class_name(cls):
-    """Return a string representing the class"""
-    # NOTE: can be changed to str(class) for more complete class info
-    return cls.__name__
+from sphinx.util import import_object, ExtensionError
+from .exceptions import MermaidError
 
 
-class ClassDiagram(object):
+def get_classes(*cls_or_modules, strict=False):
+    """
+    given one or several fully qualified names, yield class instances found.
 
-    def __init__(self, module_path, base_module=None):
+    If ``strict`` is only consider classes that are strictly defined in that module
+    and not imported from somewhere else.
+    """
+    for cls_or_module in cls_or_modules:
+        try:
+            obj = import_object(cls_or_module)
+        except ExtensionError as e:
+            raise MermaidError(str(e))
 
-        self.module = import_object(module_path)
-        self.base_module = base_module or self.module.__name__
-        self.module_classes = set()
-        self.inheritances = []
-        self._populate_tree()
+        if inspect.isclass(obj):
+            yield obj
 
-    def _inspect_class(self, cls):
-        if not inspect.isclass(cls):
-            return
+        elif inspect.ismodule(obj):
+            for obj_ in obj.__dict__.values():
+                if inspect.isclass(obj_) and (not strict or obj_.__module__.startswith(obj.__name__)):
+                    yield obj_
+        else:
+            raise MermaidError("%s is not a class nor a module" % cls_or_module)
 
-        cls_name = class_name(cls)
-        if (cls_name not in self.module_classes and
-            cls.__module__.startswith(self.base_module)):
-                self.module_classes.add(cls_name)
-                for base in cls.__bases__:
-                    if class_name(base) == 'object':
-                        continue
-                    self.inheritances.append((class_name(base), cls_name))
-                    self._inspect_class(base)
 
-    def _populate_tree(self):
-        for obj in self.module.__dict__.values():
-            self._inspect_class(obj)
+def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
+    inheritances = set()
 
-    def __str__(self):
-        return "graph TD;\n" + "\n".join(
-            list(self.module_classes) + [
-                "%s --> %s" % (a, b)
-                for a, b in self.inheritances
-            ]
-        )
+    def get_tree(cls):
+        for base in cls.__bases__:
+
+            if base.__name__ == 'object':
+                continue
+            if namespace and not base.__module__.startswith(namespace):
+                continue
+            inheritances.add((base.__name__, cls.__name__))
+            if full:
+                get_tree(base)
+
+    for cls in get_classes(*cls_or_modules, strict=strict):
+        get_tree(cls)
+
+    return "classDiagram\n" + "\n".join(
+            "  %s <|-- %s" % (a, b)
+                for a, b in inheritances
+            )
+
 
 if __name__ == "__main__":
-    print(ClassDiagram('sphinx.util', 'sphinx'))
+
+
+    class A:
+        pass
+
+    class B(A):
+        pass
+
+    class C1(B):
+        pass
+
+    class C2(B):
+        pass
+
+    class D(C1, C2):
+        pass
+
+    class E(C1):
+        pass
+
+    print(class_diagram("__main__.D", "__main__.E", full=True))
+
+

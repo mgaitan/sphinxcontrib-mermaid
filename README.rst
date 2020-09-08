@@ -51,16 +51,33 @@ As for all file references in Sphinx, if the filename is not absolute, it is
 taken as relative to the source directory.
 
 
-In addition, you can use mermaid to automatically generate a diagram to show the inheritance of classes
-for a given module using the directive ``autoclasstree``. This receive the module, and optionally the relative namespace. Obviously, the module need to be importable to be represented.
+In addition, you can use mermaid to automatically generate a diagram to show the class inheritance using the directive ``autoclasstree``. It accepts one or more fully qualified
+names to a class or a module. In the case of a module, all the class found will be included.
+
+Of course, these objects need to be importable to make its diagram.
+
+If an optional attribute ``:full:`` is given, it will show the complete hierarchie of each class.
+
+The option ``:namespace: <value>`` limits to the base classes that belongs to this namespace.
+Meanwhile, the flag ``:strict:`` only process the classes that are strictly defined in the given
+module (ignoring classes imported from other modules).
+
 
 For example::
 
+    .. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+       :full:
 
-    .. autoclasstree:: sphinx.util sphinx
+.. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+   :full:
 
 
-.. autoclasstree:: sphinx.util sphinx
+Or directly the module::
+
+    .. autoclasstree:: sphinx.util
+
+
+.. autoclasstree:: sphinx.util
 
 
 Installation
