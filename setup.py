@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 readme = io.open('README.rst', encoding="utf-8").read()
 changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
-version = '0.4.0'
+version = '0.5.0'
 
 
 def long_description():
@@ -23,6 +23,7 @@ def long_description():
         return "\n".join(input_lines[:start] + input_lines[end:])
 
     readme_ = remove_block(readme, ".. mermaid::", margin=2)
+    readme_ = remove_block(readme_, ".. autoclasstree::")
     readme_ = remove_block(readme_, ".. autoclasstree::")
     return "{}\n\n{}".format(readme_, changes)
 

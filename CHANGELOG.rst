@@ -1,10 +1,12 @@
 Changelog
 ---------
 
-Unreleased
-++++++++++
+0.5.0 (September 24, 2020)
+++++++++++++++++++++++++++
 
-- (nothing yet)
+- Added mermaid_cmd_shell. Useful for Windows user.
+- Reimplement inheritance diagrams.
+- Fix UnicodeEncodeError on Python 2
 
 0.4.0 (April 9, 2020)
 +++++++++++++++++++++
