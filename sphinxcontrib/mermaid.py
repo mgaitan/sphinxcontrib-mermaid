@@ -154,6 +154,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
         format = 'png'
 
     mermaid_cmd = self.builder.config.mermaid_cmd
+    mermaid_cmd_shell = self.builder.config.mermaid_cmd_shell in {True, 'True', 'true'}
     hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
     basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
@@ -181,7 +182,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
        mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
     try:
-        p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     except OSError as err:
         if err.errno != ENOENT:   # No such file or directory
             raise
@@ -372,6 +373,7 @@ def setup(app):
 
     #
     app.add_config_value('mermaid_cmd', 'mmdc', 'html')
+    app.add_config_value('mermaid_cmd_shell', 'False', 'html')
     app.add_config_value('mermaid_pdfcrop', '', 'html')
     app.add_config_value('mermaid_output_format', 'raw', 'html')
     app.add_config_value('mermaid_params', list(), 'html')
