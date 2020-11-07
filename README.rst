@@ -151,6 +151,10 @@ Config values
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
 
+``mermaid_js_path``
+
+    Set this path to the mermaid.js file that is stored locally on disk. The path is relative to the root of the sphinx project.
+
 Acknowledge
 -----------
 

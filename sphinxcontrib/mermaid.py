@@ -205,8 +205,13 @@ def render_mm(self, code, options, format, prefix='mermaid'):
 
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
-    if self._mermaid_js_url not in self.builder.script_files:
-        self.builder.script_files.append(self._mermaid_js_url)
+    include_js_file = True
+    for script_file in self.builder.script_files:
+        if self._mermaid_js_url in script_file:
+            include_js_file = False
+    if include_js_file:
+        self.builder.add_js_file(self._mermaid_js_url)
+
     if CSS_URL and CSS_URL not in self.builder.css_files:
         self.builder.css_files.append(CSS_URL)
     init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
@@ -230,7 +235,12 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
 def render_mm_html(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
     version = self.builder.config.mermaid_version
-    self._mermaid_js_url = 'https://unpkg.com/mermaid@{}/dist/mermaid.min.js'.format(version)
+    mermaid_js_url = self.builder.config.mermaid_js_path
+    if not mermaid_js_url:
+        self._mermaid_js_url = 'https://unpkg.com/mermaid@{}/dist/mermaid.min.js'.format(version)
+    else:
+        self._mermaid_js_url = mermaid_js_url
+
     format = self.builder.config.mermaid_output_format
     if format == 'raw':
         return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
@@ -380,5 +390,6 @@ def setup(app):
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
     app.add_config_value('mermaid_version', '8.4.8', 'html')
+    app.add_config_value('mermaid_js_path', '', 'html')
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
