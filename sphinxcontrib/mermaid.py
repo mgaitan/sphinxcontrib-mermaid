@@ -209,7 +209,8 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
         self.builder.script_files.append(self._mermaid_js_url)
     if CSS_URL and CSS_URL not in self.builder.css_files:
         self.builder.css_files.append(CSS_URL)
-    init_js = """<script>mermaid.initialize({startOnLoad:true});</script>"""
+    custom_js = self.builder.config.mermaid_custom_init_js
+    init_js = """<script>{custom_js}</script>"""
     if init_js not in self.body:
         self.body.append(init_js)
 
@@ -376,6 +377,7 @@ def setup(app):
     app.add_config_value('mermaid_cmd_shell', 'False', 'html')
     app.add_config_value('mermaid_pdfcrop', '', 'html')
     app.add_config_value('mermaid_output_format', 'raw', 'html')
+    app.add_config_value('mermaid_custom_init_js', 'mermaid.initialize({startOnLoad:true})', 'html')
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
