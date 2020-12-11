@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 
 readme = io.open('README.rst', encoding="utf-8").read()
 changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
+requires = io.open('requirements.txt', encoding="utf-8").read()
 version = '0.5.0'
 
 
@@ -61,5 +62,6 @@ setup(
     platforms='any',
     packages=find_packages(),
     include_package_data=True,
+    install_requires=requires,
     namespace_packages=['sphinxcontrib'],
 )
