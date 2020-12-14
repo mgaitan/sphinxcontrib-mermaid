@@ -56,7 +56,7 @@ names to a class or a module. In the case of a module, all the class found will 
 
 Of course, these objects need to be importable to make its diagram.
 
-If an optional attribute ``:full:`` is given, it will show the complete hierarchie of each class.
+If an optional attribute ``:full:`` is given, it will show the complete hierarchy of each class.
 
 The option ``:namespace: <value>`` limits to the base classes that belongs to this namespace.
 Meanwhile, the flag ``:strict:`` only process the classes that are strictly defined in the given
@@ -89,7 +89,7 @@ You can install it using pip
 
     pip install sphinxcontrib-mermaid
 
-Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your projec't ``conf.py``::
+Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your project's ``conf.py``::
 
     extensions = [
         ...,
