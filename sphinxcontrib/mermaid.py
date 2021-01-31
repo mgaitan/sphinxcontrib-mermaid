@@ -6,11 +6,9 @@
     Allow mermaid diagramas to be included in Sphinx-generated
     documents inline.
 
-    :copyright: Copyright 2016-2020 by Martín Gaitán and others, see AUTHORS.
+    :copyright: Copyright 2016-2021 by Martín Gaitán and others, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
-
-from __future__ import unicode_literals
 
 import re
 import codecs
@@ -19,7 +17,6 @@ import os
 from subprocess import Popen, PIPE
 from hashlib import sha1
 from tempfile import _get_default_tempdir
-from six import text_type
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
@@ -169,11 +166,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
 
     ensuredir(os.path.dirname(outfn))
 
-    # mermaid expects UTF-8 by default
-    if isinstance(code, text_type):
-        code = code.encode('utf-8')
-
-    with open(tmpfn, 'wb') as t:
+    with open(tmpfn, 'w') as t:
         t.write(code)
 
     mm_args = [mermaid_cmd, '-i', tmpfn, '-o', outfn]
@@ -371,7 +364,6 @@ def setup(app):
     app.add_directive('mermaid', Mermaid)
     app.add_directive('autoclasstree', MermaidClassDiagram)
 
-    #
     app.add_config_value('mermaid_cmd', 'mmdc', 'html')
     app.add_config_value('mermaid_cmd_shell', 'False', 'html')
     app.add_config_value('mermaid_pdfcrop', '', 'html')
