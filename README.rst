@@ -117,7 +117,21 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. The default is `"latest"`, which default to the latest available version.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. The default is ``"latest"``.
+
+  If it's set to ``""``, the lib won't be automatically included from the CDN service and you'll need to add it as a local
+  file in ``html_js_files``. For instance, if you download the lib to `_static/js/mermaid.js`, in ``conf.py``::
+
+
+    html_js_files = [
+       'js/mermaid.js',
+    ]
+
+
+``mermaid_init_js``
+
+  Mermaid initilizaction code. Default to ``"<script>mermaid.initialize({startOnLoad:true});</script>"``. It will be included
+  above the first diagram code.
 
 ``mermaid_cmd``
 
@@ -151,7 +165,3 @@ Config values
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
 
-Acknowledge
------------
-
-Much of the code is based on `sphinx.ext.graphviz <http://www.sphinx-doc.org/en/stable/ext/graphviz.html>`_. Thanks to its authors and other Sphinx contributors for such amazing tool.
