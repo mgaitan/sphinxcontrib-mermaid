@@ -117,7 +117,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. Currently, the default version is 8.4.8.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. The default is `"latest"`, which default to the latest available version.
 
 ``mermaid_cmd``
 

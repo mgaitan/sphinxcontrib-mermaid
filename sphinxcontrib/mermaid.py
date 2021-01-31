@@ -222,8 +222,8 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
 
 def render_mm_html(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
-    version = self.builder.config.mermaid_version
-    self._mermaid_js_url = 'https://unpkg.com/mermaid@{}/dist/mermaid.min.js'.format(version)
+    version = f"mermaid@{self.builder.config.mermaid_version}" if self.builder.config.mermaid_version != "latest" else "mermaid"
+    self._mermaid_js_url = f"https://unpkg.com/{version}/dist/mermaid.min.js"
     format = self.builder.config.mermaid_output_format
     if format == 'raw':
         return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
@@ -371,6 +371,6 @@ def setup(app):
     app.add_config_value('mermaid_params', list(), 'html')
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
-    app.add_config_value('mermaid_version', '8.4.8', 'html')
+    app.add_config_value('mermaid_version', 'latest', 'html')
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
