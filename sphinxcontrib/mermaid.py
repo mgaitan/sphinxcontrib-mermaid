@@ -180,7 +180,7 @@ def render_mm(self, code, options, format, prefix='mermaid'):
                        'output), check the mermaid_cmd setting' % mermaid_cmd)
         return None, None
 
-    stdout, stderr = p.communicate(code)
+    stdout, stderr = p.communicate(str.encode(code))
     if self.builder.config.mermaid_verbose:
         logger.info(stdout)
 
