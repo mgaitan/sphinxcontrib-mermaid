@@ -141,18 +141,18 @@ class MermaidClassDiagram(Mermaid):
         )
 
 
-def render_mm(self, code, options, format, prefix='mermaid'):
+def render_mm(self, code, options, _fmt, prefix='mermaid'):
     """Render mermaid code into a PNG or PDF output file."""
 
-    if format == 'raw':
-        format = 'png'
+    if _fmt == 'raw':
+        _fmt = 'png'
 
     mermaid_cmd = self.builder.config.mermaid_cmd
     mermaid_cmd_shell = self.builder.config.mermaid_cmd_shell in {True, 'True', 'true'}
     hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
     basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
-    fname = '%s.%s' % (basename, format)
+    fname = '%s.%s' % (basename, _fmt)
     relfn = posixpath.join(self.builder.imgpath, fname)
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
     outfn = os.path.join(outdir, fname)
@@ -225,17 +225,17 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
     else:
         self._mermaid_js_url = f"https://unpkg.com/mermaid@{self.builder.config.mermaid_version}/dist/mermaid.min.js"
 
-    format = self.builder.config.mermaid_output_format
-    if format == 'raw':
+    _fmt = self.builder.config.mermaid_output__fmt
+    if _fmt == 'raw':
         return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None)
 
     try:
-        if format not in ('png', 'svg'):
+        if _fmt not in ('png', 'svg'):
             raise MermaidError("mermaid_output_format must be one of 'raw', 'png', "
-                                "'svg', but is %r" % format)
+                                "'svg', but is %r" % _fmt)
 
-        fname, outfn = render_mm(self, code, options, format, prefix)
+        fname, outfn = render_mm(self, code, options, _fmt, prefix)
     except MermaidError as exc:
         logger.warning('mermaid code %r: ' % code + str(exc))
         raise nodes.SkipNode
@@ -246,7 +246,7 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
         if alt is None:
             alt = node.get('alt', self.encode(code).strip())
         imgcss = imgcls and 'class="%s"' % imgcls or ''
-        if format == 'svg':
+        if _fmt == 'svg':
             svgtag = '''<object data="%s" type="image/svg+xml">
             <p class="warning">%s</p></object>\n''' % (fname, alt)
             self.body.append(svgtag)
