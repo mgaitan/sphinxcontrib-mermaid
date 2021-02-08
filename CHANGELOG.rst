@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.6.1 (January 31, 2021)
+0.6.1 (February 8, 2021)
 ++++++++++++++++++++++++++
 
 - Fix a problem when called mermaid-cli
