@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.6.1 (January 31, 2021)
+++++++++++++++++++++++++++
+
+- Fix a problem when called mermaid-cli
+- Fix typos on documentation
+- Improve internal code formatting (via black)
+
 0.6.0 (January 31, 2021)
 ++++++++++++++++++++++++++
 
