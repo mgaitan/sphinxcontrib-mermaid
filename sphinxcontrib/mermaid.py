@@ -225,7 +225,7 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
     else:
         self._mermaid_js_url = f"https://unpkg.com/mermaid@{self.builder.config.mermaid_version}/dist/mermaid.min.js"
 
-    _fmt = self.builder.config.mermaid_output__fmt
+    _fmt = self.builder.config.mermaid_output_format
     if _fmt == 'raw':
         return _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None)
