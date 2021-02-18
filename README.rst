@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.com/mgaitan/sphinxcontrib-mermaid.svg?branch=master
+    :target: https://travis-ci.com/mgaitan/sphinxcontrib-mermaid
+
 This extension allows you to embed `Mermaid <https://mermaid-js.github.io/mermaid>`_ graphs in your
 documents, including general flowcharts, sequence and gantt diagrams.
 
