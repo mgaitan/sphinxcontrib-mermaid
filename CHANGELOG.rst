@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.6.2 (February 8, 2021)
+++++++++++++++++++++++++++
+
+- fix regression
+- setup travis
+
+
 0.6.1 (February 8, 2021)
 ++++++++++++++++++++++++++
 
