@@ -7,6 +7,6 @@ sudo: false
 cache: pip
 install:
  - pip install -r docs/requirements.txt
+ - pip install pytest
  - pip install -e .
-before_script: cd docs
-script: make html
+script: pytest

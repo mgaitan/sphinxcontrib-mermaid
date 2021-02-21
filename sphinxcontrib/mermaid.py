@@ -347,6 +347,18 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
+def install_js(app, *args):
+    # add required javascript
+    if not app.config.mermaid_version:
+        _mermaid_js_url = None     # asummed is local
+    elif app.config.mermaid_version == "latest":
+        _mermaid_js_url = f"https://unpkg.com/mermaid/dist/mermaid.min.js"
+    else:
+        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
+    if _mermaid_js_url:
+        app.add_js_file(_mermaid_js_url)
+
+
 def setup(app):
     app.add_node(mermaid,
                  html=(html_visit_mermaid, None),
@@ -366,16 +378,6 @@ def setup(app):
     app.add_config_value('mermaid_sequence_config', False, 'html')
     app.add_config_value('mermaid_version', 'latest', 'html')
     app.add_config_value('mermaid_init_js', "<script>mermaid.initialize({startOnLoad:true});</script>", 'html')
-
-    # add required javascript
-    if not app.config.mermaid_version:
-        _mermaid_js_url = None     # asummed is local
-    elif app.config.mermaid_version == "latest":
-        _mermaid_js_url = f"https://unpkg.com/mermaid/dist/mermaid.min.js"
-    else:
-        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
-
-    if _mermaid_js_url:
-        app.add_js_file(_mermaid_js_url)
+    app.connect('html-page-context', install_js)
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}
