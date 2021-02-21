@@ -195,8 +195,7 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
 
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
-    if self._mermaid_js_url and self._mermaid_js_url not in self.builder.script_files:
-        self.builder.script_files.append(self._mermaid_js_url)
+
     init_js = self.builder.config.mermaid_init_js
     if init_js not in self.body:
         self.body.append(init_js)
@@ -217,13 +216,6 @@ def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
 
 def render_mm_html(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
-
-    if not self.builder.config.mermaid_version:
-        self._mermaid_js_url = None     # asummed is local
-    elif self.builder.config.mermaid_version == "latest":
-        self._mermaid_js_url = f"https://unpkg.com/mermaid/dist/mermaid.min.js"
-    else:
-        self._mermaid_js_url = f"https://unpkg.com/mermaid@{self.builder.config.mermaid_version}/dist/mermaid.min.js"
 
     _fmt = self.builder.config.mermaid_output_format
     if _fmt == 'raw':
@@ -374,4 +366,16 @@ def setup(app):
     app.add_config_value('mermaid_sequence_config', False, 'html')
     app.add_config_value('mermaid_version', 'latest', 'html')
     app.add_config_value('mermaid_init_js', "<script>mermaid.initialize({startOnLoad:true});</script>", 'html')
+
+    # add required javascript
+    if not app.config.mermaid_version:
+        _mermaid_js_url = None     # asummed is local
+    elif app.config.mermaid_version == "latest":
+        _mermaid_js_url = f"https://unpkg.com/mermaid/dist/mermaid.min.js"
+    else:
+        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
+
+    if _mermaid_js_url:
+        app.add_js_file(_mermaid_js_url)
+
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}

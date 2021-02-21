@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.6.2 (February 8, 2021)
+0.6.2 (February 18, 2021)
 ++++++++++++++++++++++++++
 
 - fix regression
