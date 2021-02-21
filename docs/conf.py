@@ -48,8 +48,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Sphinxcontrib-mesmaid demo'
-copyright = '2017, Martín Gaitán'
+project = 'sphinxcontrib-mermaid'
+copyright = '2017-2021, Martín Gaitán'
 author = 'Martín Gaitán'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -106,7 +106,7 @@ html_js_files = [
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Sphinxcontrib-mesmaiddemodoc'
+htmlhelp_basename = 'sphinxcontrib-mermaiddoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -133,7 +133,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Sphinxcontrib-mesmaiddemo.tex', 'Sphinxcontrib-mesmaid demo Documentation',
+    (master_doc, 'sphinxcontrib-mermaid.tex', 'sphinxcontrib-mermaid documentation',
      'Martín Gaitán', 'manual'),
 ]
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'sphinxcontrib-mesmaiddemo', 'Sphinxcontrib-mesmaid demo Documentation',
+    (master_doc, 'sphinxcontrib-mermaid', 'sphinxcontrib-mermaid documentation',
      [author], 1)
 ]
 
@@ -154,8 +154,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Sphinxcontrib-mesmaiddemo', 'Sphinxcontrib-mesmaid demo Documentation',
-     author, 'Sphinxcontrib-mesmaiddemo', 'One line description of project.',
+    (master_doc, 'sphinxcontrib-mermaid', 'sphinxcontrib-mermaid documentation',
+     author, 'sphinxcontrib-mermaid', 'One line description of project.',
      'Miscellaneous'),
 ]
 
