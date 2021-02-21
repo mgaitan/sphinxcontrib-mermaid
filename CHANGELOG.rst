@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.6.3 (February 21, 2021)
+++++++++++++++++++++++++++
+
+- Make it compatible with recent Sphinx versions
+- Add basic (real) tests (So I stop breaking it!)
+
+
 0.6.2 (February 18, 2021)
 ++++++++++++++++++++++++++
 
