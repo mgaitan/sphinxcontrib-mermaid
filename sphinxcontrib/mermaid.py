@@ -195,11 +195,6 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
 
 def _render_mm_html_raw(self, node, code, options, prefix='mermaid',
                    imgcls=None, alt=None):
-
-    init_js = self.builder.config.mermaid_init_js
-    if init_js not in self.body:
-        self.body.append(init_js)
-
     if 'align' in node:
         tag_template = """<div align="{align}" class="mermaid align-{align}">
             {code}
@@ -358,6 +353,9 @@ def install_js(app, *args):
     if _mermaid_js_url:
         app.add_js_file(_mermaid_js_url)
 
+    if app.config.mermaid_init_js:
+        app.add_js_file(None, body=app.config.mermaid_init_js)
+
 
 def setup(app):
     app.add_node(mermaid,
@@ -377,7 +375,7 @@ def setup(app):
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
     app.add_config_value('mermaid_version', 'latest', 'html')
-    app.add_config_value('mermaid_init_js', "<script>mermaid.initialize({startOnLoad:true});</script>", 'html')
+    app.add_config_value('mermaid_init_js', "mermaid.initialize({startOnLoad:true});", 'html')
     app.connect('html-page-context', install_js)
 
     return {'version': sphinx.__display_version__, 'parallel_read_safe': True}

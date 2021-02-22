@@ -133,8 +133,11 @@ Config values
 
 ``mermaid_init_js``
 
-  Mermaid initilizaction code. Default to ``"<script>mermaid.initialize({startOnLoad:true});</script>"``. It will be included
-  above the first diagram code.
+  Mermaid initilizaction code. Default to ``"mermaid.initialize({startOnLoad:true});"``.
+
+.. versionchanged:: 0.7
+    The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
+
 
 ``mermaid_cmd``
 
