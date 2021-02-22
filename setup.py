@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 readme = io.open('README.rst', encoding="utf-8").read()
 changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
-version = '0.6.3'
+version = '0.7dev'
 
 
 def long_description():
