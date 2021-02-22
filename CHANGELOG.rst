@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.7 (under develpment)
+++++++++++++++++++++++++++
+
+- `mermaid_init_js` is now included in an standard way.
+- Documented how to use in Markdown documents
+
+
 0.6.3 (February 21, 2021)
 ++++++++++++++++++++++++++
 
