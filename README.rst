@@ -171,3 +171,23 @@ Config values
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
 
+
+Markdown support
+----------------
+
+You can include Mermaid diagrams in your Markdown documents in Sphinx.
+You just need to setup the `markdown support in Sphinx <https://www.sphinx-doc.org/en/master/usage/markdown.html>`_
+with the `AutoStructify component <https://recommonmark.readthedocs.io/en/latest/auto_structify.html#autostructify-component>`_ enabled. See a `minimal configuration in the tests <https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/tests/roots/test-markdown/conf.py>`_
+
+Then in your `.md` documents include a code block as in reStructuredText (note the two semicolons).
+
+```mermaid::
+
+     sequenceDiagram
+       participant Alice
+       participant Bob
+       Alice->John: Hello John, how are you?
+```
+
+
+This works via the `AutoStructify's eval_rst <https://recommonmark.readthedocs.io/en/latest/auto_structify.html#embed-restructuredtext>`_ feature.

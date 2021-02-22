@@ -9,7 +9,7 @@ def content(app):
 @pytest.mark.sphinx('html', testroot="basic")
 def test_html_raw(content):
     assert '<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>' in content
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" in content
+    assert "<script >mermaid.initialize({startOnLoad:true});</script>" in content
     assert """<div class="mermaid">
             sequenceDiagram
    participant Alice
@@ -30,7 +30,21 @@ def test_conf_mermaid_no_version(app, content):
     assert 'mermaid.min.js' not in content
 
 
-@pytest.mark.sphinx('html', testroot="basic", confoverrides={'mermaid_init_js': "<script>custom script;</script>"})
+@pytest.mark.sphinx('html', testroot="basic", confoverrides={'mermaid_init_js': "custom script;"})
 def test_mermaid_init_js(content):
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" not in content
-    assert '<script>custom script;</script><div class="mermaid">' in content
+    assert "<script >mermaid.initialize({startOnLoad:true});</script>" not in content
+    assert '<script >custom script;</script>' in content
+
+
+@pytest.mark.sphinx('html', testroot="markdown")
+def test_html_raw_from_markdown(content):
+    assert '<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>' in content
+    assert "<script >mermaid.initialize({startOnLoad:true});</script>" in content
+    assert """
+<div class="mermaid">
+            sequenceDiagram
+  participant Alice
+  participant Bob
+  Alice-&gt;John: Hello John, how are you?
+        </div>""" in content
+
