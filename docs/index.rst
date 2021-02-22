@@ -13,7 +13,6 @@ Welcome to Sphinxcontrib-mermaid demo's documentation!
 .. include:: ../README.rst
 
 
-
 Indices and tables
 ==================
 
