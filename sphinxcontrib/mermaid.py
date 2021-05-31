@@ -24,7 +24,7 @@ from docutils.statemachine import ViewList
 import sphinx
 from sphinx.locale import _
 from sphinx.util.i18n import search_image_for_language
-from sphinx.util.osutil import ensuredir, ENOENT
+from sphinx.util.osutil import ensuredir
 from sphinx.util import logging
 from .exceptions import MermaidError
 from .autoclassdiag import class_diagram
@@ -173,9 +173,7 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
 
     try:
         p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    except OSError as err:
-        if err.errno != ENOENT:   # No such file or directory
-            raise
+    except FileNotFoundError:
         logger.warning('command %r cannot be run (needed for mermaid '
                        'output), check the mermaid_cmd setting' % mermaid_cmd)
         return None, None
