@@ -1,9 +1,10 @@
 Changelog
 ---------
 
-0.7 (under develpment)
+0.7 (May 31, 2021)
 ++++++++++++++++++++++++++
 
+- Add compatibility with Sphinx 4.0
 - `mermaid_init_js` is now included in an standard way.
 - Documented how to use in Markdown documents
 
