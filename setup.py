@@ -25,6 +25,7 @@ def long_description():
     readme_ = remove_block(readme, ".. mermaid::", margin=2)
     readme_ = remove_block(readme_, ".. autoclasstree::")
     readme_ = remove_block(readme_, ".. autoclasstree::")
+    readme_ = remove_block(readme_, ".. versionchanged::")
     return "{}\n\n{}".format(readme_, changes)
 
 
