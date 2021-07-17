@@ -1,12 +1,6 @@
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
-
-extensions = ['recommonmark', 'sphinxcontrib.mermaid']
+extensions = ['sphinxcontrib.mermaid', 'myst_parser']
 exclude_patterns = ['_build']
 
-source_parsers = {
-    '.md': CommonMarkParser
+source_suffix = {
+    '.md': 'markdown'
 }
-
-def setup(app):
-    app.add_transform(AutoStructify)

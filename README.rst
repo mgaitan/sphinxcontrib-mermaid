@@ -176,13 +176,14 @@ Markdown support
 ----------------
 
 You can include Mermaid diagrams in your Markdown documents in Sphinx.
-You just need to setup the `markdown support in Sphinx <https://www.sphinx-doc.org/en/master/usage/markdown.html>`_
-with the `AutoStructify component <https://recommonmark.readthedocs.io/en/latest/auto_structify.html#autostructify-component>`_ enabled. See a `minimal configuration in the tests <https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/tests/roots/test-markdown/conf.py>`_
+You just need to setup the `markdown support in Sphinx <https://www.sphinx-doc.org/en/master/usage/markdown.html>`_ via
+`myst-parser <https://myst-parser.readthedocs.io/>`_
+. See a `minimal configuration from the tests <https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/tests/roots/test-markdown/conf.py>`_
 
-Then in your `.md` documents include a code block as in reStructuredText (note the two semicolons)::
+Then in your `.md` documents include a code block as in reStructuredTexts::
 
 
- ```mermaid::
+ ```{mermaid}
 
      sequenceDiagram
        participant Alice
@@ -191,4 +192,3 @@ Then in your `.md` documents include a code block as in reStructuredText (note t
  ```
 
 
-This works via the `AutoStructify's eval_rst <https://recommonmark.readthedocs.io/en/latest/auto_structify.html#embed-restructuredtext>`_ feature.

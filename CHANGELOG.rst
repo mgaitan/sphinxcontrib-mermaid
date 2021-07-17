@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.7.1 (July 17, 2021)
++++++++++++++++++++++
+
+- Update docs and tests for markdown support
+
+
 0.7 (May 31, 2021)
 ++++++++++++++++++++++++++
 

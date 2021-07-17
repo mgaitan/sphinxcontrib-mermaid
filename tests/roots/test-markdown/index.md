@@ -1,6 +1,6 @@
-# Hi from markdown
+# Hi from Markdown!
 
-```mermaid::
+```{mermaid}
 
     sequenceDiagram
       participant Alice

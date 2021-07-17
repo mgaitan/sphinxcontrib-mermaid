@@ -47,8 +47,8 @@ def test_html_raw_from_markdown(index):
     assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
     assert """
 <div class="mermaid">
-            sequenceDiagram
-  participant Alice
-  participant Bob
-  Alice-&gt;John: Hello John, how are you?
+                sequenceDiagram
+      participant Alice
+      participant Bob
+      Alice-&gt;John: Hello John, how are you?
         </div>""" in index
