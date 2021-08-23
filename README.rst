@@ -82,6 +82,52 @@ Or directly the module::
 
 .. autoclasstree:: sphinx.util
 
+And alternative to `autoclasstree` directive is `mermaid-inheritance`. That directive mimics exactly the
+official `inheritance_diagram <https://www.sphinx-doc.org/en/master/usage/extensions/inheritance.html>`_ 
+extension but uses mermaid JS instead of graphviz to include the inheritance diagrams.
+
+It adds this directive::
+
+    .. mermaid-inheritance::
+
+This directive has one or more arguments, each giving a module or class name. Class names can be unqualified; 
+in that case they are taken to exist in the currently described module.
+
+For each given class, and each class in each given module, the base classes are determined. Then, from all classes 
+and their base classes, a graph is generated which is then rendered via the ``mermaid`` extension to a directed graph.
+
+This directive supports an option called ``parts`` that, if given, must be an integer, advising the directive 
+to keep that many dot-separated parts in the displayed names (from right to left). For example, ``parts=1``
+will only display class names, without the names of the modules that contain them.
+
+The directive also supports a ``private-bases`` flag option; if given, private base classes (those whose name 
+starts with ``_``) will be included.
+
+You can use ``caption`` option to give a caption to the diagram.
+
+It also supports a ``top-classes`` option which requires one or more class names separated by comma. If specified 
+inheritance traversal will stop at the specified class names. 
+
+For example::
+
+    .. mermaid-inheritance:: sphinx.ext.inheritance_diagram.InheritanceDiagram
+
+.. mermaid-inheritance:: sphinx.ext.inheritance_diagram.InheritanceDiagram
+
+.. note::
+
+    ``.`` are replaced by ``_`` in class name because mermaidJS does not allow them.
+
+To stop the diagram at ``SphinxDirective`` and only display the class name::
+
+    .. mermaid-inheritance:: sphinx.ext.inheritance_diagram.InheritanceDiagram
+        :top-classes: sphinx.util.docutils.SphinxDirective
+        :parts: 1
+
+
+.. mermaid-inheritance:: sphinx.ext.inheritance_diagram.InheritanceDiagram
+   :top-classes: sphinx.util.docutils.SphinxDirective
+   :parts: 1
 
 Installation
 ------------
@@ -96,7 +142,9 @@ Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your project's ``co
 
     extensions = [
         ...,
-        'sphinxcontrib.mermaid'
+        'sphinxcontrib.mermaid',
+        # Optional if you want the inheritance graphs
+        'sphinxcontrib.mermaid-inheritance',
     ]
 
 
@@ -149,7 +197,7 @@ Config values
 
 ``mermaid_params``
 
-   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaidjs/mermaid.cli#options>`_.
+   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaid-js/mermaid-cli#options>`_.
    Examples::
 
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
@@ -159,7 +207,7 @@ Config values
 ``mermaid_sequence_config``
 
     Allows overriding the sequence diagram configuration. It could be useful to increase the width between actors. It **needs to be a json file**
-    Check options in the `documentation <https://mermaid-js.github.io/mermaid/#/mermaidAPI?id=configuration>`_
+    Check options in the `documentation <https://mermaid-js.github.io/mermaid/#/n00b-syntaxReference?id=configuration>`_
 
 ``mermaid_verbose``
 

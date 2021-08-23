@@ -6,7 +6,5 @@ python:
 sudo: false
 cache: pip
 install:
- - pip install -r docs/requirements.txt
- - pip install pytest
- - pip install -e .
-script: pytest
+ - pip install -e .[dev]
+script: pytest && pytest --check-links --check-links-ignore "https://travis-ci.com/*"
