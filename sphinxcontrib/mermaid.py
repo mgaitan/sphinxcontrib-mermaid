@@ -352,7 +352,9 @@ def install_js(app, *args):
         app.add_js_file(_mermaid_js_url)
 
     if app.config.mermaid_init_js:
-        app.add_js_file(None, body=app.config.mermaid_init_js)
+        # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
+        priority = 500 if _mermaid_js_url is not None else 801
+        app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
 
 
 def setup(app):
