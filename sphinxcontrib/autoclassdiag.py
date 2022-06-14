@@ -46,7 +46,7 @@ def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
 
     return "classDiagram\n" + "\n".join(
             "  %s <|-- %s" % (a, b)
-                for a, b in inheritances
+                for a, b in sorted(inheritances)
             )
 
 
