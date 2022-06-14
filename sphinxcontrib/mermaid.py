@@ -349,11 +349,11 @@ def install_js(app, *args):
     else:
         _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
     if _mermaid_js_url:
-        app.add_js_file(_mermaid_js_url)
+        app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority)
 
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
-        priority = 500 if _mermaid_js_url is not None else 801
+        priority = app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
         app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
 
 
@@ -375,6 +375,8 @@ def setup(app):
     app.add_config_value('mermaid_verbose', False, 'html')
     app.add_config_value('mermaid_sequence_config', False, 'html')
     app.add_config_value('mermaid_version', 'latest', 'html')
+    app.add_config_value('mermaid_js_priority', 500, 'html')
+    app.add_config_value('mermaid_init_js_priority', 500, 'html')
     app.add_config_value('mermaid_init_js', "mermaid.initialize({startOnLoad:true});", 'html')
     app.connect('html-page-context', install_js)
 
