@@ -70,6 +70,7 @@ class Mermaid(Directive):
         'alt': directives.unchanged,
         'align': align_spec,
         'caption': directives.unchanged,
+        'name': directives.unchanged,
     }
 
     def get_mm_code(self):
@@ -116,6 +117,7 @@ class Mermaid(Directive):
         if caption:
             node = figure_wrapper(self, node, caption)
 
+        self.add_name(node)
         return [node]
 
 
