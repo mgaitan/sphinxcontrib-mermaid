@@ -41,7 +41,7 @@ Changelog
 
 - Drop support for Python version older than 3.6.
 - Allow to include javascript lib locally
-- Initilization code is now customizable
+- Initialization code is now customizable
 - The default version included from the CDN is always the latest available.
 
 

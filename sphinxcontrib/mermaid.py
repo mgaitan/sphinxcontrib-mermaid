@@ -3,7 +3,7 @@
     sphinx-mermaid
     ~~~~~~~~~~~~~~~
 
-    Allow mermaid diagramas to be included in Sphinx-generated
+    Allow mermaid diagrams to be included in Sphinx-generated
     documents inline.
 
     :copyright: Copyright 2016-2021 by Martín Gaitán and others, see AUTHORS.
