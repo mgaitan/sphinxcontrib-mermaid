@@ -171,8 +171,8 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
         mm_args = shlex.split(mermaid_cmd)
     else:
         mm_args = list(mermaid_cmd)
-    mm_args += ['-i', tmpfn, '-o', outfn]
     mm_args.extend(self.builder.config.mermaid_params)
+    mm_args += ['-i', tmpfn, '-o', outfn]
     if self.builder.config.mermaid_sequence_config:
        mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
