@@ -141,7 +141,14 @@ Config values
 
 ``mermaid_cmd``
 
-   The command name with which to invoke ``mermaid-cli`` program.  The default is ``'mmdc'``; you may need to set this to a full path if it's not in the executable search path.
+   The command name with which to invoke ``mermaid-cli`` program.
+   The default is ``'mmdc'``; you may need to set this to a full path if it's not in the executable search path.
+   If a string is specified, it is split using `shlex.split` to support multi-word commands.
+   To avoid splitting, a list of strings can be specified.
+   Examples::
+
+      mermaid_cmd = 'npx mmdc'
+      mermeid_cmd = ['npx', '--no-install', 'mmdc']
 
 ``mermaid_cmd_shell``
 
