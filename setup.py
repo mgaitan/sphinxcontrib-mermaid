@@ -39,6 +39,7 @@ setup(
     author_email='gaitan@gmail.com',
     description='Mermaid diagrams in yours Sphinx powered docs',
     long_description=long_description(),
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
