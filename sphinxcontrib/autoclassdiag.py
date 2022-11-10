@@ -24,7 +24,7 @@ def get_classes(*cls_or_modules, strict=False):
                 if inspect.isclass(obj_) and (not strict or obj_.__module__.startswith(obj.__name__)):
                     yield obj_
         else:
-            raise MermaidError("%s is not a class nor a module" % cls_or_module)
+            raise MermaidError(f"{cls_or_module} is not a class nor a module")
 
 
 def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
@@ -45,7 +45,7 @@ def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
         get_tree(cls)
 
     return "classDiagram\n" + "\n".join(
-            "  {} <|-- {}".format(a, b)
+            f"  {a} <|-- {b}"
                 for a, b in sorted(inheritances)
             )
 

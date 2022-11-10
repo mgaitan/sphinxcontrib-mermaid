@@ -150,8 +150,8 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
     mermaid_cmd_shell = self.builder.config.mermaid_cmd_shell in {True, 'True', 'true'}
     hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
-    basename = '{}-{}'.format(prefix, sha1(hashkey).hexdigest())
-    fname = '{}.{}'.format(basename, _fmt)
+    basename = f'{prefix}-{sha1(hashkey).hexdigest()}'
+    fname = f'{basename}.{_fmt}'
     relfn = posixpath.join(self.builder.imgpath, fname)
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
     outfn = os.path.join(outdir, fname)
@@ -221,7 +221,7 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
 
         fname, outfn = render_mm(self, code, options, _fmt, prefix)
     except MermaidError as exc:
-        logger.warning('mermaid code %r: ' % code + str(exc))
+        logger.warning(f'mermaid code {code!r}: ' + str(exc))
         raise nodes.SkipNode
 
     if fname is None:
@@ -229,18 +229,18 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
     else:
         if alt is None:
             alt = node.get('alt', self.encode(code).strip())
-        imgcss = imgcls and 'class="%s"' % imgcls or ''
+        imgcss = imgcls and f'class="{imgcls}"' or ''
         if _fmt == 'svg':
-            svgtag = '''<object data="{}" type="image/svg+xml">
-            <p class="warning">{}</p></object>\n'''.format(fname, alt)
+            svgtag = f'''<object data="{fname}" type="image/svg+xml">
+            <p class="warning">{alt}</p></object>
+'''
             self.body.append(svgtag)
         else:
             if 'align' in node:
                 self.body.append('<div align="%s" class="align-%s">' %
                                  (node['align'], node['align']))
 
-            self.body.append('<img src="%s" alt="%s" %s/>\n' %
-                             (fname, alt, imgcss))
+            self.body.append(f'<img src="{fname}" alt="{alt}" {imgcss}/>\n')
             if 'align' in node:
                 self.body.append('</div>\n')
 
@@ -255,7 +255,7 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
     try:
         fname, outfn = render_mm(self, code, options, 'pdf', prefix)
     except MermaidError as exc:
-        logger.warning('mm code %r: ' % code + str(exc))
+        logger.warning(f'mm code {code!r}: ' + str(exc))
         raise nodes.SkipNode
 
     if self.builder.config.mermaid_pdfcrop != '':
@@ -265,7 +265,7 @@ def render_mm_latex(self, node, code, options, prefix='mermaid'):
         except OSError as err:
             if err.errno != ENOENT:   # No such file or directory
                 raise
-            logger.warning('command %r cannot be run (needed to crop pdf), check the mermaid_cmd setting' % self.builder.config.mermaid_pdfcrop)
+            logger.warning(f'command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting')
             return None, None
 
         stdout, stderr = p.communicate()
@@ -312,7 +312,7 @@ def render_mm_texinfo(self, node, code, options, prefix='mermaid'):
     try:
         fname, outfn = render_mm(self, code, options, 'png', prefix)
     except MermaidError as exc:
-        logger.warning('mm code %r: ' % code + str(exc))
+        logger.warning(f'mm code {code!r}: ' + str(exc))
         raise nodes.SkipNode
     if fname is not None:
         self.body.append('@image{%s,,,[mermaid],png}\n' % fname[:-4])
