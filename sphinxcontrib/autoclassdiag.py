@@ -45,7 +45,7 @@ def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
         get_tree(cls)
 
     return "classDiagram\n" + "\n".join(
-            "  %s <|-- %s" % (a, b)
+            "  {} <|-- {}".format(a, b)
                 for a, b in sorted(inheritances)
             )
 

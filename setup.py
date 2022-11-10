@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import io
 from setuptools import setup, find_packages
 
-readme = io.open('README.rst', encoding="utf-8").read()
-changes = io.open('CHANGELOG.rst', encoding="utf-8").read()
+readme = open('README.rst', encoding="utf-8").read()
+changes = open('CHANGELOG.rst', encoding="utf-8").read()
 version = '0.7.1'
 
 
@@ -26,7 +24,7 @@ def long_description():
     readme_ = remove_block(readme_, ".. autoclasstree::")
     readme_ = remove_block(readme_, ".. autoclasstree::")
     readme_ = remove_block(readme_, ".. versionchanged::")
-    return "{}\n\n{}".format(readme_, changes)
+    return f"{readme_}\n\n{changes}"
 
 
 setup(
@@ -35,7 +33,7 @@ setup(
     url='https://github.com/mgaitan/sphinxcontrib-mermaid',
     download_url='https://pypi.python.org/pypi/sphinxcontrib-mermaid',
     license='BSD',
-    author=u'Martín Gaitán',
+    author='Martín Gaitán',
     author_email='gaitan@gmail.com',
     description='Mermaid diagrams in yours Sphinx powered docs',
     long_description=long_description(),

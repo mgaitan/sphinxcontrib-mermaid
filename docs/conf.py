@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Sphinxcontrib-mesmaid demo documentation build configuration file, created by
 # sphinx-quickstart on Sun Apr 23 13:10:20 2017.

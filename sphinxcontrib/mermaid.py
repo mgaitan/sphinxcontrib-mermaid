@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
     sphinx-mermaid
     ~~~~~~~~~~~~~~~
@@ -88,7 +87,7 @@ class Mermaid(Directive):
             try:
                 with codecs.open(filename, 'r', 'utf-8') as fp:
                     mmcode = fp.read()
-            except (IOError, OSError):
+            except OSError:
                 return [document.reporter.warning(
                     'External Mermaid file %r not found or reading '
                     'it failed' % filename, line=self.lineno)]
@@ -151,8 +150,8 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
     mermaid_cmd_shell = self.builder.config.mermaid_cmd_shell in {True, 'True', 'true'}
     hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode('utf-8')
 
-    basename = '%s-%s' % (prefix, sha1(hashkey).hexdigest())
-    fname = '%s.%s' % (basename, _fmt)
+    basename = '{}-{}'.format(prefix, sha1(hashkey).hexdigest())
+    fname = '{}.{}'.format(basename, _fmt)
     relfn = posixpath.join(self.builder.imgpath, fname)
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
     outfn = os.path.join(outdir, fname)
@@ -232,8 +231,8 @@ def render_mm_html(self, node, code, options, prefix='mermaid',
             alt = node.get('alt', self.encode(code).strip())
         imgcss = imgcls and 'class="%s"' % imgcls or ''
         if _fmt == 'svg':
-            svgtag = '''<object data="%s" type="image/svg+xml">
-            <p class="warning">%s</p></object>\n''' % (fname, alt)
+            svgtag = '''<object data="{}" type="image/svg+xml">
+            <p class="warning">{}</p></object>\n'''.format(fname, alt)
             self.body.append(svgtag)
         else:
             if 'align' in node:
