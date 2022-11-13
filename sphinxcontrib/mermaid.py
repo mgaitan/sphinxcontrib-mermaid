@@ -13,6 +13,7 @@ import re
 import codecs
 import posixpath
 import os
+import shlex
 from subprocess import Popen, PIPE
 from hashlib import sha1
 from tempfile import _get_default_tempdir
@@ -165,8 +166,12 @@ def render_mm(self, code, options, _fmt, prefix='mermaid'):
     with open(tmpfn, 'w') as t:
         t.write(code)
 
-    mm_args = [mermaid_cmd, '-i', tmpfn, '-o', outfn]
+    if isinstance(mermaid_cmd, str):
+        mm_args = shlex.split(mermaid_cmd)
+    else:
+        mm_args = list(mermaid_cmd)
     mm_args.extend(self.builder.config.mermaid_params)
+    mm_args += ['-i', tmpfn, '-o', outfn]
     if self.builder.config.mermaid_sequence_config:
        mm_args.extend('--configFile', self.builder.config.mermaid_sequence_config)
 
