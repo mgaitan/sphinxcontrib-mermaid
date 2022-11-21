@@ -1,6 +1,7 @@
 # Hi from Markdown!
 
 ```{mermaid}
+    :name: participants
 
     sequenceDiagram
       participant Alice
