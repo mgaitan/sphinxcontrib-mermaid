@@ -9,24 +9,25 @@
     :license: BSD, see LICENSE for details.
 """
 
-import re
 import codecs
-import posixpath
 import os
-from subprocess import Popen, PIPE
+import posixpath
+import re
 from hashlib import sha1
+from subprocess import PIPE, Popen
 from tempfile import _get_default_tempdir
+
+import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
-
-import sphinx
 from sphinx.locale import _
+from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir
-from sphinx.util import logging
-from .exceptions import MermaidError
+
 from .autoclassdiag import class_diagram
+from .exceptions import MermaidError
 
 logger = logging.getLogger(__name__)
 
