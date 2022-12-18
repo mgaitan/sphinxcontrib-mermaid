@@ -8,6 +8,7 @@
     :copyright: Copyright 2016-2021 by Martín Gaitán and others, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
+from __future__ import annotations
 
 import codecs
 import os
@@ -21,6 +22,7 @@ import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
+from sphinx.application import Sphinx
 from sphinx.locale import _
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
@@ -340,10 +342,20 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def install_js(app, *args):
-    # add required javascript
+def install_js(
+    app: Sphinx,
+    pagename,
+    templatename: str,
+    context: dict,
+    doctree: nodes.document | None,
+) -> None:
+    # Skip for pages without Mermaid diagrams
+    if doctree and not doctree.next_node(mermaid):
+        return
+
+    # Add required JavaScript
     if not app.config.mermaid_version:
-        _mermaid_js_url = None     # asummed is local
+        _mermaid_js_url = None  # assume it is local
     elif app.config.mermaid_version == "latest":
         _mermaid_js_url = f"https://unpkg.com/mermaid/dist/mermaid.min.js"
     else:
