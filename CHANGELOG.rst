@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+0.8 (Feb 9, 2023)
++++++++++++++++++++++
+
+- Moved CI to Github Actions
+- Make the class diagram reproducible
+- Allow the user to change the JS priority
+- Drop support for Python 3.6
+- Black formatting
+
+
+Full set of changes: [`0.7.1...0.8`](https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.7.1...0.8)
+
+
 0.7.1 (July 17, 2021)
 +++++++++++++++++++++
 
