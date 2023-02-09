@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'sphinxcontrib-mermaid'
-copyright = '2017-2021, Martín Gaitán'
+copyright = '2017-2023, Martín Gaitán'
 author = 'Martín Gaitán'
 
 # The version info for the project you're documenting, acts as replacement for
