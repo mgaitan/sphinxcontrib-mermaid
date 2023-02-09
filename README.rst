@@ -191,4 +191,63 @@ Then in your `.md` documents include a code block as in reStructuredTexts::
        Alice->John: Hello John, how are you?
  ```
 
+Building PDFs on readthedocs.io
+-----------------------------------
+
+In order to have Mermaid diagrams build properly in PDFs generated on readthedocs.io, you will need a few extra configurations.  
+
+1. In your ``.readthedocs.yaml`` file (which should be in the root of your repository) include a ``post-install`` command to install the Mermaid CLI: ::
+
+    build:
+      os: ubuntu-20.04
+      tools:
+        python: "3.8"
+        nodejs: "16"
+      jobs:
+        post_install:
+          - npm install -g @mermaid-js/mermaid-cli
+
+ Note that if you previously did not have a ``.readthedocs.yaml`` file, you will also need to specify all targets you wish to build and other basic configuration options.  A minimal example of a complete file is: ::
+
+    # .readthedocs.yaml
+    # Read the Docs configuration file
+    # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+    # Required
+    version: 2
+
+    # Set the version of Python and other tools you might need
+    build:
+      os: ubuntu-20.04
+      tools:
+        python: "3.8"
+        nodejs: "16"
+      jobs:
+        post_install:
+          - npm install -g @mermaid-js/mermaid-cli
+
+    # Build documentation in the docs/ directory with Sphinx
+    sphinx:
+       configuration: docs/conf.py
+
+    # If using Sphinx, optionally build your docs in additional formats such as PDF
+    formats:
+      - epub
+      - pdf
+
+    python:
+       install:
+       - requirements: docs/requirements.txt
+
+2. In your documentation directory add file ``puppeteer-config.json`` with contents: ::
+
+    {
+      "args": ["--no-sandbox"]
+    }
+   
+
+3. In your documentation ``conf.py`` file, add: ::
+
+    mermaid_params = ['-p' 'puppeteer-config.json']
+
 
