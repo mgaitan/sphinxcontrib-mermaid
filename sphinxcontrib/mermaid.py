@@ -383,9 +383,9 @@ def install_js(app, *args):
     if not app.config.mermaid_version:
         _mermaid_js_url = None  # asummed is local
     elif app.config.mermaid_version == "latest":
-        _mermaid_js_url = "https://unpkg.com/mermaid/dist/mermaid.min.js"
+        _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"
     else:
-        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
+        _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
     if _mermaid_js_url:
         app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority)
 
