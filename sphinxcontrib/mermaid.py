@@ -396,6 +396,25 @@ def install_js(app, *args):
         )
         app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
 
+    if app.config.mermaid_d3_zoom:
+        _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
+        _d3_js_script = """
+        window.addEventListener('load', function () {
+          var svgs = d3.selectAll(".mermaid svg");
+          svgs.each(function() {
+            var svg = d3.select(this);
+            svg.html("<g>" + svg.html() + "</g>");
+            var inner = svg.select("g");
+            var zoom = d3.zoom().on("zoom", function(event) {
+              inner.attr("transform", event.transform);
+            });
+            svg.call(zoom);
+          });
+        });
+        """
+        app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
+        app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
+
 
 def setup(app):
     app.add_node(
@@ -427,6 +446,7 @@ def setup(app):
     app.add_config_value(
         "mermaid_init_js", "mermaid.initialize({startOnLoad:true});", "html"
     )
+    app.add_config_value("mermaid_d3_zoom", False, "html")
     app.connect("html-page-context", install_js)
 
     return {"version": sphinx.__display_version__, "parallel_read_safe": True}
