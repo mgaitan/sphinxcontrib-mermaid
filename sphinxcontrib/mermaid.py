@@ -8,20 +8,23 @@
     :copyright: Copyright 2016-2023 by Martín Gaitán and others
     :license: BSD, see LICENSE for details.
 """
+from __future__ import annotations
 
 import codecs
+import errno
 import os
+import posixpath
 import re
 from hashlib import sha1
 from subprocess import PIPE, Popen
 from tempfile import _get_default_tempdir
 import uuid
 
-import posixpath
 import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
+from sphinx.application import Sphinx
 from sphinx.locale import _
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
@@ -115,7 +118,6 @@ class Mermaid(Directive):
         return mmcode
 
     def run(self):
-
         node = mermaid()
         node["code"] = self.get_mm_code()
         node["options"] = {}
@@ -308,7 +310,7 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
         try:
             p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         except OSError as err:
-            if err.errno != ENOENT:  # No such file or directory
+            if err.errno != errno.ENOENT:   # No such file or directory
                 raise
             logger.warning(
                 f"command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting"
@@ -393,12 +395,20 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def install_js(app, *args):
-    _, _, _, doctree = args
+def install_js(
+    app: Sphinx,
+    pagename,
+    templatename: str,
+    context: dict,
+    doctree: nodes.document | None,
+) -> None:
+    # Skip for pages without Mermaid diagrams
+    if doctree and not doctree.next_node(mermaid):
+        return
 
-    # add required javascript
+    # Add required JavaScript
     if not app.config.mermaid_version:
-        _mermaid_js_url = None  # asummed is local
+        _mermaid_js_url = None  # assume it is local
     elif app.config.mermaid_version == "latest":
         _mermaid_js_url = "https://unpkg.com/mermaid/dist/mermaid.min.js"
     else:
