@@ -14,6 +14,7 @@ def index(app, build_all):
 @pytest.mark.sphinx('html', testroot="basic")
 def test_html_raw(index):
     assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";</script>' in index
+    assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
     assert """<div class="mermaid">
             sequenceDiagram
    participant Alice
