@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import codecs
+import errno
 import os
 import posixpath
 import re
@@ -294,7 +295,7 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
         try:
             p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         except OSError as err:
-            if err.errno != ENOENT:  # No such file or directory
+            if err.errno != errno.ENOENT:   # No such file or directory
                 raise
             logger.warning(
                 f"command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting"
