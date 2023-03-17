@@ -423,52 +423,53 @@ def install_js(
         )
         app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
 
-    if app.config.mermaid_d3_zoom:
-        _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
-        _d3_js_script = """
-        window.addEventListener("load", function () {
-          var svgs = d3.selectAll(".mermaid svg");
-          svgs.each(function() {
-            var svg = d3.select(this);
-            svg.html("<g>" + svg.html() + "</g>");
-            var inner = svg.select("g");
-            var zoom = d3.zoom().on("zoom", function(event) {
-              inner.attr("transform", event.transform);
-            });
-            svg.call(zoom);
-          });
-        });
-        """
-        app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
-        app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
-    elif doctree and app.config.mermaid_output_format == "raw":
-        mermaid_nodes = doctree.findall(mermaid)
-        _d3_selector = ""
-        for mermaid_node in mermaid_nodes:
-            if "zoom_id" in mermaid_node:
-                _zoom_id = mermaid_node["zoom_id"]
-                if _d3_selector == "":
-                    _d3_selector += f".mermaid#{_zoom_id} svg"
-                else:
-                    _d3_selector += f", .mermaid#{_zoom_id} svg"
-        if _d3_selector != "":
+    if app.config.mermaid_output_format == "raw":
+        if app.config.mermaid_d3_zoom:
             _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
-            _d3_js_script = f"""
-            window.addEventListener("load", function () {{
-              var svgs = d3.selectAll("{_d3_selector}");
-              svgs.each(function() {{
+            _d3_js_script = """
+            window.addEventListener("load", function () {
+              var svgs = d3.selectAll(".mermaid svg");
+              svgs.each(function() {
                 var svg = d3.select(this);
                 svg.html("<g>" + svg.html() + "</g>");
                 var inner = svg.select("g");
-                var zoom = d3.zoom().on("zoom", function(event) {{
+                var zoom = d3.zoom().on("zoom", function(event) {
                   inner.attr("transform", event.transform);
-                }});
+                });
                 svg.call(zoom);
-              }});
-            }});
+              });
+            });
             """
             app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
             app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
+        elif doctree:
+            mermaid_nodes = doctree.findall(mermaid)
+            _d3_selector = ""
+            for mermaid_node in mermaid_nodes:
+                if "zoom_id" in mermaid_node:
+                    _zoom_id = mermaid_node["zoom_id"]
+                    if _d3_selector == "":
+                        _d3_selector += f".mermaid#{_zoom_id} svg"
+                    else:
+                        _d3_selector += f", .mermaid#{_zoom_id} svg"
+            if _d3_selector != "":
+                _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
+                _d3_js_script = f"""
+                window.addEventListener("load", function () {{
+                  var svgs = d3.selectAll("{_d3_selector}");
+                  svgs.each(function() {{
+                    var svg = d3.select(this);
+                    svg.html("<g>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {{
+                      inner.attr("transform", event.transform);
+                    }});
+                    svg.call(zoom);
+                  }});
+                }});
+                """
+                app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
+                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
 
 
 def setup(app):
