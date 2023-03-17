@@ -404,11 +404,11 @@ def install_js(
     if not app.config.mermaid_version:
         _mermaid_js_url = None  # assume it is local
     elif app.config.mermaid_version == "latest":
-        _mermaid_js_url = "https://unpkg.com/mermaid/dist/mermaid.min.js"
+        _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs"
     else:
-        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
+        _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
     if _mermaid_js_url:
-        app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority)
+        app.add_js_file(None, type="module", body=f"import mermaid from \"{_mermaid_js_url}\";", priority=app.config.mermaid_js_priority)
 
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
@@ -442,7 +442,7 @@ def setup(app):
     # thus it requires a different initialization code not yet supported. 
     # So the current latest version supported is this
     # Discussion: https://github.com/mermaid-js/mermaid/discussions/4148
-    app.add_config_value("mermaid_version", "9.4.0", "html")
+    app.add_config_value("mermaid_version", "latest", "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
     app.add_config_value(

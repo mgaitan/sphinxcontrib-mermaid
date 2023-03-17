@@ -120,7 +120,10 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/.  The default is ``"9.4.0"``. If you need a newer version, you'll need to add the custom initialization. See below. 
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on <https://cdn.jsdelivr.net/npm/mermaid@latest/>_.
+  
+  .. note::
+    The package defaults to the latest available version on the CDN.
 
   If it's set to ``""``, the lib won't be automatically included from the CDN service and you'll need to add it as a local
   file in ``html_js_files``. For instance, if you download the lib to `_static/js/mermaid.js`, in ``conf.py``::
@@ -133,7 +136,7 @@ Config values
 
 ``mermaid_init_js``
 
-  Mermaid initilizaction code. Default to ``"mermaid.initialize({startOnLoad:true});"``.
+  Mermaid initialization code. Default to ``"mermaid.initialize({startOnLoad:true});"``.
 
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.

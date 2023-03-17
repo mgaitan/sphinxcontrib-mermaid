@@ -13,8 +13,7 @@ def index(app, build_all):
 
 @pytest.mark.sphinx('html', testroot="basic")
 def test_html_raw(index):
-    assert '<script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>' in index
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
+    assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";</script>' in index
     assert """<div class="mermaid">
             sequenceDiagram
    participant Alice
@@ -26,7 +25,7 @@ def test_html_raw(index):
 @pytest.mark.sphinx('html', testroot="basic", confoverrides={'mermaid_version': '8.3'})
 def test_conf_mermaid_version(app, index):
     assert app.config.mermaid_version == "8.3"
-    assert '<script src="https://unpkg.com/mermaid@8.3/dist/mermaid.min.js"></script>' in index
+    assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@8.3/dist/mermaid.esm.min.mjs";</script>' in index
 
 
 @pytest.mark.sphinx('html', testroot="basic", confoverrides={'mermaid_version': None})
@@ -43,7 +42,7 @@ def test_mermaid_init_js(index):
 
 @pytest.mark.sphinx('html', testroot="markdown")
 def test_html_raw_from_markdown(index):
-    assert '<script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>' in index
+    assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@latest/dist/mermaid.esm.min.mjs";</script>' in index
     assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
     assert """
 <div class="mermaid">
