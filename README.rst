@@ -120,7 +120,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on <https://cdn.jsdelivr.net/npm/mermaid@latest/>_.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://cdn.jsdelivr.net/npm/mermaid.
   
   .. note::
     The package defaults to the latest available version on the CDN.
