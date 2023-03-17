@@ -1,6 +1,24 @@
 Changelog
 ---------
 
+0.8.1 (Feb 25, 2023)
++++++++++++++++++++++
+
+- Default to Mermaid 9.4.0 as 10.0 introduced incompatible changes. 
+  See `the discussion <https://github.com/mermaid-js/mermaid/discussions/4148>`_. 
+
+0.8 (Feb 9, 2023)
++++++++++++++++++++++
+
+- Moved CI to Github Actions
+- Make the class diagram reproducible
+- Allow the user to change the JS priority
+- Drop support for Python 3.6
+- Black formatting
+
+See `full set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.7.1...0.8>`_.
+
+
 0.7.1 (July 17, 2021)
 +++++++++++++++++++++
 
