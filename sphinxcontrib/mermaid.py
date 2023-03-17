@@ -15,6 +15,7 @@ import re
 from hashlib import sha1
 from subprocess import PIPE, Popen
 from tempfile import _get_default_tempdir
+import uuid
 
 import posixpath
 import sphinx
@@ -71,6 +72,7 @@ class Mermaid(Directive):
         "alt": directives.unchanged,
         "align": align_spec,
         "caption": directives.unchanged,
+        "zoom": directives.unchanged,
     }
 
     def get_mm_code(self):
@@ -123,6 +125,9 @@ class Mermaid(Directive):
             node["align"] = self.options["align"]
         if "inline" in self.options:
             node["inline"] = True
+        if "zoom" in self.options:
+            node["zoom"] = True
+            node["zoom_id"] = f"id-{uuid.uuid4()}"
 
         caption = self.options.get("caption")
         if caption:
@@ -217,8 +222,18 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
 def _render_mm_html_raw(
     self, node, code, options, prefix="mermaid", imgcls=None, alt=None
 ):
-    if "align" in node:
+    if "align" in node and "zoom_id" in node:
+        tag_template = """<div align="{align}" id="{zoom_id}" class="mermaid align-{align}">
+            {code}
+        </div>
+        """
+    elif "align" in node and "zoom_id" not in node:
         tag_template = """<div align="{align}" class="mermaid align-{align}">
+            {code}
+        </div>
+        """
+    elif "align" not in node and "zoom_id" in node:
+        tag_template = """<div id="{zoom_id}" class="mermaid">
             {code}
         </div>
         """
@@ -228,7 +243,7 @@ def _render_mm_html_raw(
         </div>"""
 
     self.body.append(
-        tag_template.format(align=node.get("align"), code=self.encode(code))
+        tag_template.format(align=node.get("align"), zoom_id=node.get("zoom_id"), code=self.encode(code))
     )
     raise nodes.SkipNode
 
@@ -379,6 +394,8 @@ def man_visit_mermaid(self, node):
 
 
 def install_js(app, *args):
+    _, _, _, doctree = args
+
     # add required javascript
     if not app.config.mermaid_version:
         _mermaid_js_url = None  # asummed is local
@@ -399,7 +416,7 @@ def install_js(app, *args):
     if app.config.mermaid_d3_zoom:
         _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
         _d3_js_script = """
-        window.addEventListener('load', function () {
+        window.addEventListener("load", function () {
           var svgs = d3.selectAll(".mermaid svg");
           svgs.each(function() {
             var svg = d3.select(this);
@@ -414,6 +431,34 @@ def install_js(app, *args):
         """
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
         app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
+    elif doctree and app.config.mermaid_output_format == "raw":
+        mermaid_nodes = doctree.findall(mermaid)
+        _d3_selector = ""
+        for mermaid_node in mermaid_nodes:
+            if "zoom_id" in mermaid_node:
+                _zoom_id = mermaid_node["zoom_id"]
+                if _d3_selector == "":
+                    _d3_selector += f".mermaid#{_zoom_id} svg"
+                else:
+                    _d3_selector += f", .mermaid#{_zoom_id} svg"
+        if _d3_selector != "":
+            _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
+            _d3_js_script = f"""
+            window.addEventListener("load", function () {{
+              var svgs = d3.selectAll("{_d3_selector}");
+              svgs.each(function() {{
+                var svg = d3.select(this);
+                svg.html("<g>" + svg.html() + "</g>");
+                var inner = svg.select("g");
+                var zoom = d3.zoom().on("zoom", function(event) {{
+                  inner.attr("transform", event.transform);
+                }});
+                svg.call(zoom);
+              }});
+            }});
+            """
+            app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
+            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
 
 
 def setup(app):
