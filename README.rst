@@ -141,6 +141,25 @@ Config values
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
 
+``mermaid_securitylevel``
+
+  Sets the `securityLevel <https://mermaid.js.org/config/usage.html#securitylevel>`_ for Mermaid when installed from the CDN.
+
+``mermaid_theme``
+
+  Sets the site-wide `theme <https://mermaid.js.org/config/theming.html#available-themes>`_ for Mermaid when installed from the CDN.
+
+``mermaid_loglevel``
+
+  Sets the global log level for Mermaid when installed from the CDN.
+
+``mermaid_fontfamily``
+
+  Sets the font family used in Mermaid diagrams. You can provide a list as a single string, e.g. ``"'trebuchet ms', verdana, arial, sans-serif;"``.
+
+``mermaid_arrowmarkerabsolute``
+
+  Controls whether or arrow markers in html code are absolute paths or anchor
 
 ``mermaid_cmd``
 

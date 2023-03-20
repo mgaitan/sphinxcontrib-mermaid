@@ -31,6 +31,7 @@ from sphinx.util.osutil import ensuredir
 
 from .autoclassdiag import class_diagram
 from .exceptions import MermaidError
+from .mermaidconfig import Config
 
 logger = logging.getLogger(__name__)
 
@@ -408,7 +409,10 @@ def install_js(
     else:
         _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
     if _mermaid_js_url:
-        app.add_js_file(None, type="module", body=f"import mermaid from \"{_mermaid_js_url}\";", priority=app.config.mermaid_js_priority)
+        mermaid_config = Config(True, app.config.mermaid_theme, app.config.mermaid_fontfamily, app.config.mermaid_securitylevel, app.config.mermaid_loglevel, app.config.mermaid_arrowmarkerabsolute)
+        mermaid_conf = mermaid_config.toJSON()
+        app.add_js_file(None, body=f"const mermaidConfig = {mermaid_conf}")
+        app.add_js_file(None, type="module", body=f"import mermaid from \"{_mermaid_js_url}\"; mermaid.initialize(mermaidConfig)", priority=app.config.mermaid_js_priority)
 
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
@@ -443,10 +447,15 @@ def setup(app):
     # So the current latest version supported is this
     # Discussion: https://github.com/mermaid-js/mermaid/discussions/4148
     app.add_config_value("mermaid_version", "latest", "html")
+    app.add_config_value("mermaid_theme", "default", "html")
+    app.add_config_value("mermaid_securitylevel", "strict", "html")
+    app.add_config_value("mermaid_loglevel", "fatal", "html")
+    app.add_config_value("mermaid_fontfamily", "'trebuchet ms', verdana, arial, sans-serif;", "html")
+    app.add_config_value("mermaid_arrowmarkerabsolute", False, "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
     app.add_config_value(
-        "mermaid_init_js", "mermaid.initialize({startOnLoad:true});", "html"
+        "mermaid_init_js", "", "html"
     )
     app.connect("html-page-context", install_js)
 
