@@ -106,18 +106,27 @@ class Mermaid(Directive):
         else:
             # inline mermaid code
             mmcode = "\n".join(self.content)
-            if not mmcode.strip():
-                return [
-                    self.state_machine.reporter.warning(
-                        'Ignoring "mermaid" directive without content.',
-                        line=self.lineno,
-                    )
-                ]
         return mmcode
 
     def run(self):
+        mmcode = self.get_mm_code()
+        # mmcode is a list, so it's a system message, not content to be included in the
+        # document.
+        if not isinstance(mmcode, str):
+            return mmcode
+
+        # if mmcode is empty, ignore the directive.
+        if not mmcode.strip():
+            return [
+                self.state_machine.reporter.warning(
+                    'Ignoring "mermaid" directive without content.',
+                    line=self.lineno,
+                )
+            ]
+
+        # Wrap the mermaid code into a code node.
         node = mermaid()
-        node["code"] = self.get_mm_code()
+        node["code"] = mmcode
         node["options"] = {}
         if "alt" in self.options:
             node["alt"] = self.options["alt"]

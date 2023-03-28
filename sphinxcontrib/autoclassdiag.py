@@ -48,6 +48,9 @@ def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
     for cls in get_classes(*cls_or_modules, strict=strict):
         get_tree(cls)
 
+    if not inheritances:
+        return ""
+
     return "classDiagram\n" + "\n".join(
         f"  {a} <|-- {b}" for a, b in sorted(inheritances)
     )
