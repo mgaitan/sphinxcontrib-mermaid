@@ -229,14 +229,14 @@ def _render_mm_html_raw(
     self, node, code, options, prefix="mermaid", imgcls=None, alt=None
 ):
     if "align" in node:
-        tag_template = """<div align="{align}" class="mermaid align-{align}">
+        tag_template = """<pre align="{align}" class="mermaid align-{align}">
             {code}
-        </div>
+        </pre>
         """
     else:
-        tag_template = """<div class="mermaid">
+        tag_template = """<pre class="mermaid">
             {code}
-        </div>"""
+        </pre>"""
 
     self.body.append(
         tag_template.format(align=node.get("align"), code=self.encode(code))
