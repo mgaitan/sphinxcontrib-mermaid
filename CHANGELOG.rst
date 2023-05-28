@@ -9,7 +9,7 @@ Changelog
 - Upgrade default to Mermaid 10.2.0. 
 - Implement automatic releases from Github Actions when a tag is pushed 
 
-See `full set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.9.1...0.8.1>`_.
+See full `set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.9.1...0.8.1>`_.
 
 
 0.8.1 (Feb 25, 2023)
