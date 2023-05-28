@@ -16,7 +16,7 @@ def index(app, build_all):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_raw(index):
     assert (
-        '<script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>'
+        '<script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>'
         in index
     )
     assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
@@ -78,7 +78,7 @@ def test_mermaid_init_js(index):
 @pytest.mark.sphinx("html", testroot="markdown")
 def test_html_raw_from_markdown(index):
     assert (
-        '<script src="https://unpkg.com/mermaid@9.4.0/dist/mermaid.min.js"></script>'
+        '<script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>'
         in index
     )
     assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
