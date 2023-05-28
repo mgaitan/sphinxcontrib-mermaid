@@ -109,6 +109,8 @@ Directive options
 
 ``:caption:``: can be used to give a caption to the diagram.
 
+``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom``` bellow
+
 
 Config values
 -------------
@@ -170,6 +172,10 @@ Config values
 
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
+
+``mermaid_d3_zoom``
+
+    Enables zooming in all the generated Mermaid diagrams.
 
 
 Markdown support
