@@ -8,8 +8,8 @@
    :target: https://libraries.io/pypi/sphinxcontrib-mermaid/
 
 
-This extension allows you to embed `Mermaid <https://mermaid-js.github.io/mermaid>`_ graphs in your
-documents, including general flowcharts, sequence and gantt diagrams.
+This extension allows you to embed `Mermaid <https://mermaid.js.org/>`_ graphs in your
+documents, including general flowcharts, sequence diagrams, gantt diagrams and more.
 
 It adds a directive to embed mermaid markup. For example::
 
