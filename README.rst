@@ -1,6 +1,13 @@
 .. image:: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml/badge.svg
     :target: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml
 
+.. image:: https://img.shields.io/pypi/v/sphinxcontrib-mermaid
+   :target: https://pypi.org/project/sphinxcontrib-mermaid/
+
+.. image:: https://img.shields.io/pypi/v/sphinxcontrib-mermaid
+   :target: https://libraries.io/pypi/sphinxcontrib-mermaid/
+
+
 This extension allows you to embed `Mermaid <https://mermaid-js.github.io/mermaid>`_ graphs in your
 documents, including general flowcharts, sequence and gantt diagrams.
 
