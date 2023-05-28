@@ -4,7 +4,7 @@
 .. image:: https://img.shields.io/pypi/v/sphinxcontrib-mermaid
    :target: https://pypi.org/project/sphinxcontrib-mermaid/
 
-.. image:: https://img.shields.io/pypi/v/sphinxcontrib-mermaid
+.. image:: https://img.shields.io/pypi/dm/shbin
    :target: https://libraries.io/pypi/sphinxcontrib-mermaid/
 
 
