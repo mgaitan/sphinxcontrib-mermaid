@@ -75,10 +75,10 @@ module (ignoring classes imported from other modules).
 
 For example::
 
-    .. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+    .. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
        :full:
 
-.. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
    :full:
 
 
