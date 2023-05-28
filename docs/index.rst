@@ -6,12 +6,14 @@
 Welcome to Sphinxcontrib-mermaid demo's documentation!
 ======================================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 .. include:: ../README.rst
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: More examples:
+
+   zoom.rst
 
 Indices and tables
 ==================

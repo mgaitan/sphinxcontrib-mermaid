@@ -109,7 +109,12 @@ Directive options
 
 ``:caption:``: can be used to give a caption to the diagram.
 
-``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom``` bellow
+``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom``` bellow. 
+
+.. figure:: https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif
+   :align: center
+   
+   A preview after adding ``:zoom:`` option only to the first diagram example above:
 
 
 Config values

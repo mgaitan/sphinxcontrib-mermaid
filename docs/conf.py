@@ -160,3 +160,4 @@ texinfo_documents = [
 ]
 
 mermaid_params = ['-p' 'puppeteer-config.json']
+# mermaid_d3_zoom = True
