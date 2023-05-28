@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 readme = open("README.rst", encoding="utf-8").read()
 changes = open("CHANGELOG.rst", encoding="utf-8").read()
-version = "0.8.1"
+version = "0.9"
 
 
 def long_description():
