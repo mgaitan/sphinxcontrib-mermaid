@@ -237,6 +237,8 @@ In order to have Mermaid diagrams build properly in PDFs generated on readthedoc
     # Set the version of Python and other tools you might need
     build:
       os: ubuntu-20.04
+      apt_packages:
+        - libasound2
       tools:
         python: "3.8"
         nodejs: "16"
