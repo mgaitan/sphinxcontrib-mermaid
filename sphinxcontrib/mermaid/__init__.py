@@ -426,6 +426,10 @@ def install_js(
     context: dict,
     doctree: nodes.document | None,
 ) -> None:
+    # Build-time PNG and SVG output does not need client-side rendering.
+    if app.config.mermaid_output_format != "raw":
+        return
+
     # Skip for pages without Mermaid diagrams
     if doctree and not doctree.next_node(mermaid):
         return
