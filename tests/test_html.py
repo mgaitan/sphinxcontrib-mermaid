@@ -16,20 +16,22 @@ def index(app, build_all):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_raw(index):
     assert (
-        '<script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>'
+        '<script type="module">import mermaid from '
+        "'https://cdn.jsdelivr.net/npm/mermaid@10.2.0/dist/mermaid.esm.min.mjs';\n"
+        'let config = { startOnLoad: true };\n'
+        'mermaid.initialize(config);</script>\n'
+        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
         in index
     )
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
     assert (
-        """<div class="mermaid">
+        """<pre class="mermaid">
             sequenceDiagram
    participant Alice
    participant Bob
    Alice-&gt;John: Hello John, how are you?
-        </div>"""
+        </pre>"""
         in index
     )
-
 
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_zoom_option(index, app):
@@ -38,11 +40,11 @@ def test_html_zoom_option(index, app):
     assert "svg.call(zoom);" in zoom_page
 
     # the first diagram has no id
-    assert '<div class="mermaid">\n            sequenceDiagram' in zoom_page
+    assert '<pre class="mermaid">\n            sequenceDiagram' in zoom_page
 
     # the second has id and its loaded in the zooming code.
     div_id = re.findall(
-        r'<div id="(id\-[a-fA-F0-9-]+)" class="mermaid">\n\s+flowchart TD', zoom_page
+        r'<pre id="(id\-[a-fA-F0-9-]+)" class="mermaid">\n\s+flowchart TD', zoom_page
     )
     assert f'var svgs = d3.selectAll(".mermaid#{div_id[0]} svg")' in zoom_page
 
@@ -56,7 +58,11 @@ def test_html_zoom_option_global(index):
 def test_conf_mermaid_version(app, index):
     assert app.config.mermaid_version == "8.3"
     assert (
-        '<script src="https://unpkg.com/mermaid@8.3/dist/mermaid.min.js"></script>'
+        '<script type="module">import mermaid from '
+        "'https://cdn.jsdelivr.net/npm/mermaid@8.3/dist/mermaid.esm.min.mjs';\n"
+        'let config = { startOnLoad: true };\n'
+        'mermaid.initialize(config);</script>\n'
+        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
         in index
     )
 
@@ -78,17 +84,20 @@ def test_mermaid_init_js(index):
 @pytest.mark.sphinx("html", testroot="markdown")
 def test_html_raw_from_markdown(index):
     assert (
-        '<script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>'
+        '<script type="module">import mermaid from '
+        "'https://cdn.jsdelivr.net/npm/mermaid@10.2.0/dist/mermaid.esm.min.mjs';\n"
+        'let config = { startOnLoad: true };\n'
+        'mermaid.initialize(config);</script>\n'
+        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
         in index
     )
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" in index
     assert (
         """
-<div class="mermaid">
+<pre align="center" class="mermaid align-center">
                 sequenceDiagram
       participant Alice
       participant Bob
       Alice-&gt;John: Hello John, how are you?
-        </div>"""
+        </pre>"""
         in index
     )
