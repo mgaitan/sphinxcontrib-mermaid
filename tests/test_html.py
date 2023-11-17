@@ -17,11 +17,9 @@ def index(app, build_all):
 def test_html_raw(index):
     assert (
         '<script type="module">import mermaid from '
-        "'https://cdn.jsdelivr.net/npm/mermaid@10.2.0/dist/mermaid.esm.min.mjs';\n"
-        'let config = { startOnLoad: true };\n'
-        'mermaid.initialize(config);</script>\n'
-        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
-        in index
+        "'https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs';\n"
+        "let config = { startOnLoad: true };\n"
+        "mermaid.initialize(config);</script>\n" in index
     )
     assert (
         """<pre class="mermaid">
@@ -32,6 +30,7 @@ def test_html_raw(index):
         </pre>"""
         in index
     )
+
 
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_zoom_option(index, app):
@@ -52,7 +51,7 @@ def test_html_zoom_option(index, app):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
 def test_html_zoom_option_global(index):
     assert "svg.call(zoom);" in index
-    
+
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "8.3"})
 def test_conf_mermaid_version(app, index):
@@ -60,10 +59,8 @@ def test_conf_mermaid_version(app, index):
     assert (
         '<script type="module">import mermaid from '
         "'https://cdn.jsdelivr.net/npm/mermaid@8.3/dist/mermaid.esm.min.mjs';\n"
-        'let config = { startOnLoad: true };\n'
-        'mermaid.initialize(config);</script>\n'
-        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
-        in index
+        "let config = { startOnLoad: true };\n"
+        "mermaid.initialize(config);</script>\n" in index
     )
 
 
@@ -77,19 +74,22 @@ def test_conf_mermaid_no_version(app, index):
     "html", testroot="basic", confoverrides={"mermaid_init_js": "custom script;"}
 )
 def test_mermaid_init_js(index):
-    assert "<script>mermaid.initialize({startOnLoad:true});</script>" not in index
-    assert "<script>custom script;</script>" in index
+    assert "let config = { startOnLoad: true };\n" not in index
+    assert (
+        '<script type="module">import mermaid from '
+        "'https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs';\n"
+        "let config = custom script;\n"
+        "mermaid.initialize(config);</script>\n" in index
+    )
 
 
 @pytest.mark.sphinx("html", testroot="markdown")
 def test_html_raw_from_markdown(index):
     assert (
         '<script type="module">import mermaid from '
-        "'https://cdn.jsdelivr.net/npm/mermaid@10.2.0/dist/mermaid.esm.min.mjs';\n"
-        'let config = { startOnLoad: true };\n'
-        'mermaid.initialize(config);</script>\n'
-        '    <script>mermaid.initialize({startOnLoad:true});</script>\n'
-        in index
+        "'https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs';\n"
+        "let config = { startOnLoad: true };\n"
+        "mermaid.initialize(config);</script>\n" in index
     )
     assert (
         """

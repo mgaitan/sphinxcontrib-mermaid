@@ -423,7 +423,7 @@ def install_js(
         _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
     else:
         _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
-    if _mermaid_js_url:
+    if _mermaid_js_url and not app.config.mermaid_init_js:
         # Configuration for Mermaid initialization
         mermaid_init_script = (
             f"import mermaid from '{_mermaid_js_url}';\n"
@@ -433,13 +433,17 @@ def install_js(
 
         # Add the initialization script
         app.add_js_file(None, body=mermaid_init_script, type="module", priority=app.config.mermaid_js_priority)
-
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
         priority = (
             app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
         )
-        app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
+        mermaid_custom_script = (
+            f"import mermaid from '{_mermaid_js_url}';\n"
+            f"let config = {app.config.mermaid_init_js}\n"
+            "mermaid.initialize(config);"
+        )
+        app.add_js_file(None, body=mermaid_custom_script, type="module", priority=priority)
 
     if app.config.mermaid_output_format == "raw":
         if app.config.mermaid_d3_zoom:
@@ -518,7 +522,7 @@ def setup(app):
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
     app.add_config_value(
-        "mermaid_init_js", "mermaid.initialize({startOnLoad:true});", "html"
+        "mermaid_init_js", None, "html"
     )
     app.add_config_value("mermaid_d3_zoom", False, "html")
     app.connect("html-page-context", install_js)

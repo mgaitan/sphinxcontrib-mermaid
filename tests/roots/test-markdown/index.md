@@ -1,7 +1,7 @@
 # Hi from Markdown!
 
 ```{mermaid}
-
+:align: center
     sequenceDiagram
       participant Alice
       participant Bob
