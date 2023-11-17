@@ -134,7 +134,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/.  The default is ``"10.2.0"``. If you need a newer version, you'll need to add the custom initialization. See below. 
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"10.6.1"``. If you need a newer version, you'll need to add the custom initialization. See below.
 
   If it's set to ``""``, the lib won't be automatically included from the CDN service and you'll need to add it as a local
   file in ``html_js_files``. For instance, if you download the lib to `_static/js/mermaid.js`, in ``conf.py``::
