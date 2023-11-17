@@ -147,7 +147,14 @@ Config values
 
 ``mermaid_init_js``
 
-  Mermaid initilizaction code. Default to ``"mermaid.initialize({startOnLoad:true});"``.
+  Mermaid initilizaction code. The Default inicialization is set to
+
+    <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/dist/mermaid.esm.min.mjs';
+    let config = { startOnLoad: true};
+    mermaid.initialize(config)
+    </script>
+
 
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
