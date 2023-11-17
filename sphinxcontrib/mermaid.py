@@ -514,7 +514,7 @@ def setup(app):
     # thus it requires a different initialization code not yet supported. 
     # So the current latest version supported is this
     # Discussion: https://github.com/mermaid-js/mermaid/discussions/4148
-    app.add_config_value("mermaid_version", "10.2.0", "html")
+    app.add_config_value("mermaid_version", "10.6.1", "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
     app.add_config_value(
