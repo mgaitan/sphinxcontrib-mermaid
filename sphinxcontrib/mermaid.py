@@ -234,24 +234,24 @@ def _render_mm_html_raw(
     self, node, code, options, prefix="mermaid", imgcls=None, alt=None
 ):
     if "align" in node and "zoom_id" in node:
-        tag_template = """<div align="{align}" id="{zoom_id}" class="mermaid align-{align}">
+        tag_template = """<pre align="{align}" id="{zoom_id}" class="mermaid align-{align}">
             {code}
-        </div>
+        </pre>
         """
     elif "align" in node and "zoom_id" not in node:
-        tag_template = """<div align="{align}" class="mermaid align-{align}">
+        tag_template = """<pre align="{align}" class="mermaid align-{align}">
             {code}
-        </div>
+        </pre>
         """
     elif "align" not in node and "zoom_id" in node:
-        tag_template = """<div id="{zoom_id}" class="mermaid">
+        tag_template = """<pre id="{zoom_id}" class="mermaid">
             {code}
-        </div>
+        </pre>
         """
     else:
-        tag_template = """<div class="mermaid">
+        tag_template = """<pre class="mermaid">
             {code}
-        </div>"""
+        </pre>"""
 
     self.body.append(
         tag_template.format(align=node.get("align"), zoom_id=node.get("zoom_id"), code=self.encode(code))
@@ -416,21 +416,34 @@ def install_js(
         return
 
     # Add required JavaScript
+    # Add required JavaScript
     if not app.config.mermaid_version:
         _mermaid_js_url = None  # assume it is local
     elif app.config.mermaid_version == "latest":
-        _mermaid_js_url = "https://unpkg.com/mermaid/dist/mermaid.min.js"
+        _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
     else:
-        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
-    if _mermaid_js_url:
-        app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority)
+        _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
+    if _mermaid_js_url and not app.config.mermaid_init_js:
+        # Configuration for Mermaid initialization
+        mermaid_init_script = (
+            f"import mermaid from '{_mermaid_js_url}';\n"
+            "let config = { startOnLoad: true };\n"
+            "mermaid.initialize(config);"
+        )
 
+        # Add the initialization script
+        app.add_js_file(None, body=mermaid_init_script, type="module", priority=app.config.mermaid_js_priority)
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
         priority = (
             app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
         )
-        app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
+        mermaid_custom_script = (
+            f"import mermaid from '{_mermaid_js_url}';\n"
+            f"let config = {app.config.mermaid_init_js}\n"
+            "mermaid.initialize(config);"
+        )
+        app.add_js_file(None, body=mermaid_custom_script, type="module", priority=priority)
 
     if app.config.mermaid_output_format == "raw":
         if app.config.mermaid_d3_zoom:
@@ -505,11 +518,11 @@ def setup(app):
     # thus it requires a different initialization code not yet supported. 
     # So the current latest version supported is this
     # Discussion: https://github.com/mermaid-js/mermaid/discussions/4148
-    app.add_config_value("mermaid_version", "10.2.0", "html")
+    app.add_config_value("mermaid_version", "10.6.1", "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
     app.add_config_value(
-        "mermaid_init_js", "mermaid.initialize({startOnLoad:true});", "html"
+        "mermaid_init_js", None, "html"
     )
     app.add_config_value("mermaid_d3_zoom", False, "html")
     app.connect("html-page-context", install_js)
