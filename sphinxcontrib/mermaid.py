@@ -285,20 +285,14 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
         if alt is None:
             alt = node.get("alt", self.encode(code).strip())
         imgcss = imgcls and f'class="{imgcls}"' or ""
-        if _fmt == "svg":
-            svgtag = f"""<object data="{fname}" type="image/svg+xml">
-            <p class="warning">{alt}</p></object>
-"""
-            self.body.append(svgtag)
-        else:
-            if "align" in node:
-                self.body.append(
-                    '<div align="%s" class="align-%s">' % (node["align"], node["align"])
-                )
+        if "align" in node:
+            self.body.append(
+                '<div align="%s" class="align-%s">' % (node["align"], node["align"])
+            )
 
-            self.body.append(f'<img src="{fname}" alt="{alt}" {imgcss}/>\n')
-            if "align" in node:
-                self.body.append("</div>\n")
+        self.body.append(f'<img src="{fname}" alt="{alt}" {imgcss}/>\n')
+        if "align" in node:
+            self.body.append("</div>\n")
 
     raise nodes.SkipNode
 
