@@ -3,15 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Sphinxcontrib-mermaid demo's documentation!
-======================================================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+Welcome to Sphinxcontrib-mermaid's documentation!
+=================================================
 
 .. include:: ../README.rst
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: More examples:
+
+   zoom.rst
 
 Indices and tables
 ==================

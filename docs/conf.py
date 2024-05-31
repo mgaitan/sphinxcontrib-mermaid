@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Sphinxcontrib-mesmaid demo documentation build configuration file, created by
 # sphinx-quickstart on Sun Apr 23 13:10:20 2017.
@@ -32,7 +31,8 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinxcontrib.mermaid'
+    'sphinxcontrib.mermaid',
+    'sphinx.ext.imgconverter',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'sphinxcontrib-mermaid'
-copyright = '2017-2021, Martín Gaitán'
+copyright = '2017-2023, Martín Gaitán'
 author = 'Martín Gaitán'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -67,7 +67,7 @@ release = ''
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+# language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -147,7 +147,7 @@ man_pages = [
      [author], 1)
 ]
 
-
+    
 # -- Options for Texinfo output -------------------------------------------
 
 # Grouping the document tree into Texinfo files. List of tuples
@@ -159,5 +159,5 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
-
+mermaid_params = ['-p' 'puppeteer-config.json']
+# mermaid_d3_zoom = True

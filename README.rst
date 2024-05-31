@@ -1,8 +1,15 @@
-.. image:: https://travis-ci.com/mgaitan/sphinxcontrib-mermaid.svg?branch=master
-    :target: https://travis-ci.com/mgaitan/sphinxcontrib-mermaid
+.. image:: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml
 
-This extension allows you to embed `Mermaid <https://mermaid-js.github.io/mermaid>`_ graphs in your
-documents, including general flowcharts, sequence and gantt diagrams.
+.. image:: https://img.shields.io/pypi/v/sphinxcontrib-mermaid
+   :target: https://pypi.org/project/sphinxcontrib-mermaid/
+
+.. image:: https://img.shields.io/pypi/dm/shbin
+   :target: https://libraries.io/pypi/sphinxcontrib-mermaid/
+
+
+This extension allows you to embed `Mermaid <https://mermaid.js.org/>`_ graphs in your
+documents, including general flowcharts, sequence diagrams, gantt diagrams and more.
 
 It adds a directive to embed mermaid markup. For example::
 
@@ -68,10 +75,10 @@ module (ignoring classes imported from other modules).
 
 For example::
 
-    .. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+    .. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
        :full:
 
-.. autoclasstree:: sphinx.util.SphinxParallelError sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
    :full:
 
 
@@ -109,6 +116,13 @@ Directive options
 
 ``:caption:``: can be used to give a caption to the diagram.
 
+``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom``` bellow. 
+
+.. figure:: https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif
+   :align: center
+   
+   A preview after adding ``:zoom:`` option only to the first diagram example above:
+
 
 Config values
 -------------
@@ -120,7 +134,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/. The default is ``"latest"``.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/.  The default is ``"10.2.0"``. If you need a newer version, you'll need to add the custom initialization. See below. 
 
   If it's set to ``""``, the lib won't be automatically included from the CDN service and you'll need to add it as a local
   file in ``html_js_files``. For instance, if you download the lib to `_static/js/mermaid.js`, in ``conf.py``::
@@ -178,6 +192,10 @@ Config values
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
 
+``mermaid_d3_zoom``
+
+    Enables zooming in all the generated Mermaid diagrams.
+
 
 Markdown support
 ----------------
@@ -197,5 +215,66 @@ Then in your `.md` documents include a code block as in reStructuredTexts::
        participant Bob
        Alice->John: Hello John, how are you?
  ```
+
+Building PDFs on readthedocs.io
+-----------------------------------
+
+In order to have Mermaid diagrams build properly in PDFs generated on readthedocs.io, you will need a few extra configurations.  
+
+1. In your ``.readthedocs.yaml`` file (which should be in the root of your repository) include a ``post-install`` command to install the Mermaid CLI: ::
+
+    build:
+      os: ubuntu-20.04
+      tools:
+        python: "3.8"
+        nodejs: "16"
+      jobs:
+        post_install:
+          - npm install -g @mermaid-js/mermaid-cli
+
+ Note that if you previously did not have a ``.readthedocs.yaml`` file, you will also need to specify all targets you wish to build and other basic configuration options.  A minimal example of a complete file is: ::
+
+    # .readthedocs.yaml
+    # Read the Docs configuration file
+    # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+    # Required
+    version: 2
+
+    # Set the version of Python and other tools you might need
+    build:
+      os: ubuntu-20.04
+      apt_packages:
+        - libasound2
+      tools:
+        python: "3.8"
+        nodejs: "16"
+      jobs:
+        post_install:
+          - npm install -g @mermaid-js/mermaid-cli
+
+    # Build documentation in the docs/ directory with Sphinx
+    sphinx:
+       configuration: docs/conf.py
+
+    # If using Sphinx, optionally build your docs in additional formats such as PDF
+    formats:
+      - epub
+      - pdf
+
+    python:
+       install:
+       - requirements: docs/requirements.txt
+
+2. In your documentation directory add file ``puppeteer-config.json`` with contents: ::
+
+    {
+      "args": ["--no-sandbox"]
+    }
+   
+
+3. In your documentation ``conf.py`` file, add: ::
+
+    mermaid_params = ['-p' 'puppeteer-config.json']
 
 
