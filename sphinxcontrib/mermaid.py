@@ -13,6 +13,7 @@ from __future__ import annotations
 import codecs
 import errno
 import os
+import shlex
 import posixpath
 import re
 from hashlib import sha1
@@ -197,8 +198,13 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
     with open(tmpfn, "w") as t:
         t.write(code)
 
-    mm_args = [mermaid_cmd, "-i", tmpfn, "-o", outfn]
+    if isinstance(mermaid_cmd, str):
+        mm_args = shlex.split(mermaid_cmd)
+    else:
+        mm_args = list(mermaid_cmd)
+
     mm_args.extend(self.builder.config.mermaid_params)
+    mm_args += ['-i', tmpfn, '-o', outfn]
     if self.builder.config.mermaid_sequence_config:
         mm_args.extend("--configFile", self.builder.config.mermaid_sequence_config)
 
