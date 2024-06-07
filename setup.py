@@ -60,4 +60,5 @@ setup(
     packages=find_namespace_packages(where='./', include=['sphinxcontrib.mermaid']),
     package_dir={'': './'},
     include_package_data=True,
+    extras_require={'test': ['myst-parser', 'defusedxml', 'sphinx', 'pytest']}
 )
