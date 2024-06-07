@@ -62,4 +62,5 @@ setup(
     package_dir={'': './'},
     include_package_data=True,
     install_requires=["sphinx", "pyyaml"],
+    extras_require={'test': ['myst-parser', 'defusedxml', 'sphinx', 'pytest']},
 )
