@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 readme = open("README.rst", encoding="utf-8").read()
 changes = open("CHANGELOG.rst", encoding="utf-8").read()
@@ -58,8 +58,8 @@ setup(
         "Topic :: Utilities",
     ],
     platforms="any",
-    packages=find_packages(),
+    packages=find_namespace_packages(where='./', include=['sphinxcontrib.mermaid']),
+    package_dir={'': './'},
     include_package_data=True,
     install_requires=["sphinx", "pyyaml"],
-    namespace_packages=["sphinxcontrib"],
 )
