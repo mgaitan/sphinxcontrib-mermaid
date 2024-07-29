@@ -13,14 +13,14 @@ from __future__ import annotations
 import codecs
 import errno
 import os
-import shlex
 import posixpath
 import re
+import shlex
+import uuid
 from hashlib import sha1
 from json import loads
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
-import uuid
 
 import sphinx
 from docutils import nodes
@@ -115,6 +115,7 @@ class Mermaid(Directive):
     final_argument_whitespace = False
     option_spec = {
         # Sphinx directives
+        "name": directives.unchanged,
         "alt": directives.unchanged,
         "align": align_spec,
         "caption": directives.unchanged,
@@ -200,9 +201,10 @@ class Mermaid(Directive):
             node["code"] = mm_config + node["code"]
 
         caption = self.options.get("caption")
-        if caption:
+        if caption is not None:
             node = figure_wrapper(self, node, caption)
 
+        self.add_name(node)
         return [node]
 
 
@@ -298,28 +300,29 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
 def _render_mm_html_raw(
     self, node, code, options, prefix="mermaid", imgcls=None, alt=None
 ):
-    if "align" in node and "zoom_id" in node:
-        tag_template = """<pre align="{align}" id="{zoom_id}" class="mermaid align-{align}">
-            {code}
-        </pre>
-        """
-    elif "align" in node and "zoom_id" not in node:
-        tag_template = """<pre align="{align}" class="mermaid align-{align}">
-            {code}
-        </pre>
-        """
-    elif "align" not in node and "zoom_id" in node:
-        tag_template = """<pre id="{zoom_id}" class="mermaid">
-            {code}
-        </pre>
-        """
-    else:
-        tag_template = """<pre class="mermaid">
-            {code}
-        </pre>"""
+    classes = ["mermaid"]
+    attrs = {}
+    
+    if "align" in node:
+        classes.append(f"align-{node['align']}")
+        attrs["align"] = node["align"]
 
+    if "zoom_id" in node:
+        attrs["data-zoom-id"] = node["zoom_id"]
+    
+    if "ids" in node and len(node["ids"]) == 1:
+        attrs["id"] = node["ids"][0]
+        
+    tag_template = """<pre {attr_defs} class="{classes}">
+        {code}
+    </pre>"""
+    attr_defs = ["{}=\"{}\"".format(k, v) for k, v in attrs.items()]
     self.body.append(
-        tag_template.format(align=node.get("align"), zoom_id=node.get("zoom_id"), code=self.encode(code))
+        tag_template.format(
+            attr_defs=" ".join(attr_defs),
+            classes=" ".join(classes),
+            code=self.encode(code)
+        )
     )
     raise nodes.SkipNode
 
@@ -540,9 +543,9 @@ def install_js(
                 if "zoom_id" in mermaid_node:
                     _zoom_id = mermaid_node["zoom_id"]
                     if _d3_selector == "":
-                        _d3_selector += f".mermaid#{_zoom_id} svg"
+                        _d3_selector += f".mermaid[data-zoom-id={_zoom_id}] svg"
                     else:
-                        _d3_selector += f", .mermaid#{_zoom_id} svg"
+                        _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
                     count += 1
             if _d3_selector != "":
                 _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)

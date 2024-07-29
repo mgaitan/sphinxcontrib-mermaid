@@ -3,6 +3,7 @@ Zooming
 -------
 
 .. mermaid::
+   :name: participants
 
    sequenceDiagram
       participant Alice

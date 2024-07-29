@@ -1,5 +1,6 @@
-import pytest
 import re
+
+import pytest
 
 
 @pytest.fixture
@@ -22,12 +23,7 @@ def test_html_raw(index):
     )
     assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>' in index
     assert (
-        """<pre class="mermaid">
-            sequenceDiagram
-   participant Alice
-   participant Bob
-   Alice-&gt;John: Hello John, how are you?
-        </pre>"""
+        '<pre id="participants" class="mermaid">\n        sequenceDiagram\n   participant Alice\n   participant Bob\n   Alice-&gt;John: Hello John, how are you?\n    </pre>'
         in index
     )
 
@@ -40,13 +36,13 @@ def test_html_zoom_option(index, app):
     assert "svg.call(zoom);" in zoom_page
 
     # the first diagram has no id
-    assert '<pre class="mermaid">\n            sequenceDiagram' in zoom_page
+    assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
 
     # the second has id and its loaded in the zooming code.
     pre_id = re.findall(
-        r'<pre id="(id\-[a-fA-F0-9-]+)" class="mermaid">\n\s+flowchart TD', zoom_page
+        r'<pre data-zoom-id="(id\-[a-fA-F0-9-]+)" class="mermaid">\n\s+flowchart TD', zoom_page
     )
-    assert f'var svgs = d3.selectAll(".mermaid#{pre_id[0]} svg")' in zoom_page
+    assert f'var svgs = d3.selectAll(".mermaid[data-zoom-id={pre_id[0]}] svg")' in zoom_page
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
@@ -126,12 +122,6 @@ def test_html_raw_from_markdown(index):
     )
     assert '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>' in index
     assert (
-        """
-<pre align="center" class="mermaid align-center">
-                sequenceDiagram
-      participant Alice
-      participant Bob
-      Alice-&gt;John: Hello John, how are you?
-        </pre>"""
+        '<pre align="center" id="participants" class="mermaid align-center">\n            sequenceDiagram\n      participant Alice\n      participant Bob\n      Alice-&gt;John: Hello John, how are you?\n    </pre>'
         in index
     )
