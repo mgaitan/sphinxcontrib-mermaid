@@ -1,3 +1,12 @@
+.. attention::
+
+   **Seeking for new maintainers**
+
+   `sphinxcontrib-mermaid` is actively seeking new maintainers. As the original creator, I’m no longer able to dedicate the time and attention needed. If you’re interested in contributing and helping to drive this project forward, please see `this issue <https://github.com/mgaitan/sphinxcontrib-mermaid/issues/148>`_.
+
+
+------
+
 .. image:: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml/badge.svg
     :target: https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml
 
