@@ -17,6 +17,7 @@ import shlex
 import posixpath
 import re
 from hashlib import sha1
+from json import loads
 from subprocess import PIPE, Popen
 from tempfile import _get_default_tempdir
 import uuid
@@ -25,11 +26,13 @@ import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import ViewList
+from packaging.version import Version
 from sphinx.application import Sphinx
 from sphinx.locale import _
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir
+from yaml import dump
 
 from .autoclassdiag import class_diagram
 from .exceptions import MermaidError
@@ -37,7 +40,45 @@ from .exceptions import MermaidError
 logger = logging.getLogger(__name__)
 
 mapname_re = re.compile(r'<map id="(.*?)"')
+_MERMAID_INIT_JS_DEFAULT = "mermaid.initialize({startOnLoad:false});"
+_MERMAID_RUN_NO_D3_ZOOM = """
+import mermaid from "{mermaid_js_url}";
+window.addEventListener("load", () => mermaid.run());
+"""
 
+_MERMAID_RUN_D3_ZOOM = """
+import mermaid from "{mermaid_js_url}";
+const load = async () => {{
+    await mermaid.run();
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+    if(mermaids_to_add_zoom > 0) {{
+        var svgs = d3.selectAll("{d3_selector}");
+        if(all_mermaids.length !== mermaids_processed.length) {{
+            // try again in a sec, wait for mermaids to load
+            setTimeout(load, 200);
+            return;
+        }} else if(svgs.size() !== mermaids_to_add_zoom) {{
+            // try again in a sec, wait for mermaids to load
+            setTimeout(load, 200);
+            return;
+        }} else {{
+            svgs.each(function() {{
+                var svg = d3.select(this);
+                svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                var inner = svg.select("g");
+                var zoom = d3.zoom().on("zoom", function(event) {{
+                    inner.attr("transform", event.transform);
+                }});
+                svg.call(zoom);
+            }});
+        }}
+    }}
+}};
+
+window.addEventListener("load", load);
+"""
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
     pass
@@ -73,10 +114,14 @@ class Mermaid(Directive):
     optional_arguments = 1
     final_argument_whitespace = False
     option_spec = {
+        # Sphinx directives
         "alt": directives.unchanged,
         "align": align_spec,
         "caption": directives.unchanged,
         "zoom": directives.unchanged,
+        # Mermaid directives
+        "config": directives.unchanged,
+        "title": directives.unchanged,
     }
 
     def get_mm_code(self):
@@ -111,7 +156,7 @@ class Mermaid(Directive):
             mmcode = "\n".join(self.content)
         return mmcode
 
-    def run(self):
+    def run(self, **kwargs):
         mmcode = self.get_mm_code()
         # mmcode is a list, so it's a system message, not content to be included in the
         # document.
@@ -131,6 +176,7 @@ class Mermaid(Directive):
         node = mermaid()
         node["code"] = mmcode
         node["options"] = {}
+        # Sphinx directives
         if "alt" in self.options:
             node["alt"] = self.options["alt"]
         if "align" in self.options:
@@ -140,6 +186,18 @@ class Mermaid(Directive):
         if "zoom" in self.options:
             node["zoom"] = True
             node["zoom_id"] = f"id-{uuid.uuid4()}"
+
+        # Mermaid directives
+        mm_config = "---"
+        if "config" in self.options:
+            mm_config += "\n"
+            mm_config += dump({"config": loads(self.options['config'])})
+        if "title" in self.options:
+            mm_config += "\n"
+            mm_config += f"title: {self.options['title']}"
+        mm_config += "\n---\n"
+        if mm_config != "---\n---\n":
+            node["code"] = mm_config + node["code"]
 
         caption = self.options.get("caption")
         if caption:
@@ -420,44 +478,61 @@ def install_js(
         return
 
     # Add required JavaScript
-    if not app.config.mermaid_version:
-        _mermaid_js_url = None  # assume it is local
+    if app.config.mermaid_use_local:
+        _mermaid_js_url = app.config.mermaid_use_local
     elif app.config.mermaid_version == "latest":
-        _mermaid_js_url = "https://unpkg.com/mermaid/dist/mermaid.min.js"
+        _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
+    elif Version(app.config.mermaid_version) > Version("10.2.0"):
+        _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
+    elif app.config.mermaid_version:
+        raise MermaidError("Requires mermaid js version 10.3.0 or later")
+    
+    app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority, type="module")
+
+    if app.config.mermaid_elk_use_local:
+        _mermaid_elk_js_url = app.config.mermaid_elk_use_local
+    elif app.config.mermaid_include_elk == "latest":
+        _mermaid_elk_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"
+    elif app.config.mermaid_include_elk:
+        _mermaid_elk_js_url = f"https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@{app.config.mermaid_include_elk}/dist/mermaid-layout-elk.esm.min.mjs"
     else:
-        _mermaid_js_url = f"https://unpkg.com/mermaid@{app.config.mermaid_version}/dist/mermaid.min.js"
-    if _mermaid_js_url:
-        app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority)
+        _mermaid_elk_js_url = None
+    if _mermaid_elk_js_url:
+        app.add_js_file(_mermaid_elk_js_url, priority=app.config.mermaid_js_priority, type="module")
+
+    if app.config.mermaid_init_js == _MERMAID_INIT_JS_DEFAULT:
+        # Update if esm is used and no custom init-js is provided
+        if _mermaid_elk_js_url:
+            # Add registration of ELK layouts
+            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";import elkLayouts from "{_mermaid_elk_js_url}";mermaid.registerLayoutLoaders(elkLayouts);{app.config.mermaid_init_js}';
+        else:
+            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";{app.config.mermaid_init_js}';
 
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
         priority = (
             app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
         )
-        app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority)
-
+        app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority, type="module")
+            
+    _wrote_mermaid_run = False
     if app.config.mermaid_output_format == "raw":
+        if app.config.d3_use_local:
+            _d3_js_url = app.config.d3_use_local
+        elif app.config.d3_version == "latest":
+            _d3_js_url = "https://cdn.jsdelivr.net/npm/d3/dist/d3.min.js"
+        elif app.config.d3_version:
+            _d3_js_url = f"https://cdn.jsdelivr.net/npm/d3@{app.config.d3_version}/dist/d3.min.js"
+        app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
+
         if app.config.mermaid_d3_zoom:
-            _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
-            _d3_js_script = """
-            window.addEventListener("load", function () {
-              var svgs = d3.selectAll(".mermaid svg");
-              svgs.each(function() {
-                var svg = d3.select(this);
-                svg.html("<g>" + svg.html() + "</g>");
-                var inner = svg.select("g");
-                var zoom = d3.zoom().on("zoom", function(event) {
-                  inner.attr("transform", event.transform);
-                });
-                svg.call(zoom);
-              });
-            });
-            """
-            app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
-            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
+            _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid svg", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
+            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+            _wrote_mermaid_run = True
         elif doctree:
             mermaid_nodes = doctree.findall(mermaid)
             _d3_selector = ""
+            count = 0
             for mermaid_node in mermaid_nodes:
                 if "zoom_id" in mermaid_node:
                     _zoom_id = mermaid_node["zoom_id"]
@@ -465,25 +540,14 @@ def install_js(
                         _d3_selector += f".mermaid#{_zoom_id} svg"
                     else:
                         _d3_selector += f", .mermaid#{_zoom_id} svg"
+                    count += 1
             if _d3_selector != "":
-                _d3_js_url = "https://unpkg.com/d3/dist/d3.min.js"
-                _d3_js_script = f"""
-                window.addEventListener("load", function () {{
-                  var svgs = d3.selectAll("{_d3_selector}");
-                  svgs.each(function() {{
-                    var svg = d3.select(this);
-                    svg.html("<g>" + svg.html() + "</g>");
-                    var inner = svg.select("g");
-                    var zoom = d3.zoom().on("zoom", function(event) {{
-                      inner.attr("transform", event.transform);
-                    }});
-                    svg.call(zoom);
-                  }});
-                }});
-                """
-                app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
-                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority)
+                _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)
+                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+                _wrote_mermaid_run = True
 
+    if not _wrote_mermaid_run and _mermaid_js_url:
+        app.add_js_file(None, body=_MERMAID_RUN_NO_D3_ZOOM.format(mermaid_js_url=_mermaid_js_url), priority=app.config.mermaid_js_priority, type="module")
 
 def setup(app):
     app.add_node(
@@ -505,16 +569,15 @@ def setup(app):
     app.add_config_value("mermaid_verbose", False, "html")
     app.add_config_value("mermaid_sequence_config", False, "html")
     
-    # Starting in version 10, mermaid is an "ESM only" package
-    # thus it requires a different initialization code not yet supported. 
-    # So the current latest version supported is this
-    # Discussion: https://github.com/mermaid-js/mermaid/discussions/4148
-    app.add_config_value("mermaid_version", "10.2.0", "html")
+    app.add_config_value("mermaid_use_local", "", "html")
+    app.add_config_value("mermaid_version", "11.2.0", "html")
+    app.add_config_value("mermaid_elk_use_local", "", "html")
+    app.add_config_value("mermaid_include_elk", "0.1.4", "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_init_js_priority", 500, "html")
-    app.add_config_value(
-        "mermaid_init_js", "mermaid.initialize({startOnLoad:true});", "html"
-    )
+    app.add_config_value("mermaid_init_js", _MERMAID_INIT_JS_DEFAULT, "html")
+    app.add_config_value("d3_use_local", "", "html")
+    app.add_config_value("d3_version", "7.9.0", "html")
     app.add_config_value("mermaid_d3_zoom", False, "html")
     app.connect("html-page-context", install_js)
 
