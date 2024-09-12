@@ -296,24 +296,24 @@ def _render_mm_html_raw(
     self, node, code, options, prefix="mermaid", imgcls=None, alt=None
 ):
     if "align" in node and "zoom_id" in node:
-        tag_template = """<div align="{align}" id="{zoom_id}" class="mermaid align-{align}">
+        tag_template = """<pre align="{align}" id="{zoom_id}" class="mermaid align-{align}">
             {code}
-        </div>
+        </pre>
         """
     elif "align" in node and "zoom_id" not in node:
-        tag_template = """<div align="{align}" class="mermaid align-{align}">
+        tag_template = """<pre align="{align}" class="mermaid align-{align}">
             {code}
-        </div>
+        </pre>
         """
     elif "align" not in node and "zoom_id" in node:
-        tag_template = """<div id="{zoom_id}" class="mermaid">
+        tag_template = """<pre id="{zoom_id}" class="mermaid">
             {code}
-        </div>
+        </pre>
         """
     else:
-        tag_template = """<div class="mermaid">
+        tag_template = """<pre class="mermaid">
             {code}
-        </div>"""
+        </pre>"""
 
     self.body.append(
         tag_template.format(align=node.get("align"), zoom_id=node.get("zoom_id"), code=self.encode(code))
@@ -355,12 +355,12 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
         else:
             if "align" in node:
                 self.body.append(
-                    '<div align="%s" class="align-%s">' % (node["align"], node["align"])
+                    '<pre align="%s" class="align-%s">' % (node["align"], node["align"])
                 )
 
             self.body.append(f'<img src="{fname}" alt="{alt}" {imgcss}/>\n')
             if "align" in node:
-                self.body.append("</div>\n")
+                self.body.append("</pre>\n")
 
     raise nodes.SkipNode
 

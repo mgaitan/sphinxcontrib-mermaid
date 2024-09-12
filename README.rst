@@ -151,11 +151,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://unpkg.com/browse/mermaid/.  The default is ``"11.2.0"``.
-
-``mermaid_init_js``
-
-  Mermaid initialization code. Default to ``"mermaid.initialize({startOnLoad:false});"``.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.2.0"``.
 
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
@@ -178,7 +174,10 @@ Config values
 
 ``mermaid_init_js``
 
-  Mermaid initialization code. Default to ``"mermaid.initialize({startOnLoad:false});"``.
+  Mermaid initialization code. The Default initialization is set to
+
+    mermaid.initialize({ startOnLoad: true})
+
 
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
