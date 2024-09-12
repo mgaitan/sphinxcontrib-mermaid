@@ -19,7 +19,7 @@ import re
 from hashlib import sha1
 from json import loads
 from subprocess import PIPE, Popen
-from tempfile import _get_default_tempdir
+from tempfile import TemporaryDirectory
 import uuid
 
 import sphinx
@@ -246,50 +246,53 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
     relfn = posixpath.join(self.builder.imgpath, fname)
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
     outfn = os.path.join(outdir, fname)
-    tmpfn = os.path.join(_get_default_tempdir(), basename)
+    with TemporaryDirectory() as tempDir:
+        tmpfn = os.path.join(tempDir, basename)    
 
-    if os.path.isfile(outfn):
+        if os.path.isfile(outfn):
+            return relfn, outfn
+
+        ensuredir(os.path.dirname(outfn))
+
+        with open(tmpfn, "w") as t:
+            t.write(code)
+
+        if isinstance(mermaid_cmd, str):
+            mm_args = shlex.split(mermaid_cmd)
+        else:
+            mm_args = list(mermaid_cmd)
+
+        mm_args.extend(self.builder.config.mermaid_params)
+        mm_args += ['-i', tmpfn, '-o', outfn]
+        if self.builder.config.mermaid_sequence_config:
+            mm_args.extend(["--configFile", self.builder.config.mermaid_sequence_config])
+
+        try:
+            p = Popen(
+                mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE
+            )
+        except FileNotFoundError:
+            logger.warning(
+                "command %r cannot be run (needed for mermaid "
+                "output), check the mermaid_cmd setting" % mermaid_cmd
+            )
+            return None, None
+
+        stdout, stderr = p.communicate(str.encode(code))
+        if self.builder.config.mermaid_verbose:
+            logger.info(stdout)
+
+        if p.returncode != 0:
+            raise MermaidError(
+                "Mermaid exited with error:\n[stderr]\n%s\n"
+                "[stdout]\n%s" % (stderr, stdout)
+            )
+        if not os.path.isfile(outfn):
+            raise MermaidError(
+                "Mermaid did not produce an output file:\n[stderr]\n%s\n"
+                "[stdout]\n%s" % (stderr, stdout)
+            )
         return relfn, outfn
-
-    ensuredir(os.path.dirname(outfn))
-
-    with open(tmpfn, "w") as t:
-        t.write(code)
-
-    if isinstance(mermaid_cmd, str):
-        mm_args = shlex.split(mermaid_cmd)
-    else:
-        mm_args = list(mermaid_cmd)
-
-    mm_args.extend(self.builder.config.mermaid_params)
-    mm_args += ['-i', tmpfn, '-o', outfn]
-    if self.builder.config.mermaid_sequence_config:
-        mm_args.extend(["--configFile", self.builder.config.mermaid_sequence_config])
-
-    try:
-        p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE, env=os.environ)
-    except FileNotFoundError:
-        logger.warning(
-            "command %r cannot be run (needed for mermaid "
-            "output), check the mermaid_cmd setting" % mermaid_cmd
-        )
-        return None, None
-
-    stdout, stderr = p.communicate(str.encode(code))
-    if self.builder.config.mermaid_verbose:
-        logger.info(stdout)
-
-    if p.returncode != 0:
-        raise MermaidError(
-            "Mermaid exited with error:\n[stderr]\n%s\n"
-            "[stdout]\n%s" % (stderr, stdout)
-        )
-    if not os.path.isfile(outfn):
-        raise MermaidError(
-            "Mermaid did not produce an output file:\n[stderr]\n%s\n"
-            "[stdout]\n%s" % (stderr, stdout)
-        )
-    return relfn, outfn
 
 
 def _render_mm_html_raw(
