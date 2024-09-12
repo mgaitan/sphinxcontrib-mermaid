@@ -119,6 +119,8 @@ Then add ``sphinxcontrib.mermaid`` in ``extensions`` list of your project's ``co
 Directive options
 ------------------
 
+``:name:``: determines the image's name (id) for HTML output.
+
 ``:alt:``: determines the image's alternate text for HTML output.  If not given, the alternate text defaults to the mermaid code.
 
 ``:align:``: determines the image's position. Valid options are ``'left'``, ``'center'``, ``'right'``

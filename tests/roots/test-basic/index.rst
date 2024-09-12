@@ -2,6 +2,7 @@ Hi, basic test
 --------------
 
 .. mermaid::
+   :name: participants
 
    sequenceDiagram
       participant Alice
