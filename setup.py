@@ -58,9 +58,9 @@ setup(
         "Topic :: Utilities",
     ],
     platforms="any",
-    packages=find_namespace_packages(where='./', include=['sphinxcontrib.mermaid']),
-    package_dir={'': './'},
+    packages=find_namespace_packages(where="./", include=["sphinxcontrib.mermaid"]),
+    package_dir={"": "./"},
     include_package_data=True,
     install_requires=["sphinx", "pyyaml"],
-    extras_require={'test': ['myst-parser', 'defusedxml', 'sphinx', 'pytest']},
+    extras_require={"test": ["defusedxml", "myst-parser", "pytest", "ruff", "sphinx"]},
 )

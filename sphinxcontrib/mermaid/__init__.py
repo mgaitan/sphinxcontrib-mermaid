@@ -1,13 +1,14 @@
 """
-    sphinx-mermaid
-    ~~~~~~~~~~~~~~~
+sphinx-mermaid
+~~~~~~~~~~~~~~~
 
-    Allow mermaid diagrams to be included in Sphinx-generated
-    documents inline.
+Allow mermaid diagrams to be included in Sphinx-generated
+documents inline.
 
-    :copyright: Copyright 2016-2023 by Martín Gaitán and others
-    :license: BSD, see LICENSE for details.
+:copyright: Copyright 2016-2023 by Martín Gaitán and others
+:license: BSD, see LICENSE for details.
 """
+
 from __future__ import annotations
 
 import codecs
@@ -80,6 +81,7 @@ const load = async () => {{
 window.addEventListener("load", load);
 """
 
+
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
     pass
 
@@ -90,9 +92,7 @@ def figure_wrapper(directive, node, caption):
         figure_node["align"] = node.attributes.pop("align")
 
     parsed = nodes.Element()
-    directive.state.nested_parse(
-        ViewList([caption], source=""), directive.content_offset, parsed
-    )
+    directive.state.nested_parse(ViewList([caption], source=""), directive.content_offset, parsed)
     caption_node = nodes.caption(parsed[0].rawsource, "", *parsed[0].children)
     caption_node.source = parsed[0].source
     caption_node.line = parsed[0].line
@@ -132,8 +132,7 @@ class Mermaid(Directive):
             if self.content:
                 return [
                     document.reporter.warning(
-                        "Mermaid directive cannot have both content and "
-                        "a filename argument",
+                        "Mermaid directive cannot have both content and " "a filename argument",
                         line=self.lineno,
                     )
                 ]
@@ -147,8 +146,7 @@ class Mermaid(Directive):
             except OSError:
                 return [
                     document.reporter.warning(
-                        "External Mermaid file %r not found or reading "
-                        "it failed" % filename,
+                        "External Mermaid file %r not found or reading " "it failed" % filename,
                         line=self.lineno,
                     )
                 ]
@@ -192,7 +190,7 @@ class Mermaid(Directive):
         mm_config = "---"
         if "config" in self.options:
             mm_config += "\n"
-            mm_config += dump({"config": loads(self.options['config'])})
+            mm_config += dump({"config": loads(self.options["config"])})
         if "title" in self.options:
             mm_config += "\n"
             mm_config += f"title: {self.options['title']}"
@@ -209,7 +207,6 @@ class Mermaid(Directive):
 
 
 class MermaidClassDiagram(Mermaid):
-
     has_content = False
     required_arguments = 1
     optional_arguments = 100
@@ -239,9 +236,7 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
 
     mermaid_cmd = self.builder.config.mermaid_cmd
     mermaid_cmd_shell = self.builder.config.mermaid_cmd_shell in {True, "True", "true"}
-    hashkey = (
-        code + str(options) + str(self.builder.config.mermaid_sequence_config)
-    ).encode("utf-8")
+    hashkey = (code + str(options) + str(self.builder.config.mermaid_sequence_config)).encode("utf-8")
 
     basename = f"{prefix}-{sha1(hashkey).hexdigest()}"
     fname = f"{basename}.{_fmt}"
@@ -249,7 +244,7 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
     outdir = os.path.join(self.builder.outdir, self.builder.imagedir)
     outfn = os.path.join(outdir, fname)
     with TemporaryDirectory() as tempDir:
-        tmpfn = os.path.join(tempDir, basename)    
+        tmpfn = os.path.join(tempDir, basename)
 
         if os.path.isfile(outfn):
             return relfn, outfn
@@ -265,19 +260,14 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
             mm_args = list(mermaid_cmd)
 
         mm_args.extend(self.builder.config.mermaid_params)
-        mm_args += ['-i', tmpfn, '-o', outfn]
+        mm_args += ["-i", tmpfn, "-o", outfn]
         if self.builder.config.mermaid_sequence_config:
             mm_args.extend(["--configFile", self.builder.config.mermaid_sequence_config])
 
         try:
-            p = Popen(
-                mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE
-            )
+            p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         except FileNotFoundError:
-            logger.warning(
-                "command %r cannot be run (needed for mermaid "
-                "output), check the mermaid_cmd setting" % mermaid_cmd
-            )
+            logger.warning("command %r cannot be run (needed for mermaid " "output), check the mermaid_cmd setting" % mermaid_cmd)
             return None, None
 
         stdout, stderr = p.communicate(str.encode(code))
@@ -285,62 +275,42 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
             logger.info(stdout)
 
         if p.returncode != 0:
-            raise MermaidError(
-                "Mermaid exited with error:\n[stderr]\n%s\n"
-                "[stdout]\n%s" % (stderr, stdout)
-            )
+            raise MermaidError("Mermaid exited with error:\n[stderr]\n%s\n" "[stdout]\n%s" % (stderr, stdout))
         if not os.path.isfile(outfn):
-            raise MermaidError(
-                "Mermaid did not produce an output file:\n[stderr]\n%s\n"
-                "[stdout]\n%s" % (stderr, stdout)
-            )
+            raise MermaidError("Mermaid did not produce an output file:\n[stderr]\n%s\n" "[stdout]\n%s" % (stderr, stdout))
         return relfn, outfn
 
 
-def _render_mm_html_raw(
-    self, node, code, options, prefix="mermaid", imgcls=None, alt=None
-):
+def _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
     classes = ["mermaid"]
     attrs = {}
-    
+
     if "align" in node:
         classes.append(f"align-{node['align']}")
         attrs["align"] = node["align"]
 
     if "zoom_id" in node:
         attrs["data-zoom-id"] = node["zoom_id"]
-    
+
     if "ids" in node and len(node["ids"]) == 1:
         attrs["id"] = node["ids"][0]
-        
+
     tag_template = """<pre {attr_defs} class="{classes}">
         {code}
     </pre>"""
-    attr_defs = ["{}=\"{}\"".format(k, v) for k, v in attrs.items()]
-    self.body.append(
-        tag_template.format(
-            attr_defs=" ".join(attr_defs),
-            classes=" ".join(classes),
-            code=self.encode(code)
-        )
-    )
+    attr_defs = ['{}="{}"'.format(k, v) for k, v in attrs.items()]
+    self.body.append(tag_template.format(attr_defs=" ".join(attr_defs), classes=" ".join(classes), code=self.encode(code)))
     raise nodes.SkipNode
 
 
 def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
-
     _fmt = self.builder.config.mermaid_output_format
     if _fmt == "raw":
-        return _render_mm_html_raw(
-            self, node, code, options, prefix="mermaid", imgcls=None, alt=None
-        )
+        return _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None)
 
     try:
         if _fmt not in ("png", "svg"):
-            raise MermaidError(
-                "mermaid_output_format must be one of 'raw', 'png', "
-                "'svg', but is %r" % _fmt
-            )
+            raise MermaidError("mermaid_output_format must be one of 'raw', 'png', " "'svg', but is %r" % _fmt)
 
         fname, outfn = render_mm(self, code, options, _fmt, prefix)
     except MermaidError as exc:
@@ -360,9 +330,7 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
             self.body.append(svgtag)
         else:
             if "align" in node:
-                self.body.append(
-                    '<pre align="%s" class="align-%s">' % (node["align"], node["align"])
-                )
+                self.body.append('<pre align="%s" class="align-%s">' % (node["align"], node["align"]))
 
             self.body.append(f'<img src="{fname}" alt="{alt}" {imgcss}/>\n')
             if "align" in node:
@@ -387,11 +355,9 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
         try:
             p = Popen(mm_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
         except OSError as err:
-            if err.errno != errno.ENOENT:   # No such file or directory
+            if err.errno != errno.ENOENT:  # No such file or directory
                 raise
-            logger.warning(
-                f"command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting"
-            )
+            logger.warning(f"command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting")
             return None, None
 
         stdout, stderr = p.communicate()
@@ -399,19 +365,11 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
             logger.info(stdout)
 
         if p.returncode != 0:
-            raise MermaidError(
-                "PdfCrop exited with error:\n[stderr]\n%s\n"
-                "[stdout]\n%s" % (stderr, stdout)
-            )
+            raise MermaidError("PdfCrop exited with error:\n[stderr]\n%s\n" "[stdout]\n%s" % (stderr, stdout))
         if not os.path.isfile(outfn):
-            raise MermaidError(
-                "PdfCrop did not produce an output file:\n[stderr]\n%s\n"
-                "[stdout]\n%s" % (stderr, stdout)
-            )
+            raise MermaidError("PdfCrop did not produce an output file:\n[stderr]\n%s\n" "[stdout]\n%s" % (stderr, stdout))
 
-        fname = "{filename[0]}-crop{filename[1]}".format(
-            filename=os.path.splitext(fname)
-        )
+        fname = "{filename[0]}-crop{filename[1]}".format(filename=os.path.splitext(fname))
 
     is_inline = self.is_inline(node)
     if is_inline:
@@ -428,9 +386,7 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
             elif node["align"] == "right":
                 self.body.append("{\\hspace*{\\fill}")
                 post = "}"
-        self.body.append(
-            "%s\\sphinxincludegraphics{%s}%s" % (para_separator, fname, para_separator)
-        )
+        self.body.append("%s\\sphinxincludegraphics{%s}%s" % (para_separator, fname, para_separator))
         if post:
             self.body.append(post)
 
@@ -492,7 +448,7 @@ def install_js(
         _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
     elif app.config.mermaid_version:
         raise MermaidError("Requires mermaid js version 10.3.0 or later")
-    
+
     app.add_js_file(_mermaid_js_url, priority=app.config.mermaid_js_priority, type="module")
 
     if app.config.mermaid_elk_use_local:
@@ -500,7 +456,9 @@ def install_js(
     elif app.config.mermaid_include_elk == "latest":
         _mermaid_elk_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"
     elif app.config.mermaid_include_elk:
-        _mermaid_elk_js_url = f"https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@{app.config.mermaid_include_elk}/dist/mermaid-layout-elk.esm.min.mjs"
+        _mermaid_elk_js_url = (
+            f"https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@{app.config.mermaid_include_elk}/dist/mermaid-layout-elk.esm.min.mjs"
+        )
     else:
         _mermaid_elk_js_url = None
     if _mermaid_elk_js_url:
@@ -510,17 +468,15 @@ def install_js(
         # Update if esm is used and no custom init-js is provided
         if _mermaid_elk_js_url:
             # Add registration of ELK layouts
-            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";import elkLayouts from "{_mermaid_elk_js_url}";mermaid.registerLayoutLoaders(elkLayouts);{app.config.mermaid_init_js}';
+            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";import elkLayouts from "{_mermaid_elk_js_url}";mermaid.registerLayoutLoaders(elkLayouts);{app.config.mermaid_init_js}'
         else:
-            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";{app.config.mermaid_init_js}';
+            app.config.mermaid_init_js = f'import mermaid from "{_mermaid_js_url}";{app.config.mermaid_init_js}'
 
     if app.config.mermaid_init_js:
         # If mermaid is local the init-call must be placed after `html_js_files` which has a priority of 800.
-        priority = (
-            app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
-        )
+        priority = app.config.mermaid_init_js_priority if _mermaid_js_url is not None else 801
         app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority, type="module")
-            
+
     _wrote_mermaid_run = False
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
@@ -553,7 +509,10 @@ def install_js(
                 _wrote_mermaid_run = True
 
     if not _wrote_mermaid_run and _mermaid_js_url:
-        app.add_js_file(None, body=_MERMAID_RUN_NO_D3_ZOOM.format(mermaid_js_url=_mermaid_js_url), priority=app.config.mermaid_js_priority, type="module")
+        app.add_js_file(
+            None, body=_MERMAID_RUN_NO_D3_ZOOM.format(mermaid_js_url=_mermaid_js_url), priority=app.config.mermaid_js_priority, type="module"
+        )
+
 
 def setup(app):
     app.add_node(
@@ -574,7 +533,7 @@ def setup(app):
     app.add_config_value("mermaid_params", list(), "html")
     app.add_config_value("mermaid_verbose", False, "html")
     app.add_config_value("mermaid_sequence_config", False, "html")
-    
+
     app.add_config_value("mermaid_use_local", "", "html")
     app.add_config_value("mermaid_version", "11.2.0", "html")
     app.add_config_value("mermaid_elk_use_local", "", "html")
