@@ -254,7 +254,7 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
 
         ensuredir(os.path.dirname(outfn))
 
-        with open(tmpfn, "w") as t:
+        with open(tmpfn, "w", encoding="utf-8") as t:
             t.write(code)
 
         if isinstance(mermaid_cmd, str):
