@@ -9,7 +9,7 @@ description="Mermaid diagrams in yours Sphinx powered docs"
 readme = "README.rst"
 license = { text = "BSD" }
 version = "1.0.0"
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
 
 classifiers = [
