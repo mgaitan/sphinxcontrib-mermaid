@@ -1,5 +1,7 @@
 include README.rst
 include CHANGELOG.rst
 include LICENSE.rst
-global-exclude *.pyc
+
+prune tests
 exclude .gitignore
+global-exclude *.pyc
