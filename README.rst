@@ -42,7 +42,7 @@ By default, the HTML builder will simply render this as a ``div`` tag with
 make mermaid works.
 
 For other builders (or if ``mermaid_output_format`` config variable is set differently), the extension
-will use `mermaid-cli <https://github.com/mermaidjs/mermaid.cli>`_ to render as
+will use `mermaid-cli <https://github.com/mermaid-js/mermaid-cli>`_ to render as
 to a PNG or SVG image, and then used in the proper code.
 
 
@@ -202,7 +202,7 @@ Config values
 
 ``mermaid_params``
 
-   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaidjs/mermaid.cli#options>`_.
+   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaid-js/mermaid-cli#usage>`_.
    Examples::
 
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
