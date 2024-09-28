@@ -42,7 +42,7 @@ By default, the HTML builder will simply render this as a ``div`` tag with
 make mermaid works.
 
 For other builders (or if ``mermaid_output_format`` config variable is set differently), the extension
-will use `mermaid-cli <https://github.com/mermaidjs/mermaid.cli>`_ to render as
+will use `mermaid-cli <https://github.com/mermaid-js/mermaid-cli>`_ to render as
 to a PNG or SVG image, and then used in the proper code.
 
 
