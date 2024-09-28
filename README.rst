@@ -202,7 +202,7 @@ Config values
 
 ``mermaid_params``
 
-   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaid-js/mermaid-cli#options>`_.
+   For individual parameters, a list of parameters can be added. Refer to `<https://github.com/mermaid-js/mermaid-cli#usage>`_.
    Examples::
 
       mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
