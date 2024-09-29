@@ -233,7 +233,7 @@ Markdown support
 ----------------
 
 You can include Mermaid diagrams in your Markdown documents in Sphinx.
-You just need to setup the `markdown support in Sphinx <https://www.sphinx-doc.org/en/master/usage/markdown.html>`_ via
+You just need to set up the `markdown support in Sphinx <https://www.sphinx-doc.org/en/master/usage/markdown.html>`_ via
 `myst-parser <https://myst-parser.readthedocs.io/>`_
 . See a `minimal configuration from the tests <https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/tests/roots/test-markdown/conf.py>`_
 
