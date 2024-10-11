@@ -1,6 +1,10 @@
 import inspect
 
-from sphinx.util import ExtensionError, import_object
+try:
+    from sphinx.errors import ExtensionError
+except ImportError:
+    from sphinx.util import ExtensionError
+from sphinx.util import  import_object
 
 from .exceptions import MermaidError
 
