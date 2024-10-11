@@ -1,7 +1,7 @@
 import inspect
 
 from sphinx.errors import ExtensionError
-from sphinx.util import  import_object
+from sphinx.util import import_object
 
 from .exceptions import MermaidError
 
