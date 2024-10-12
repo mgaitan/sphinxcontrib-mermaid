@@ -1,6 +1,23 @@
 Changelog
 ---------
 
+1.0.0 (October 12, 2024)
++++++++++++++++++++++
+
+- Upgrade Mermaid to 11.2.0
+- Add support for ELK diagrams
+- Add support for name parameter
+- Add passthrough of mermaid frontmatter
+- Convert to native namespace package
+- Drop support for Python 3.7
+- Convert default placeholder from div to pre
+- Fix for tempfile encoding when containing non ascii characters
+- Fix for mermaid sequence config arguments
+- Default to jsdelivr (previously unpkg) for JS asset CDN
+
+See full `set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compare/1.0.0...0.9.2>`_.
+
+
 0.9.2 (May 28, 2023)
 +++++++++++++++++++++
 

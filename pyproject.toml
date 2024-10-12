@@ -8,8 +8,8 @@ authors = [{name = "Martín Gaitán", email = "gaitan@gmail.com"}]
 description="Mermaid diagrams in yours Sphinx powered docs"
 readme = "README.rst"
 license = { text = "BSD" }
-version = "0.9.2"
-requires-python = ">=3.9"
+version = "1.0.0"
+requires-python = ">=3.8"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
 
 classifiers = [
@@ -40,6 +40,7 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/mgaitan/sphinxcontrib-mermaid"
 Homepage = "https://github.com/mgaitan/sphinxcontrib-mermaid"
+Changelog = "https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/CHANGELOG.rst"
 
 [project.optional-dependencies]
 test = [
