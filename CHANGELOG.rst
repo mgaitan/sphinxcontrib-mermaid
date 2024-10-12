@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-1.0.0 (October 11, 2024)
+1.0.0 (October 12, 2024)
 +++++++++++++++++++++
 
 - Upgrade Mermaid to 11.2.0
