@@ -55,7 +55,9 @@ const load = async () => {{
     const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
     const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
     if(mermaids_to_add_zoom > 0) {{
-        var svgs = d3.selectAll("{d3_selector}");
+        var svgs = d3.selectAll("{d3_selector}").select(function() {{
+            return this.querySelector("svg"); // Get the first SVG child of each mermaid container
+        }});
         if(all_mermaids.length !== mermaids_processed.length) {{
             // try again in a sec, wait for mermaids to load
             setTimeout(load, 200);
@@ -488,7 +490,7 @@ def install_js(
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
 
         if app.config.mermaid_d3_zoom:
-            _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid svg", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
+            _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
             app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
         elif doctree:
@@ -499,9 +501,9 @@ def install_js(
                 if "zoom_id" in mermaid_node:
                     _zoom_id = mermaid_node["zoom_id"]
                     if _d3_selector == "":
-                        _d3_selector += f".mermaid[data-zoom-id={_zoom_id}] svg"
+                        _d3_selector += f".mermaid[data-zoom-id={_zoom_id}]"
                     else:
-                        _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
+                        _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}]"
                     count += 1
             if _d3_selector != "":
                 _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)
