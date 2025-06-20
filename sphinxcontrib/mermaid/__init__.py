@@ -503,7 +503,7 @@ def install_js(
             if not _has_fullscreen:
                 _d3_js_script = template_js.render(
                     fullscreen_css="",  # ignored
-                    d3_selector=".mermaid svg",
+                    d3_selector=".mermaid",
                     d3_node_count=-1,
                     **common_render_args,
                 )
@@ -517,9 +517,9 @@ def install_js(
                 if "zoom_id" in mermaid_node:
                     _zoom_id = mermaid_node["zoom_id"]
                     if _d3_selector == "":
-                        _d3_selector += f".mermaid[data-zoom-id={_zoom_id}] svg"
+                        _d3_selector += f".mermaid[data-zoom-id={_zoom_id}]"
                     else:
-                        _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
+                        _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}]"
                     count += 1
             if _d3_selector != "":
                 if not _has_fullscreen:
@@ -536,7 +536,7 @@ def install_js(
     if _has_fullscreen and not _wrote_mermaid_run:
         if _has_zoom:
             # Fullscreen with zoom
-            _d3_selector = ".mermaid svg"
+            _d3_selector = ".mermaid"
             if not _d3_selector and doctree:
                 # Build selector for per-diagram zoom
                 mermaid_nodes = doctree.findall(mermaid)
@@ -545,12 +545,12 @@ def install_js(
                     if "zoom_id" in mermaid_node:
                         _zoom_id = mermaid_node["zoom_id"]
                         if _d3_selector == "":
-                            _d3_selector += f".mermaid[data-zoom-id={_zoom_id}] svg"
+                            _d3_selector += f".mermaid[data-zoom-id={_zoom_id}]"
                         else:
-                            _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
+                            _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}]"
                         count += 1
                 if _d3_selector == "":
-                    _d3_selector = ".mermaid svg"
+                    _d3_selector = ".mermaid"
                     count = -1
             else:
                 count = -1
@@ -559,7 +559,7 @@ def install_js(
                     mermaid_width=_mermaid_width,
                     mermaid_height=_mermaid_height,
                 ),
-                d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
+                d3_selector=_d3_selector if _d3_selector else ".mermaid",
                 d3_node_count=count if _d3_selector else -1,
                 **common_render_args,
             )
