@@ -311,6 +311,6 @@ In order to have Mermaid diagrams build properly in PDFs generated on readthedoc
 
 3. In your documentation ``conf.py`` file, add: ::
 
-    mermaid_params = ['-p' 'puppeteer-config.json']
+    mermaid_params = ['-p', 'puppeteer-config.json']
 
 
