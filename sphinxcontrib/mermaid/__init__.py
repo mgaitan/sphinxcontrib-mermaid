@@ -35,6 +35,7 @@ from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir
 from yaml import dump
 
+from . import fullscreen
 from .autoclassdiag import class_diagram
 from .exceptions import MermaidError
 
@@ -478,6 +479,9 @@ def install_js(
         app.add_js_file(None, body=app.config.mermaid_init_js, priority=priority, type="module")
 
     _wrote_mermaid_run = False
+    _has_zoom = False
+    _has_fullscreen = app.config.mermaid_fullscreen
+
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
             _d3_js_url = app.config.d3_use_local
@@ -488,9 +492,11 @@ def install_js(
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
 
         if app.config.mermaid_d3_zoom:
-            _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid svg", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
-            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
-            _wrote_mermaid_run = True
+            _has_zoom = True
+            if not _has_fullscreen:
+                _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid svg", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
+                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+                _wrote_mermaid_run = True
         elif doctree:
             mermaid_nodes = doctree.findall(mermaid)
             _d3_selector = ""
@@ -504,9 +510,51 @@ def install_js(
                         _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
                     count += 1
             if _d3_selector != "":
-                _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)
-                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
-                _wrote_mermaid_run = True
+                _has_zoom = True
+                if not _has_fullscreen:
+                    _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)
+                    app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+                    _wrote_mermaid_run = True
+
+    # Handle fullscreen feature
+    if _has_fullscreen and not _wrote_mermaid_run:
+        _button_text = app.config.mermaid_fullscreen_button
+        if _has_zoom:
+            # Fullscreen with zoom
+            _d3_selector = ".mermaid svg" if app.config.mermaid_d3_zoom else ""
+            if not _d3_selector and doctree:
+                # Build selector for per-diagram zoom
+                mermaid_nodes = doctree.findall(mermaid)
+                count = 0
+                for mermaid_node in mermaid_nodes:
+                    if "zoom_id" in mermaid_node:
+                        _zoom_id = mermaid_node["zoom_id"]
+                        if _d3_selector == "":
+                            _d3_selector += f".mermaid[data-zoom-id={_zoom_id}] svg"
+                        else:
+                            _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
+                        count += 1
+                if _d3_selector == "":
+                    _d3_selector = ".mermaid svg"
+                    count = -1
+            else:
+                count = -1
+            _d3_js_script = fullscreen.MERMAID_RUN_FULLSCREEN_ZOOM.format(
+                mermaid_js_url=_mermaid_js_url,
+                fullscreen_css=fullscreen.FULLSCREEN_CSS,
+                button_text=_button_text,
+                d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
+                d3_node_count=count if _d3_selector else -1,
+            )
+            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+            _wrote_mermaid_run = True
+        else:
+            # Fullscreen without zoom
+            _fullscreen_js_script = fullscreen.MERMAID_RUN_FULLSCREEN.format(
+                mermaid_js_url=_mermaid_js_url, fullscreen_css=fullscreen.FULLSCREEN_CSS, button_text=_button_text
+            )
+            app.add_js_file(None, body=_fullscreen_js_script, priority=app.config.mermaid_js_priority, type="module")
+            _wrote_mermaid_run = True
 
     if not _wrote_mermaid_run and _mermaid_js_url:
         app.add_js_file(
@@ -544,6 +592,8 @@ def setup(app):
     app.add_config_value("d3_use_local", "", "html")
     app.add_config_value("d3_version", "7.9.0", "html")
     app.add_config_value("mermaid_d3_zoom", False, "html")
+    app.add_config_value("mermaid_fullscreen", False, "html")
+    app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
     app.connect("html-page-context", install_js)
 
     return {"version": sphinx.__display_version__, "parallel_read_safe": True}

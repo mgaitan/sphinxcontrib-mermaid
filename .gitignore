@@ -94,3 +94,7 @@ ENV/
 
 # IDEA project settings
 .idea
+
+# Test directories (for manual theme testing)
+test-fullscreen/
+theme-tests/
