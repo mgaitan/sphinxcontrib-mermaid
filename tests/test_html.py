@@ -141,8 +141,8 @@ def test_fullscreen_with_zoom(index):
     assert "d3.zoom" in index
 
 
-@pytest.mark.sphinx("html", testroot="fullscreen", confoverrides={"mermaid_fullscreen_button": "🔍"})
+@pytest.mark.sphinx("html", testroot="fullscreen", confoverrides={"mermaid_fullscreen_button": "[+]"})
 def test_custom_fullscreen_button(index):
     """Test custom fullscreen button icon."""
     assert "mermaid.run()" in index
-    assert "🔍" in index
+    assert "[+]" in index

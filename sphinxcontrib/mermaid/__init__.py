@@ -20,6 +20,7 @@ import shlex
 import uuid
 from hashlib import sha1
 from json import loads
+from pathlib import Path
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
 
@@ -35,11 +36,16 @@ from sphinx.util.i18n import search_image_for_language
 from sphinx.util.osutil import ensuredir
 from yaml import dump
 
-from . import fullscreen
 from .autoclassdiag import class_diagram
 from .exceptions import MermaidError
 
 logger = logging.getLogger(__name__)
+
+# Load fullscreen CSS and JavaScript from external files
+_MODULE_DIR = Path(__file__).parent
+_FULLSCREEN_CSS = (_MODULE_DIR / "fullscreen.css").read_text(encoding="utf-8")
+_MERMAID_RUN_FULLSCREEN = (_MODULE_DIR / "fullscreen.js").read_text(encoding="utf-8")
+_MERMAID_RUN_FULLSCREEN_ZOOM = (_MODULE_DIR / "fullscreen_zoom.js").read_text(encoding="utf-8")
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 _MERMAID_INIT_JS_DEFAULT = "mermaid.initialize({startOnLoad:false});"
@@ -539,9 +545,9 @@ def install_js(
                     count = -1
             else:
                 count = -1
-            _d3_js_script = fullscreen.MERMAID_RUN_FULLSCREEN_ZOOM.format(
+            _d3_js_script = _MERMAID_RUN_FULLSCREEN_ZOOM.format(
                 mermaid_js_url=_mermaid_js_url,
-                fullscreen_css=fullscreen.FULLSCREEN_CSS,
+                fullscreen_css=_FULLSCREEN_CSS,
                 button_text=_button_text,
                 d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
                 d3_node_count=count if _d3_selector else -1,
@@ -550,8 +556,8 @@ def install_js(
             _wrote_mermaid_run = True
         else:
             # Fullscreen without zoom
-            _fullscreen_js_script = fullscreen.MERMAID_RUN_FULLSCREEN.format(
-                mermaid_js_url=_mermaid_js_url, fullscreen_css=fullscreen.FULLSCREEN_CSS, button_text=_button_text
+            _fullscreen_js_script = _MERMAID_RUN_FULLSCREEN.format(
+                mermaid_js_url=_mermaid_js_url, fullscreen_css=_FULLSCREEN_CSS, button_text=_button_text
             )
             app.add_js_file(None, body=_fullscreen_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
