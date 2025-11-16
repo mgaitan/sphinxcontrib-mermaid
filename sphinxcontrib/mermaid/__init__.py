@@ -598,7 +598,7 @@ def setup(app):
     app.add_config_value("d3_use_local", "", "html")
     app.add_config_value("d3_version", "7.9.0", "html")
     app.add_config_value("mermaid_d3_zoom", False, "html")
-    app.add_config_value("mermaid_fullscreen", False, "html")
+    app.add_config_value("mermaid_fullscreen", True, "html")
     app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
     app.connect("html-page-context", install_js)
 

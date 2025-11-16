@@ -60,10 +60,13 @@ const load = async () => {{
     const modalContent = modal.querySelector('.mermaid-fullscreen-content');
     const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
 
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
     const closeModal = () => {{
         modal.classList.remove('active');
         modalContent.innerHTML = '';
-        document.body.style.overflow = '';
+        document.body.style.overflow = ''
+        window.scrollTo({{left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'}});
     }};
 
     closeBtn.addEventListener('click', closeModal);
@@ -104,6 +107,7 @@ const load = async () => {{
         fullscreenBtn.style.right = `${{marginRight + paddingRight + 4}}px`;
 
         fullscreenBtn.addEventListener('click', () => {{
+            previousScrollOffset = [window.scroll, window.scrollY];
             const clone = mermaidDiv.cloneNode(true);
             modalContent.innerHTML = '';
             modalContent.appendChild(clone);
