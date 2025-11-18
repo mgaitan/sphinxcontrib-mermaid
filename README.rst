@@ -155,7 +155,7 @@ Config values
 
 ``mermaid_version``
 
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.2.0"``.
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.12.1"``.
 
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
@@ -269,7 +269,7 @@ For GitHub cross-support, you can omit the curly braces and configure myst to us
 Building PDFs on readthedocs.io
 -----------------------------------
 
-In order to have Mermaid diagrams build properly in PDFs generated on readthedocs.io, you will need a few extra configurations.  
+In order to have Mermaid diagrams build properly in PDFs generated on readthedocs.io, you will need a few extra configurations.
 
 1. In your ``.readthedocs.yaml`` file (which should be in the root of your repository) include a ``post-install`` command to install the Mermaid CLI: ::
 
@@ -321,7 +321,7 @@ In order to have Mermaid diagrams build properly in PDFs generated on readthedoc
     {
       "args": ["--no-sandbox"]
     }
-   
+
 
 3. In your documentation ``conf.py`` file, add: ::
 

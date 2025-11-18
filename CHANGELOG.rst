@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+1.1.0 (November 19, 2025)
++++++++++++++++++++++
+
+- Upgrade Mermaid to 11.12.1
+- Add fullscreen graph view capabilities
+
+
 1.0.0 (October 12, 2024)
 +++++++++++++++++++++
 
@@ -22,9 +29,9 @@ See full `set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compa
 +++++++++++++++++++++
 
 - Implemented zoom on diagrams functionality. Contributed by `Daniel Althviz Moré <https://github.com/dalthviz>`_
-- Fix a bug on empty diagram generations. Contributed by `Kevin Deldycke <https://github.com/kdeldycke>`_.  
-- Upgrade default to Mermaid 10.2.0. 
-- Implement automatic releases from Github Actions when a tag is pushed 
+- Fix a bug on empty diagram generations. Contributed by `Kevin Deldycke <https://github.com/kdeldycke>`_.
+- Upgrade default to Mermaid 10.2.0.
+- Implement automatic releases from Github Actions when a tag is pushed
 
 See full `set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.9.2...0.8.1>`_.
 
@@ -32,8 +39,8 @@ See full `set of changes <https://github.com/mgaitan/sphinxcontrib-mermaid/compa
 0.8.1 (Feb 25, 2023)
 +++++++++++++++++++++
 
-- Default to Mermaid 9.4.0 as 10.0 introduced incompatible changes. 
-  See `the discussion <https://github.com/mermaid-js/mermaid/discussions/4148>`_. 
+- Default to Mermaid 9.4.0 as 10.0 introduced incompatible changes.
+  See `the discussion <https://github.com/mermaid-js/mermaid/discussions/4148>`_.
 
 0.8 (Feb 9, 2023)
 +++++++++++++++++++++
