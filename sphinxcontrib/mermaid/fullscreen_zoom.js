@@ -1,0 +1,179 @@
+import mermaid from "{mermaid_js_url}";
+
+const style = document.createElement('style');
+style.textContent = `{fullscreen_css}`;
+document.head.appendChild(style);
+
+// Detect if page has dark background
+const isDarkTheme = () => {{
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {{
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }}
+    return false;
+}};
+
+const load = async () => {{
+    await mermaid.run();
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+    if(mermaids_to_add_zoom > 0) {{
+        var svgs = d3.selectAll("{d3_selector}");
+        if(all_mermaids.length !== mermaids_processed.length) {{
+            setTimeout(load, 200);
+            return;
+        }} else if(svgs.size() !== mermaids_to_add_zoom) {{
+            setTimeout(load, 200);
+            return;
+        }} else {{
+            svgs.each(function() {{
+                var svg = d3.select(this);
+                svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                var inner = svg.select("g");
+                var zoom = d3.zoom().on("zoom", function(event) {{
+                    inner.attr("transform", event.transform);
+                }});
+                svg.call(zoom);
+            }});
+        }}
+    }}
+
+    const darkTheme = isDarkTheme();
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${{darkTheme ? ' dark-theme' : ''}}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-fullscreen-content${{darkTheme ? ' dark-theme' : ''}}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-fullscreen-content');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {{
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({{left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'}});
+    }};
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {{
+        if (e.target === modal) closeModal();
+    }});
+    document.addEventListener('keydown', (e) => {{
+        if (e.key === 'Escape' && modal.classList.contains('active')) {{
+            closeModal();
+        }}
+    }});
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {{
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {{
+            return;
+        }}
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '{button_text}';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${{marginTop + paddingTop + 4}}px`;
+        fullscreenBtn.style.right = `${{marginRight + paddingRight + 4}}px`;
+
+        fullscreenBtn.addEventListener('click', () => {{
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {{
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                setTimeout(() => {{
+                    const g = svg.querySelector('g');
+                    if (g) {{
+                        var svgD3 = d3.select(svg);
+                        svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                        var inner = svgD3.select("g");
+                        var zoom = d3.zoom().on("zoom", function(event) {{
+                            inner.attr("transform", event.transform);
+                        }});
+                        svgD3.call(zoom);
+                    }}
+                }}, 100);
+            }}
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }});
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    }});
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {{
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {{
+            if (dark) {{
+                btn.classList.add('dark-theme');
+            }} else {{
+                btn.classList.remove('dark-theme');
+            }}
+        }});
+        if (dark) {{
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        }} else {{
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }}
+    }};
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {{
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    }});
+    observer.observe(document.body, {{
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    }});
+}};
+
+window.addEventListener("load", load);

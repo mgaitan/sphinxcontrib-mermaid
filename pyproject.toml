@@ -81,3 +81,6 @@ section-order = [
 [tool.setuptools.packages.find]
 where = ["./"]
 include = ["sphinxcontrib.mermaid"]
+
+[tool.setuptools.package-data]
+"sphinxcontrib.mermaid" = ["*.css", "*.js"]

@@ -127,12 +127,14 @@ Directive options
 
 ``:caption:``: can be used to give a caption to the diagram.
 
-``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom`` bellow. 
+``:zoom:``: can be used to enable zooming the diagram. For a global config see ``mermaid_d3_zoom`` bellow.
 
 .. figure:: https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif
    :align: center
-   
+
    A preview after adding ``:zoom:`` option only to the first diagram example above:
+
+``:fullscreen:``: can be used to enable fullscreen modal viewing of the diagram. For a global config see ``mermaid_fullscreen`` below.
 
 ``:config:``: JSON to pass through to the `mermaid configuration <https://mermaid.js.org/config/configuration.html>`_
 
@@ -227,6 +229,18 @@ Config values
 ``mermaid_d3_zoom``
 
     Enables zooming in all the generated Mermaid diagrams.
+
+``mermaid_fullscreen``
+
+    Enables fullscreen modal viewing for all Mermaid diagrams. When enabled, a fullscreen button
+    appears in the top-right corner of each diagram. Clicking it opens the diagram in a fullscreen
+    modal overlay. The modal can be closed by pressing ESC, clicking outside the diagram, or clicking
+    the close button. This feature is theme-agnostic and works with any Sphinx theme.
+
+``mermaid_fullscreen_button``
+
+    Customizes the fullscreen button icon/text. Default is ``"⛶"``. You can use any Unicode character
+    or emoji, for example ``"🔍"`` or ``"⛶"``.
 
 
 Markdown support
