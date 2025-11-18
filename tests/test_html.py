@@ -17,9 +17,9 @@ def index(app, build_all):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_raw(index):
     assert "mermaid.run()" in index
-    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>' in index
+    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"></script>' in index
     assert (
-        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>'
+        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>'
         in index
     )
     assert (
@@ -91,7 +91,7 @@ def test_conf_d3_local(app, index):
 def test_mermaid_init_js(index):
     assert "mermaid.run()" in index
     assert (
-        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"; mermaid.initialize({startOnLoad:false});</script>'
+        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"; mermaid.initialize({startOnLoad:false});</script>'
         not in index
     )
     assert '<script type="module">custom script;</script>' in index
@@ -100,15 +100,15 @@ def test_mermaid_init_js(index):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": "latest"})
 def test_mermaid_with_elk(app, index):
     assert "mermaid.run()" in index
-    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>' in index
+    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"></script>' in index
 
 
 @pytest.mark.sphinx("html", testroot="markdown")
 def test_html_raw_from_markdown(index):
     assert "mermaid.run()" in index
-    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>' in index
+    assert '<script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"></script>' in index
     assert (
-        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>'
+        '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>'
         in index
     )
     assert (

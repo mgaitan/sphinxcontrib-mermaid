@@ -589,7 +589,7 @@ def setup(app):
     app.add_config_value("mermaid_sequence_config", False, "html")
 
     app.add_config_value("mermaid_use_local", "", "html")
-    app.add_config_value("mermaid_version", "11.2.0", "html")
+    app.add_config_value("mermaid_version", "11.12.1", "html")
     app.add_config_value("mermaid_elk_use_local", "", "html")
     app.add_config_value("mermaid_include_elk", "0.1.4", "html")
     app.add_config_value("mermaid_js_priority", 500, "html")
