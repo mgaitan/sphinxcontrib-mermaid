@@ -242,6 +242,10 @@ Config values
     Customizes the fullscreen button icon/text. Default is ``"⛶"``. You can use any Unicode character
     or emoji, for example ``"🔍"`` or ``"⛶"``.
 
+``mermaid_fullscreen_button_opacity``
+
+    Customizes the fullscreen button opacity, to avoid fully obscuring important chart content.
+    Default is ``50`` (percent). You can use any value from 0 to 100. Button becomes fully opaque on hover.
 
 Markdown support
 ----------------
