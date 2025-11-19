@@ -96,6 +96,7 @@ const load = async () => {{
         fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
         fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
         fullscreenBtn.textContent = '{button_text}';
+        fullscreenBtn.style.opacity = '{button_opacity}%';
 
         // Calculate dynamic position based on diagram's margin and padding
         const diagramStyle = window.getComputedStyle(mermaidDiv);

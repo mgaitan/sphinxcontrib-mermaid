@@ -525,6 +525,7 @@ def install_js(
     # Handle fullscreen feature
     if _has_fullscreen and not _wrote_mermaid_run:
         _button_text = app.config.mermaid_fullscreen_button
+        _button_opacity = app.config.mermaid_fullscreen_button_opacity
         if _has_zoom:
             # Fullscreen with zoom
             _d3_selector = ".mermaid svg" if app.config.mermaid_d3_zoom else ""
@@ -549,6 +550,7 @@ def install_js(
                 mermaid_js_url=_mermaid_js_url,
                 fullscreen_css=_FULLSCREEN_CSS,
                 button_text=_button_text,
+                button_opacity=_button_opacity,
                 d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
                 d3_node_count=count if _d3_selector else -1,
             )
@@ -600,6 +602,7 @@ def setup(app):
     app.add_config_value("mermaid_d3_zoom", False, "html")
     app.add_config_value("mermaid_fullscreen", True, "html")
     app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
+    app.add_config_value("mermaid_fullscreen_button_opacity", "50", "html")
     app.connect("html-page-context", install_js)
 
     return {"version": sphinx.__display_version__, "parallel_read_safe": True}
