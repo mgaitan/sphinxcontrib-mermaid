@@ -20,31 +20,42 @@ const isDarkTheme = () => {{
 
 const load = async () => {{
     await mermaid.run();
+
     const all_mermaids = document.querySelectorAll(".mermaid");
-    const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
     const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
-    if(mermaids_to_add_zoom > 0) {{
-        var svgs = d3.selectAll("{d3_selector}");
-        if(all_mermaids.length !== mermaids_processed.length) {{
-            setTimeout(load, 200);
-            return;
-        }} else if(svgs.size() !== mermaids_to_add_zoom) {{
-            setTimeout(load, 200);
-            return;
-        }} else {{
-            svgs.each(function() {{
-                var svg = d3.select(this);
-                svg.html("<g class='wrapper'>" + svg.html() + "</g>");
-                var inner = svg.select("g");
-                var zoom = d3.zoom().on("zoom", function(event) {{
-                    inner.attr("transform", event.transform);
+
+    if ("{add_zoom}" === "True") {{
+        const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
+        if(mermaids_to_add_zoom > 0) {{
+            var svgs = d3.selectAll("{d3_selector}");
+            if(all_mermaids.length !== mermaids_processed.length) {{
+                setTimeout(load, 200);
+                return;
+            }} else if(svgs.size() !== mermaids_to_add_zoom) {{
+                setTimeout(load, 200);
+                return;
+            }} else {{
+                svgs.each(function() {{
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {{
+                        inner.attr("transform", event.transform);
+                    }});
+                    svg.call(zoom);
                 }});
-                svg.call(zoom);
-            }});
+            }}
         }}
+    }} else if(all_mermaids.length !== mermaids_processed.length) {{
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
     }}
 
     const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("{add_fullscreen}" !== "True") return;
 
     const modal = document.createElement('div');
     modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
@@ -120,20 +131,22 @@ const load = async () => {{
                 svg.style.width = '100%';
                 svg.style.height = 'auto';
                 svg.style.maxWidth = '100%';
-                svg.style.display = 'block';
+                svg.style.sdisplay = 'block';
 
-                setTimeout(() => {{
-                    const g = svg.querySelector('g');
-                    if (g) {{
-                        var svgD3 = d3.select(svg);
-                        svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
-                        var inner = svgD3.select("g");
-                        var zoom = d3.zoom().on("zoom", function(event) {{
-                            inner.attr("transform", event.transform);
-                        }});
-                        svgD3.call(zoom);
-                    }}
-                }}, 100);
+                if ("{add_zoom}" === "True") {{
+                    setTimeout(() => {{
+                        const g = svg.querySelector('g');
+                        if (g) {{
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {{
+                                inner.attr("transform", event.transform);
+                            }});
+                            svgD3.call(zoom);
+                        }}
+                    }}, 100);
+                }}
             }}
 
             modal.classList.add('active');
