@@ -39,11 +39,11 @@ const initFullscreen = async () => {{
     modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
     modal.innerHTML = `
         <button class="mermaid-fullscreen-close${{darkTheme ? ' dark-theme' : ''}}" aria-label="Close fullscreen">✕</button>
-        <div class="mermaid-fullscreen-content${{darkTheme ? ' dark-theme' : ''}}"></div>
+        <div class="mermaid-container-fullscreen${{darkTheme ? ' dark-theme' : ''}}"></div>
     `;
     document.body.appendChild(modal);
 
-    const modalContent = modal.querySelector('.mermaid-fullscreen-content');
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
     const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
 
     const closeModal = () => {{
