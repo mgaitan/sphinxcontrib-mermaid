@@ -44,49 +44,11 @@ logger = logging.getLogger(__name__)
 # Load fullscreen CSS and JavaScript from external files
 _MODULE_DIR = Path(__file__).parent
 _FULLSCREEN_CSS = (_MODULE_DIR / "fullscreen.css").read_text(encoding="utf-8")
-_MERMAID_RUN_FULLSCREEN = (_MODULE_DIR / "fullscreen.js").read_text(encoding="utf-8")
-_MERMAID_RUN_FULLSCREEN_ZOOM = (_MODULE_DIR / "fullscreen_zoom.js").read_text(encoding="utf-8")
+_MERMAID_CSS = (_MODULE_DIR / "default.css").read_text(encoding="utf-8")
+_MERMAID_RUN = (_MODULE_DIR / "default.js").read_text(encoding="utf-8")
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 _MERMAID_INIT_JS_DEFAULT = "mermaid.initialize({startOnLoad:false});"
-_MERMAID_RUN_NO_D3_ZOOM = """
-import mermaid from "{mermaid_js_url}";
-window.addEventListener("load", () => mermaid.run());
-"""
-
-_MERMAID_RUN_D3_ZOOM = """
-import mermaid from "{mermaid_js_url}";
-const load = async () => {{
-    await mermaid.run();
-    const all_mermaids = document.querySelectorAll(".mermaid");
-    const mermaids_to_add_zoom = {d3_node_count} === -1 ? all_mermaids.length : {d3_node_count};
-    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
-    if(mermaids_to_add_zoom > 0) {{
-        var svgs = d3.selectAll("{d3_selector}");
-        if(all_mermaids.length !== mermaids_processed.length) {{
-            // try again in a sec, wait for mermaids to load
-            setTimeout(load, 200);
-            return;
-        }} else if(svgs.size() !== mermaids_to_add_zoom) {{
-            // try again in a sec, wait for mermaids to load
-            setTimeout(load, 200);
-            return;
-        }} else {{
-            svgs.each(function() {{
-                var svg = d3.select(this);
-                svg.html("<g class='wrapper'>" + svg.html() + "</g>");
-                var inner = svg.select("g");
-                var zoom = d3.zoom().on("zoom", function(event) {{
-                    inner.attr("transform", event.transform);
-                }});
-                svg.call(zoom);
-            }});
-        }}
-    }}
-}};
-
-window.addEventListener("load", load);
-"""
 
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
@@ -487,6 +449,8 @@ def install_js(
     _wrote_mermaid_run = False
     _has_zoom = False
     _has_fullscreen = app.config.mermaid_fullscreen
+    _button_text = app.config.mermaid_fullscreen_button
+    _button_opacity = app.config.mermaid_fullscreen_button_opacity
 
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
@@ -500,7 +464,16 @@ def install_js(
         if app.config.mermaid_d3_zoom:
             _has_zoom = True
             if not _has_fullscreen:
-                _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=".mermaid svg", d3_node_count=-1, mermaid_js_url=_mermaid_js_url)
+                _d3_js_script = _MERMAID_RUN.format(
+                    mermaid_js_url=_mermaid_js_url,
+                    fullscreen_css="",  # ignored
+                    button_text=_button_text,  # ignored
+                    button_opacity=_button_opacity,  # ignored
+                    d3_selector=".mermaid svg",
+                    d3_node_count=-1,
+                    add_fullscreen=False,
+                    add_zoom=True,
+                )
                 app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
                 _wrote_mermaid_run = True
         elif doctree:
@@ -518,14 +491,21 @@ def install_js(
             if _d3_selector != "":
                 _has_zoom = True
                 if not _has_fullscreen:
-                    _d3_js_script = _MERMAID_RUN_D3_ZOOM.format(d3_selector=_d3_selector, d3_node_count=count, mermaid_js_url=_mermaid_js_url)
+                    _d3_js_script = _MERMAID_RUN.format(
+                        mermaid_js_url=_mermaid_js_url,
+                        fullscreen_css="",  # ignored
+                        button_text=_button_text,  # ignored
+                        button_opacity=_button_opacity,  # ignored
+                        d3_selector=_d3_selector,
+                        d3_node_count=count,
+                        add_zoom=False,
+                        add_fullscreen=True,
+                    )
                     app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
                     _wrote_mermaid_run = True
 
     # Handle fullscreen feature
     if _has_fullscreen and not _wrote_mermaid_run:
-        _button_text = app.config.mermaid_fullscreen_button
-        _button_opacity = app.config.mermaid_fullscreen_button_opacity
         if _has_zoom:
             # Fullscreen with zoom
             _d3_selector = ".mermaid svg" if app.config.mermaid_d3_zoom else ""
@@ -546,27 +526,48 @@ def install_js(
                     count = -1
             else:
                 count = -1
-            _d3_js_script = _MERMAID_RUN_FULLSCREEN_ZOOM.format(
+            _d3_js_script = _MERMAID_RUN.format(
                 mermaid_js_url=_mermaid_js_url,
                 fullscreen_css=_FULLSCREEN_CSS,
                 button_text=_button_text,
                 button_opacity=_button_opacity,
                 d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
                 d3_node_count=count if _d3_selector else -1,
+                add_zoom=True,
+                add_fullscreen=True,
             )
             app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
         else:
             # Fullscreen without zoom
-            _fullscreen_js_script = _MERMAID_RUN_FULLSCREEN.format(
-                mermaid_js_url=_mermaid_js_url, fullscreen_css=_FULLSCREEN_CSS, button_text=_button_text
+            _fullscreen_js_script = _MERMAID_RUN.format(
+                mermaid_js_url=_mermaid_js_url,
+                fullscreen_css=_FULLSCREEN_CSS,
+                button_text=_button_text,
+                button_opacity=_button_opacity,
+                d3_selector="",  # ignored
+                d3_node_count=-1,  # ignored
+                add_zoom=False,
+                add_fullscreen=True,
             )
             app.add_js_file(None, body=_fullscreen_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
 
     if not _wrote_mermaid_run and _mermaid_js_url:
         app.add_js_file(
-            None, body=_MERMAID_RUN_NO_D3_ZOOM.format(mermaid_js_url=_mermaid_js_url), priority=app.config.mermaid_js_priority, type="module"
+            None,
+            body=_MERMAID_RUN.format(
+                mermaid_js_url=_mermaid_js_url,
+                fullscreen_css="",
+                button_text="",
+                button_opacity="",
+                d3_selector="",  # ignored
+                d3_node_count=-1,  # ignored
+                add_zoom=False,
+                add_fullscreen=False,
+            ),
+            priority=app.config.mermaid_js_priority,
+            type="module",
         )
 
 

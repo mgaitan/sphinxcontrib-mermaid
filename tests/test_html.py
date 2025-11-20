@@ -31,7 +31,7 @@ def test_html_raw(index):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_zoom_option(index, app):
     assert "mermaid.run()" in index
-    assert "svg.call(zoom);" not in index
+    assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
     zoom_page = (app.outdir / "zoom.html").read_text().replace("<script >", "<script>")
     assert "svg.call(zoom);" in zoom_page
 
@@ -46,13 +46,13 @@ def test_html_zoom_option(index, app):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
 def test_html_zoom_option_global(index):
     assert "mermaid.run()" in index
-    assert "svg.call(zoom);" in index
+    assert 'if ("True" === "True") {\n        const mermaids_to_add_zoom' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": False})
 def test_html_no_zoom(index):
     assert "mermaid.run()" in index
-    assert "svg.call(zoom);" not in index
+    assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "10.3.0", "mermaid_include_elk": ""})
@@ -84,7 +84,7 @@ def test_conf_d3_version(app, index):
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_use_local": "test"})
 def test_conf_d3_local(app, index):
-    assert "d3" not in index
+    assert "cdn.jsdelivr.net/npm/d3" not in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_init_js": "custom script;"})

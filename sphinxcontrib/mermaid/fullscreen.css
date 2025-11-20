@@ -1,18 +1,27 @@
 .mermaid-container {
-    position: relative !important;
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
     width: 100%;
 }
 
+.mermaid-container > pre {
+    display: block;
+    width: 95%;
+}
+
+.mermaid-container > pre > svg {
+    width: 100%;
+    height: auto;
+    max-width: 100% !important;
+}
+
 .mermaid-fullscreen-btn {
-    position: absolute !important;
     width: 28px;
     height: 28px;
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     cursor: pointer;
-    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -65,7 +74,7 @@
     justify-content: center;
 }
 
-.mermaid-container-fullscreen {
+.mermaid-fullscreen-content {
     position: relative;
     width: 95vw;
     height: 90vh;
@@ -81,12 +90,12 @@
     justify-content: center;
 }
 
-.mermaid-container-fullscreen.dark-theme {
+.mermaid-fullscreen-content.dark-theme {
     background: #1a1a1a;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
 }
 
-.mermaid-container-fullscreen .mermaid {
+.mermaid-fullscreen-content .mermaid {
     width: 100%;
     height: 100%;
     display: flex;
@@ -94,7 +103,7 @@
     justify-content: center;
 }
 
-.mermaid-container-fullscreen .mermaid svg {
+.mermaid-fullscreen-content .mermaid svg {
     width: 100%;
     height: auto;
     max-width: 100%;
