@@ -49,7 +49,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "sphinxcontrib-mermaid"
-copyright = "2017-2023, Martín Gaitán"
+copyright = "2017-2025, Martín Gaitán"
 author = "Martín Gaitán"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -160,3 +160,4 @@ texinfo_documents = [
 
 mermaid_params = ["-ppuppeteer-config.json"]
 # mermaid_d3_zoom = True
+mermaid_fullscreen = True

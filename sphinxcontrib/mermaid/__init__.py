@@ -5,7 +5,7 @@ sphinx-mermaid
 Allow mermaid diagrams to be included in Sphinx-generated
 documents inline.
 
-:copyright: Copyright 2016-2023 by Martín Gaitán and others
+:copyright: Copyright 2016-2025 by Martín Gaitán and others
 :license: BSD, see LICENSE for details.
 """
 
