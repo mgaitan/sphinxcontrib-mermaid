@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+1.2.0 (November 23, 2025)
++++++++++++++++++++++
+
+- Normalize javascript across various configuration options
+- Make graph full width and avoid unused margins in graph image
+- Rename fullscreen container class from `mermaid-fullscreen-content` to `mermaid-container-fullscreen`
+
 1.1.0 (November 19, 2025)
 +++++++++++++++++++++
 
