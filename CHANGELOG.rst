@@ -1,10 +1,10 @@
 Changelog
 ---------
 
-2.0.0 (TBD)
+1.2.2 (November 23, 2025)
 +++++++++++++++++++++
 
-- Drop support for Python 3.8 and 3.9
+- Hotfix for CSS/JS assets included via old MANIFEST mechanism
 
 1.2.1 (November 23, 2025)
 +++++++++++++++++++++
