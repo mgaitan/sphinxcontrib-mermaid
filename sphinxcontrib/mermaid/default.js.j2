@@ -1,8 +1,12 @@
 import mermaid from "{mermaid_js_url}";
 
-const style = document.createElement('style');
-style.textContent = `{fullscreen_css}`;
-document.head.appendChild(style);
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `{common_css}`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `{fullscreen_css}`;
+document.head.appendChild(fullscreenStyle);
 
 // Detect if page has dark background
 const isDarkTheme = () => {{

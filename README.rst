@@ -230,6 +230,14 @@ Config values
 
     Enables zooming in all the generated Mermaid diagrams.
 
+``mermaid_width``
+
+    Sets the default diagram width within its container. Default to 100%.
+
+``mermaid_height``
+
+    Sets the default diagram height within its container. Default to 500px.
+
 ``mermaid_fullscreen``
 
     Enables fullscreen modal viewing for all Mermaid diagrams. When enabled, a fullscreen button

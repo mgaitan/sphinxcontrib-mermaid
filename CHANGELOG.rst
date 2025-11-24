@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+1.2.1 (November 23, 2025)
++++++++++++++++++++++
+
+- Adjust chart size defaults to closer resember previous
+- Fix issue with fullscreen classes after rebase
+
 1.2.0 (November 23, 2025)
 +++++++++++++++++++++
 
