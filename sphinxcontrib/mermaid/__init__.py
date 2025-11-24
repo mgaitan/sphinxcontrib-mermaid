@@ -43,9 +43,9 @@ logger = logging.getLogger(__name__)
 
 # Load fullscreen CSS and JavaScript from external files
 _MODULE_DIR = Path(__file__).parent
-_FULLSCREEN_CSS = (_MODULE_DIR / "fullscreen.css").read_text(encoding="utf-8")
-_MERMAID_CSS = (_MODULE_DIR / "default.css").read_text(encoding="utf-8")
-_MERMAID_RUN = (_MODULE_DIR / "default.js").read_text(encoding="utf-8")
+_FULLSCREEN_CSS = (_MODULE_DIR / "fullscreen.css.j2").read_text(encoding="utf-8")
+_MERMAID_CSS = (_MODULE_DIR / "default.css.j2").read_text(encoding="utf-8")
+_MERMAID_RUN = (_MODULE_DIR / "default.js.j2").read_text(encoding="utf-8")
 
 mapname_re = re.compile(r'<map id="(.*?)"')
 _MERMAID_INIT_JS_DEFAULT = "mermaid.initialize({startOnLoad:false});"
@@ -451,6 +451,8 @@ def install_js(
     _has_fullscreen = app.config.mermaid_fullscreen
     _button_text = app.config.mermaid_fullscreen_button
     _button_opacity = app.config.mermaid_fullscreen_button_opacity
+    _mermaid_width = app.config.mermaid_width
+    _mermaid_height = app.config.mermaid_height
 
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
@@ -466,6 +468,10 @@ def install_js(
             if not _has_fullscreen:
                 _d3_js_script = _MERMAID_RUN.format(
                     mermaid_js_url=_mermaid_js_url,
+                    common_css=_MERMAID_CSS.format(
+                        mermaid_width=_mermaid_width,
+                        mermaid_height=_mermaid_height,
+                    ),
                     fullscreen_css="",  # ignored
                     button_text=_button_text,  # ignored
                     button_opacity=_button_opacity,  # ignored
@@ -493,6 +499,10 @@ def install_js(
                 if not _has_fullscreen:
                     _d3_js_script = _MERMAID_RUN.format(
                         mermaid_js_url=_mermaid_js_url,
+                        common_css=_MERMAID_CSS.format(
+                            mermaid_width=_mermaid_width,
+                            mermaid_height=_mermaid_height,
+                        ),
                         fullscreen_css="",  # ignored
                         button_text=_button_text,  # ignored
                         button_opacity=_button_opacity,  # ignored
@@ -528,7 +538,14 @@ def install_js(
                 count = -1
             _d3_js_script = _MERMAID_RUN.format(
                 mermaid_js_url=_mermaid_js_url,
-                fullscreen_css=_FULLSCREEN_CSS,
+                common_css=_MERMAID_CSS.format(
+                    mermaid_width=_mermaid_width,
+                    mermaid_height=_mermaid_height,
+                ),
+                fullscreen_css=_FULLSCREEN_CSS.format(
+                    mermaid_width=_mermaid_width,
+                    mermaid_height=_mermaid_height,
+                ),
                 button_text=_button_text,
                 button_opacity=_button_opacity,
                 d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
@@ -542,7 +559,14 @@ def install_js(
             # Fullscreen without zoom
             _fullscreen_js_script = _MERMAID_RUN.format(
                 mermaid_js_url=_mermaid_js_url,
-                fullscreen_css=_FULLSCREEN_CSS,
+                common_css=_MERMAID_CSS.format(
+                    mermaid_width=_mermaid_width,
+                    mermaid_height=_mermaid_height,
+                ),
+                fullscreen_css=_FULLSCREEN_CSS.format(
+                    mermaid_width=_mermaid_width,
+                    mermaid_height=_mermaid_height,
+                ),
                 button_text=_button_text,
                 button_opacity=_button_opacity,
                 d3_selector="",  # ignored
@@ -558,6 +582,7 @@ def install_js(
             None,
             body=_MERMAID_RUN.format(
                 mermaid_js_url=_mermaid_js_url,
+                common_css="",
                 fullscreen_css="",
                 button_text="",
                 button_opacity="",
@@ -601,6 +626,8 @@ def setup(app):
     app.add_config_value("d3_use_local", "", "html")
     app.add_config_value("d3_version", "7.9.0", "html")
     app.add_config_value("mermaid_d3_zoom", False, "html")
+    app.add_config_value("mermaid_width", "100%", "html")
+    app.add_config_value("mermaid_height", "500px", "html")
     app.add_config_value("mermaid_fullscreen", True, "html")
     app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
     app.add_config_value("mermaid_fullscreen_button_opacity", "50", "html")
