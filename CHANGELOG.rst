@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+2.0.0 (TBD)
++++++++++++++++++++++
+
+- Drop support for Python 3.8 and 3.9
+
 1.2.1 (November 23, 2025)
 +++++++++++++++++++++
 
