@@ -6,6 +6,11 @@ Changelog
 
 - Drop support for Python 3.8 and 3.9
 
+1.2.3 (November 25, 2025)
++++++++++++++++++++++
+
+- Fix issue with ELK charts by upgrading to ELK plugin `0.2.0`
+
 1.2.2 (November 23, 2025)
 +++++++++++++++++++++
 

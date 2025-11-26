@@ -8,8 +8,8 @@ authors = [{name = "Martín Gaitán", email = "gaitan@gmail.com"}]
 description="Mermaid diagrams in yours Sphinx powered docs"
 readme = "docs/readme_pypa.md"
 license = { text = "BSD" }
-version = "1.2.2"
-requires-python = ">=3.10"
+version = "1.2.3"
+requires-python = ">=3.8"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
 
 classifiers = [
