@@ -149,44 +149,6 @@ Config values
    The output format for Mermaid when building HTML files.  This must be either ``'raw'``
    ``'png'`` or ``'svg'``; the default is ``'raw'``. ``mermaid-cli`` is required if it's not ``raw``
 
-``mermaid_use_local``
-
-   Optional path to a local installation of ``mermaid.esm.min.mjs``. By default, we will pull from jsdelivr.
-
-``mermaid_version``
-
-  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.12.1"``.
-
-.. versionchanged:: 0.7
-    The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
-
-``mermaid_elk_use_local``
-
-   Optional path to a local installation of ``mermaid-layout-elk.esm.min.mjs``. By default, we will pull from jsdelivr.
-
-``mermaid_include_elk``
-
-  The version of mermaid ELK renderer that will be used. The default is ``"0.2.0"``. Leave blank to disable ELK layout.
-
-``d3_use_local``
-
-   Optional path to a local installation of ``d3.min.js``. By default, we will pull from jsdelivr.
-
-``d3_version``
-
-  The version of d3 that will be used to provide zoom functionality on mermaid graphs.  The default is ``"7.9.0"``.
-
-``mermaid_init_js``
-
-  Mermaid initialization code. The Default initialization is set to
-
-    mermaid.initialize({ startOnLoad: true})
-
-
-.. versionchanged:: 0.7
-    The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
-
-
 ``mermaid_cmd``
 
    The command name with which to invoke ``mermaid-cli`` program.
@@ -225,6 +187,37 @@ Config values
 
     If using latex output, it might be useful to crop the pdf just to the needed space. For this, ``pdfcrop`` can be used.
     State binary name to use this extra function.
+
+``mermaid_init_config``
+
+   Optional override of arguments to ``mermaid.initialize()``, passed in as a JSON. Defaults to ``{ "startOnLoad": True}``.
+
+``mermaid_use_local``
+
+   Optional path to a local installation of ``mermaid.esm.min.mjs``. By default, we will pull from jsdelivr.
+
+``mermaid_version``
+
+  The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.12.1"``.
+
+.. versionchanged:: 0.7
+    The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
+
+``mermaid_elk_use_local``
+
+   Optional path to a local installation of ``mermaid-layout-elk.esm.min.mjs``. By default, we will pull from jsdelivr.
+
+``mermaid_include_elk``
+
+  The version of mermaid ELK renderer that will be used. The default is ``"0.2.0"``. Leave blank to disable ELK layout.
+
+``d3_use_local``
+
+   Optional path to a local installation of ``d3.min.js``. By default, we will pull from jsdelivr.
+
+``d3_version``
+
+  The version of d3 that will be used to provide zoom functionality on mermaid graphs.  The default is ``"7.9.0"``.
 
 ``mermaid_d3_zoom``
 
