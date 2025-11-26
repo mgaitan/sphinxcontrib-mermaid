@@ -166,7 +166,7 @@ Config values
 
 ``mermaid_include_elk``
 
-  The version of mermaid ELK renderer that will be used. The default is ``"0.1.4"``. Leave blank to disable ELK layout.
+  The version of mermaid ELK renderer that will be used. The default is ``"0.2.0"``. Leave blank to disable ELK layout.
 
 ``d3_use_local``
 
