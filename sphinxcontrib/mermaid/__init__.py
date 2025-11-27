@@ -160,6 +160,9 @@ class Mermaid(Directive):
         if "config" in self.options:
             mm_config += "\n"
             mm_config += dump({"config": loads(self.options["config"])})
+        elif 'mermaid_config' in self.state_machine.document.settings.env.config:
+            mm_config += "\n"
+            mm_config += dump({"config": self.state_machine.document.settings.env.config['mermaid_config']})
         if "title" in self.options:
             mm_config += "\n"
             mm_config += f"title: {self.options['title']}"
@@ -617,6 +620,7 @@ def setup(app):
     app.add_config_value("mermaid_params", list(), "html")
     app.add_config_value("mermaid_verbose", False, "html")
     app.add_config_value("mermaid_sequence_config", False, "html")
+    app.add_config_value("mermaid_config", None, "html")
 
     app.add_config_value("mermaid_init_config", {"startOnLoad": False}, "html")
     app.add_config_value("mermaid_use_local", "", "html")
