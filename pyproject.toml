@@ -5,7 +5,7 @@ build-backend="setuptools.build_meta"
 [project]
 name = "sphinxcontrib-mermaid"
 authors = [{name = "Martín Gaitán", email = "gaitan@gmail.com"}]
-description="Mermaid diagrams in yours Sphinx powered docs"
+description="Mermaid diagrams in your Sphinx-powered docs"
 readme = "docs/readme_pypa.md"
 license = { text = "BSD" }
 version = "2.0.0rc0"
