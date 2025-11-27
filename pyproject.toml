@@ -9,7 +9,7 @@ description="Mermaid diagrams in yours Sphinx powered docs"
 readme = "docs/readme_pypa.md"
 license = { text = "BSD" }
 version = "1.2.3"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
 
 classifiers = [
@@ -33,6 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "jinja2",
     "sphinx",
     "pyyaml",
 ]

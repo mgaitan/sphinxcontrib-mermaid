@@ -5,6 +5,7 @@ Changelog
 +++++++++++++++++++++
 
 - Drop support for Python 3.8 and 3.9
+- Add support for dynamic theme changes
 
 1.2.3 (November 25, 2025)
 +++++++++++++++++++++
