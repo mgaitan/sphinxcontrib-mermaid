@@ -418,19 +418,30 @@ def install_js(
     elif app.config.mermaid_version:
         raise MermaidError("Requires mermaid js version 10.3.0 or later")
 
-    if app.config.mermaid_elk_use_local:
-        _mermaid_elk_js_url = app.config.mermaid_elk_use_local
-    elif app.config.mermaid_include_elk == "latest":
-        _mermaid_elk_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"
-    elif app.config.mermaid_include_elk:
-        _mermaid_elk_js_url = (
-            f"https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@{app.config.mermaid_include_elk}/dist/mermaid-layout-elk.esm.min.mjs"
-        )
-    else:
-        _mermaid_elk_js_url = None
+    _mermaid_elk_js_url = None
+    if app.config.mermaid_include_elk:
+        if app.config.mermaid_elk_use_local:
+            _mermaid_elk_js_url = app.config.mermaid_elk_use_local
+        elif app.config.mermaid_elk_version == "latest":
+            _mermaid_elk_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"
+        elif app.config.mermaid_elk_version:
+            _mermaid_elk_js_url = (
+                f"https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@{app.config.mermaid_elk_version}/dist/mermaid-layout-elk.esm.min.mjs"
+            )
+
+    _mermaid_zenuml_js_url = None
+    if app.config.mermaid_include_zenuml:
+        if app.config.mermaid_zenuml_use_local:
+            _mermaid_zenuml_js_url = app.config.mermaid_zenuml_use_local
+        elif app.config.mermaid_zenuml_version == "latest":
+            _mermaid_zenuml_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs"
+        elif app.config.mermaid_zenuml_version:
+            _mermaid_zenuml_js_url = (
+                f"https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml@{app.config.mermaid_zenuml_version}/dist/mermaid-zenuml.esm.min.mjs"
+            )
 
     _wrote_mermaid_run = False
-    _has_zoom = False
+    _has_zoom = app.config.mermaid_d3_zoom
     _has_fullscreen = app.config.mermaid_fullscreen
     _button_text = app.config.mermaid_fullscreen_button
     _button_opacity = app.config.mermaid_fullscreen_button_opacity
@@ -440,6 +451,23 @@ def install_js(
     template_js = Template(_MERMAID_JS)
     template_css = Template(_MERMAID_CSS)
     template_fullscreen_css = Template(_FULLSCREEN_CSS)
+
+    common_render_args = dict(
+        mermaid_js_url=_mermaid_js_url,
+        mermaid_init_config=dumps(app.config.mermaid_init_config),
+        mermaid_include_elk=_mermaid_elk_js_url is not None,
+        mermaid_include_zenuml=_mermaid_zenuml_js_url is not None,
+        mermaid_elk_js_url=_mermaid_elk_js_url,
+        mermaid_zenuml_js_url=_mermaid_zenuml_js_url,
+        common_css=template_css.render(
+            mermaid_width=_mermaid_width,
+            mermaid_height=_mermaid_height,
+        ),
+        button_text=_button_text,  # ignored
+        button_opacity=_button_opacity,  # ignored
+        add_fullscreen=_has_fullscreen,
+        add_zoom=_has_zoom,
+    )
 
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
@@ -451,24 +479,12 @@ def install_js(
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
 
         if app.config.mermaid_d3_zoom:
-            _has_zoom = True
             if not _has_fullscreen:
                 _d3_js_script = template_js.render(
-                    mermaid_js_url=_mermaid_js_url,
-                    mermaid_init_config=dumps(app.config.mermaid_init_config),
-                    mermaid_include_elk=_mermaid_elk_js_url is not None,
-                    mermaid_elk_js_url=_mermaid_elk_js_url,
-                    common_css=template_css.render(
-                        mermaid_width=_mermaid_width,
-                        mermaid_height=_mermaid_height,
-                    ),
                     fullscreen_css="",  # ignored
-                    button_text=_button_text,  # ignored
-                    button_opacity=_button_opacity,  # ignored
                     d3_selector=".mermaid svg",
                     d3_node_count=-1,
-                    add_fullscreen=False,
-                    add_zoom=True,
+                    **common_render_args,
                 )
                 app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
                 _wrote_mermaid_run = True
@@ -485,24 +501,12 @@ def install_js(
                         _d3_selector += f", .mermaid[data-zoom-id={_zoom_id}] svg"
                     count += 1
             if _d3_selector != "":
-                _has_zoom = True
                 if not _has_fullscreen:
                     _d3_js_script = template_js.render(
-                        mermaid_js_url=_mermaid_js_url,
-                        mermaid_init_config=dumps(app.config.mermaid_init_config),
-                        mermaid_include_elk=_mermaid_elk_js_url is not None,
-                        mermaid_elk_js_url=_mermaid_elk_js_url,
-                        common_css=template_css.render(
-                            mermaid_width=_mermaid_width,
-                            mermaid_height=_mermaid_height,
-                        ),
                         fullscreen_css="",  # ignored
-                        button_text=_button_text,  # ignored
-                        button_opacity=_button_opacity,  # ignored
                         d3_selector=_d3_selector,
                         d3_node_count=count,
-                        add_zoom=False,
-                        add_fullscreen=True,
+                        **common_render_args,
                     )
                     app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
                     _wrote_mermaid_run = True
@@ -511,7 +515,7 @@ def install_js(
     if _has_fullscreen and not _wrote_mermaid_run:
         if _has_zoom:
             # Fullscreen with zoom
-            _d3_selector = ".mermaid svg" if app.config.mermaid_d3_zoom else ""
+            _d3_selector = ".mermaid svg"
             if not _d3_selector and doctree:
                 # Build selector for per-diagram zoom
                 mermaid_nodes = doctree.findall(mermaid)
@@ -530,48 +534,26 @@ def install_js(
             else:
                 count = -1
             _d3_js_script = template_js.render(
-                mermaid_js_url=_mermaid_js_url,
-                mermaid_init_config=dumps(app.config.mermaid_init_config),
-                mermaid_include_elk=_mermaid_elk_js_url is not None,
-                mermaid_elk_js_url=_mermaid_elk_js_url,
-                common_css=template_css.render(
-                    mermaid_width=_mermaid_width,
-                    mermaid_height=_mermaid_height,
-                ),
                 fullscreen_css=template_fullscreen_css.render(
                     mermaid_width=_mermaid_width,
                     mermaid_height=_mermaid_height,
                 ),
-                button_text=_button_text,
-                button_opacity=_button_opacity,
                 d3_selector=_d3_selector if _d3_selector else ".mermaid svg",
                 d3_node_count=count if _d3_selector else -1,
-                add_zoom=True,
-                add_fullscreen=True,
+                **common_render_args,
             )
             app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
         else:
             # Fullscreen without zoom
             _fullscreen_js_script = template_js.render(
-                mermaid_js_url=_mermaid_js_url,
-                mermaid_init_config=dumps(app.config.mermaid_init_config),
-                mermaid_include_elk=_mermaid_elk_js_url is not None,
-                mermaid_elk_js_url=_mermaid_elk_js_url,
-                common_css=template_css.render(
-                    mermaid_width=_mermaid_width,
-                    mermaid_height=_mermaid_height,
-                ),
                 fullscreen_css=template_fullscreen_css.render(
                     mermaid_width=_mermaid_width,
                     mermaid_height=_mermaid_height,
                 ),
-                button_text=_button_text,
-                button_opacity=_button_opacity,
                 d3_selector="",  # ignored
                 d3_node_count=-1,  # ignored
-                add_zoom=False,
-                add_fullscreen=True,
+                **common_render_args,
             )
             app.add_js_file(None, body=_fullscreen_js_script, priority=app.config.mermaid_js_priority, type="module")
             _wrote_mermaid_run = True
@@ -580,18 +562,10 @@ def install_js(
         app.add_js_file(
             None,
             body=template_js.render(
-                mermaid_js_url=_mermaid_js_url,
-                mermaid_init_config=dumps(app.config.mermaid_init_config),
-                mermaid_include_elk=_mermaid_elk_js_url is not None,
-                mermaid_elk_js_url=_mermaid_elk_js_url,
-                common_css="",
                 fullscreen_css="",
-                button_text="",
-                button_opacity="",
                 d3_selector="",  # ignored
                 d3_node_count=-1,  # ignored
-                add_zoom=False,
-                add_fullscreen=False,
+                **common_render_args,
             ),
             priority=app.config.mermaid_js_priority,
             type="module",
@@ -619,19 +593,28 @@ def setup(app):
     app.add_config_value("mermaid_sequence_config", False, "html")
 
     app.add_config_value("mermaid_init_config", {"startOnLoad": False}, "html")
-    app.add_config_value("mermaid_use_local", "", "html")
     app.add_config_value("mermaid_version", "11.12.1", "html")
+    app.add_config_value("mermaid_use_local", "", "html")
+
+    # Plugins
+    app.add_config_value("mermaid_include_elk", False, "html")
+    app.add_config_value("mermaid_include_zenuml", False, "html")
+    app.add_config_value("mermaid_elk_version", "0.2.0", "html")
+    app.add_config_value("mermaid_zenuml_version", "0.2.2", "html")
     app.add_config_value("mermaid_elk_use_local", "", "html")
-    app.add_config_value("mermaid_include_elk", "0.2.0", "html")
-    app.add_config_value("mermaid_js_priority", 500, "html")
+    app.add_config_value("mermaid_zenuml_use_local", "", "html")
+
     app.add_config_value("d3_use_local", "", "html")
     app.add_config_value("d3_version", "7.9.0", "html")
     app.add_config_value("mermaid_d3_zoom", False, "html")
+
+    app.add_config_value("mermaid_js_priority", 500, "html")
     app.add_config_value("mermaid_width", "100%", "html")
     app.add_config_value("mermaid_height", "500px", "html")
     app.add_config_value("mermaid_fullscreen", True, "html")
     app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
     app.add_config_value("mermaid_fullscreen_button_opacity", "50", "html")
+
     app.connect("html-page-context", install_js)
 
     return {"version": sphinx.__display_version__, "parallel_read_safe": True}

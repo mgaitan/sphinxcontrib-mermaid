@@ -4,6 +4,10 @@ import mermaid from "{{ mermaid_js_url }}";
 import elkLayouts from "{{ mermaid_elk_js_url }}"
 {% endif %}
 
+{% if mermaid_include_zenuml %}
+import zenumlLayouts from "{{ mermaid_zenuml_js_url }}"
+{% endif %}
+
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
     defaultStyle.textContent = `{{ common_css }}`;
@@ -258,6 +262,10 @@ const load = async () => {
 
 {% if mermaid_include_elk %}
 mermaid.registerLayoutLoaders(elkLayouts);
+{% endif %}
+
+{% if mermaid_include_zenuml %}
+mermaid.registerExternalDiagrams([zenumlLayouts]);
 {% endif %}
 
 console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");

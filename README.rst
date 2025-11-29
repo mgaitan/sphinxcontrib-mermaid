@@ -192,24 +192,40 @@ Config values
 
    Optional override of arguments to ``mermaid.initialize()``, passed in as a JSON. Defaults to ``{ "startOnLoad": True}``.
 
-``mermaid_use_local``
-
-   Optional path to a local installation of ``mermaid.esm.min.mjs``. By default, we will pull from jsdelivr.
-
 ``mermaid_version``
 
   The version of mermaid that will be used to parse ``raw`` output in HTML files. This should match a version available on https://www.jsdelivr.com/package/npm/mermaid.  The default is ``"11.12.1"``.
 
+``mermaid_use_local``
+
+   Optional path to a local installation of ``mermaid.esm.min.mjs``. By default, we will pull from jsdelivr.
+
 .. versionchanged:: 0.7
     The init code doesn't include the `<script>` tag anymore. It's automatically added at build time.
+
+``mermaid_include_elk``
+
+  Whether to download and load the ELK JavaScript extensions. Defaults to False.
+
+``mermaid_include_zenuml``
+
+  Whether to download and load the ZenuML JavaScript extensions. Defaults to False.
+
+``mermaid_elk_version``
+
+  The version of mermaid ELK renderer that will be used. The default is ``"0.2.0"``.
+
+``mermaid_zenuml_version``
+
+  The version of mermaid ZenuML renderer that will be used. The default is ``"0.2.2"``.
 
 ``mermaid_elk_use_local``
 
    Optional path to a local installation of ``mermaid-layout-elk.esm.min.mjs``. By default, we will pull from jsdelivr.
 
-``mermaid_include_elk``
+``mermaid_zenuml_use_local``
 
-  The version of mermaid ELK renderer that will be used. The default is ``"0.2.0"``. Leave blank to disable ELK layout.
+   Optional path to a local installation of ``mermaid-zenuml.esm.min.mjs``. By default, we will pull from jsdelivr.
 
 ``d3_use_local``
 
