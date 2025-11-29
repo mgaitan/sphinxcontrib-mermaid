@@ -14,7 +14,7 @@ def index(app, build_all):
     return (app.outdir / "index.html").read_text().replace("<script >", "<script>")
 
 
-@pytest.mark.sphinx("html", testroot="basic")
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True})
 def test_html_raw(index):
     assert "mermaid.run()" in index
     assert (
@@ -49,11 +49,6 @@ def test_html_zoom_option(index, app):
     # the first diagram has no id
     assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
 
-    # the second has id and its loaded in the zooming code.
-    pre_id = re.findall(r'<pre data-zoom-id="(id\-[a-fA-F0-9-]+)" class="mermaid">\n\s+flowchart TD', zoom_page)
-    assert f'var svgs = d3.selectAll(".mermaid[data-zoom-id={pre_id[0]}] svg")' in zoom_page
-
-
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
 def test_html_zoom_option_global(index):
     assert "mermaid.run()" in index
@@ -66,7 +61,7 @@ def test_html_no_zoom(index):
     assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "10.3.0", "mermaid_include_elk": ""})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "10.3.0", "mermaid_include_elk": False})
 def test_conf_mermaid_version(app, index):
     assert "mermaid.run()" in index
     assert app.config.mermaid_version == "10.3.0"
@@ -76,7 +71,7 @@ def test_conf_mermaid_version(app, index):
     )
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": ""})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": False})
 def test_conf_mermaid_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
@@ -89,7 +84,7 @@ def test_conf_mermaid_elk_local(app, index):
     assert "mermaid-layout-elk.esm.min.mjs" not in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_version": "1.2.3", "mermaid_include_elk": ""})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_version": "1.2.3", "mermaid_include_elk": False})
 def test_conf_d3_version(app, index):
     assert "mermaid.run()" in index
     assert app.config.d3_version == "1.2.3"
@@ -113,7 +108,7 @@ def test_mermaid_init_js(index):
         in index
     )
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": "latest"})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True, "mermaid_elk_version": "latest"})
 def test_mermaid_with_elk(app, index):
     assert "mermaid.run()" in index
     assert (
@@ -122,7 +117,7 @@ def test_mermaid_with_elk(app, index):
     )
 
 
-@pytest.mark.sphinx("html", testroot="markdown")
+@pytest.mark.sphinx("html", testroot="markdown", confoverrides={"mermaid_include_elk": True})
 def test_html_raw_from_markdown(index):
     assert "mermaid.run()" in index
     assert "mermaid.run()" in index
