@@ -37,11 +37,9 @@ def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False
 
     def get_tree(cls: type[Any]) -> None:
         for base in cls.__bases__:
-            if base.__name__ == "object":
-                continue
             if namespace and not base.__module__.startswith(namespace):
                 continue
-            inheritances.add((base.__name__, cls.__name__))
+            inheritances.add((base.__name__, cls.__name__, cls.__module__))
             if full:
                 get_tree(base)
 
@@ -50,8 +48,11 @@ def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False
 
     if not inheritances:
         return ""
+    sorted_inheritances = sorted(inheritances)
 
-    return "classDiagram\n" + "\n".join(f"  {a} <|-- {b}" for a, b in sorted(inheritances))
+    classes = "\n  ".join(f'class {class_name}\n  link {class_name} "#{module}.{class_name}"' for _, class_name, module in sorted_inheritances)
+    links = "\n  ".join(f"{base_name} <|-- {class_name}" for base_name, class_name, _ in sorted_inheritances if base_name != "object")
+    return f"classDiagram\n  {classes}\n  {links}"
 
 
 if __name__ == "__main__":
