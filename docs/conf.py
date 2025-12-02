@@ -156,6 +156,7 @@ texinfo_documents = [
 ]
 
 # Myst
+myst_enable_extensions = ["amsmath", "colon_fence", "dollarmath", "html_image"]
 myst_fence_as_directive = ["mermaid"]
 
 mermaid_params = ["-ppuppeteer-config.json"]
