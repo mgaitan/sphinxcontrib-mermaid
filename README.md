@@ -361,7 +361,7 @@ version: 2
 build:
   os: ubuntu-24.04
   apt_packages:
-    - libasound2
+    - libasound2t64
   tools:
     python: "3.11"
     nodejs: "20"
