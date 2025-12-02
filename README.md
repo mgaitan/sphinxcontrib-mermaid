@@ -18,32 +18,9 @@ diagrams, gantt diagrams and more.
 It adds a directive to embed mermaid markup. For example:
 
 ```rst
-    .. mermaid::
+.. mermaid::
 
-       sequenceDiagram
-          participant Alice
-          participant Bob
-          Alice->John: Hello John, how are you?
-          loop Healthcheck
-              John->John: Fight against hypochondria
-          end
-          Note right of John: Rational thoughts <br/>prevail...
-          John-->Alice: Great!
-          John->Bob: How about you?
-          Bob-->John: Jolly good!
-```
-
-By default, the HTML builder will simply render this as a `div` tag with
-`class="mermaid"`, injecting the external javascript, css and
-initialization code to make mermaid works.
-
-For other builders (or if `mermaid_output_format` config variable is set
-differently), the extension will use
-[mermaid-cli](https://github.com/mermaid-js/mermaid-cli) to render as to
-a PNG or SVG image, and then used in the proper code.
-
-```mermaid
-   sequenceDiagram
+    sequenceDiagram
       participant Alice
       participant Bob
       Alice->John: Hello John, how are you?
@@ -56,11 +33,34 @@ a PNG or SVG image, and then used in the proper code.
       Bob-->John: Jolly good!
 ```
 
+By default, the HTML builder will simply render this as a `div` tag with
+`class="mermaid"`, injecting the external javascript, css and
+initialization code to make mermaid works.
+
+For other builders (or if `mermaid_output_format` config variable is set
+differently), the extension will use
+[mermaid-cli](https://github.com/mermaid-js/mermaid-cli) to render as to
+a PNG or SVG image, and then used in the proper code.
+
+```mermaid
+sequenceDiagram
+  participant Alice
+  participant Bob
+  Alice->John: Hello John, how are you?
+  loop Healthcheck
+      John->John: Fight against hypochondria
+  end
+  Note right of John: Rational thoughts <br/>prevail...
+  John-->Alice: Great!
+  John->Bob: How about you?
+  Bob-->John: Jolly good!
+```
+
 You can also embed external mermaid files, by giving the file name as an
 argument to the directive and no additional content:
 
 ```rst
-    .. mermaid:: path/to/mermaid-gantt-code.mmd
+.. mermaid:: path/to/mermaid-gantt-code.mmd
 ```
 
 As for all file references in Sphinx, if the filename is not absolute,
@@ -84,8 +84,8 @@ imported from other modules).
 For example:
 
 ```rst
-    .. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
-       :full:
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+    :full:
 ```
 
 ```{eval-rst}
@@ -96,7 +96,7 @@ For example:
 Or directly the module:
 
 ```rst
-    .. autoclasstree:: sphinx.util
+.. autoclasstree:: sphinx.util
 ```
 
 ```{eval-rst}
