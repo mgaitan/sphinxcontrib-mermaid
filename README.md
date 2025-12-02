@@ -146,8 +146,10 @@ name: test
 - `caption`: can be used to give a caption to the diagram.
 - `zoom`: can be used to enable zooming the diagram. For a global config see `mermaid_d3_zoom` bellow.
 
-<figure class="align-center"><img src="https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif" alt="A preview after adding :zoom: option only to the first diagram example above:" /><figcaption aria-hidden="true">A preview after adding <code>:zoom:</code> option only to the first diagram above:</figcaption>
+<figure class="align-center">
+<img src="https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif" alt="A preview after adding :zoom: option only to the first diagram example above:" />
 </figure>
+
 - `fullscreen`: can be used to enable fullscreen modal viewing of the diagram. For a global config see `mermaid_fullscreen` below.
 - `config`: JSON to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html). **NOTE**: The mermaid documentation uses YAML, but we must use JSON because Markdown processing of frontmatter will interfere.
 - `title`: Title to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html)
