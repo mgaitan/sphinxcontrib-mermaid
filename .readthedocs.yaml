@@ -7,12 +7,12 @@ version: 2
 
 # Set the version of Python and other tools you might need
 build:
-  os: ubuntu-20.04
+  os: ubuntu-24.04
   apt_packages:
     - libasound2
   tools:
-    python: "3.8"
-    nodejs: "16"
+    python: "3"
+    nodejs: "20"
   jobs:
     post_install:
       - npm install -g @mermaid-js/mermaid-cli
