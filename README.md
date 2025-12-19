@@ -144,7 +144,7 @@ name: test
 - `alt`: determines the image's alternate text for HTML output. If not given, the alternate text defaults to the mermaid code.
 - `align`: determines the image's position. Valid options are `'left'`, `'center'`, `'right'`
 - `caption`: can be used to give a caption to the diagram.
-- `zoom`: can be used to enable zooming the diagram. For a global config see `mermaid_d3_zoom` bellow.
+- `zoom`: can be used to enable zooming the diagram. For a global config see `mermaid_d3_zoom` below.
 
 <figure class="align-center">
 <img src="https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif" alt="A preview after adding :zoom: option only to the first diagram example above:" />
