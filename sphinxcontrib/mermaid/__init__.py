@@ -397,6 +397,14 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
+def markdown_visit_mermaid(self, node):
+    node["language"] = "mermaid"
+    self.visit_literal_block(node)
+    self.add(node.attributes["code"])
+    self.depart_literal_block(node)
+    raise nodes.SkipNode
+
+
 def install_js(
     app: Sphinx,
     pagename,
@@ -580,6 +588,7 @@ def setup(app):
         texinfo=(texinfo_visit_mermaid, None),
         text=(text_visit_mermaid, None),
         man=(man_visit_mermaid, None),
+        markdown=(markdown_visit_mermaid, None),
     )
     app.add_directive("mermaid", Mermaid)
     app.add_directive("autoclasstree", MermaidClassDiagram)
