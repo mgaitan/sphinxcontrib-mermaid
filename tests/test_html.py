@@ -172,3 +172,66 @@ def test_custom_fullscreen_button(index):
     """Test custom fullscreen button icon."""
     assert "mermaid.run()" in index
     assert "[+]" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_external_init": True})
+def test_external_init_enabled(app, build_all):
+    """Test that external init file is created when enabled."""
+    index = (app.outdir / "index.html").read_text()
+    
+    # Should NOT have inline script
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid' not in index
+    
+    # Should have external script reference
+    assert '<script type="module" src="_static/mermaid-init-' in index
+    
+    # External file should exist
+    static_files = list((app.outdir / "_static").glob("mermaid-init-*.js"))
+    assert len(static_files) == 1
+    
+    # External file should contain mermaid code
+    external_js = static_files[0].read_text()
+    assert 'import mermaid from' in external_js
+    assert 'mermaid.initialize' in external_js
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_external_init": False})
+def test_external_init_disabled(app, build_all):
+    """Test that inline script is used when external init is disabled (default)."""
+    index = (app.outdir / "index.html").read_text()
+    
+    # Should have inline script
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid' in index
+    
+    # Should NOT have external script reference
+    assert '<script type="module" src="_static/mermaid-init-' not in index
+    
+    # External file should NOT exist
+    static_files = list((app.outdir / "_static").glob("mermaid-init-*.js"))
+    assert len(static_files) == 0
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_external_init": True, "mermaid_init_filename_prefix": "test-prefix"})
+def test_external_init_custom_prefix(app, build_all):
+    """Test that custom filename prefix is used."""
+    index = (app.outdir / "index.html").read_text()
+    
+    # Should have external script reference with custom prefix
+    assert '<script type="module" src="_static/mermaid-init-test-prefix-' in index
+    
+    # External file with custom prefix should exist
+    static_files = list((app.outdir / "_static").glob("mermaid-init-test-prefix-*.js"))
+    assert len(static_files) == 1
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_external_init": True, "project": "My Test Project!"})
+def test_external_init_sanitized_project_name(app, build_all):
+    """Test that project name is sanitized for filename."""
+    index = (app.outdir / "index.html").read_text()
+    
+    # Project name "My Test Project!" should be sanitized to "my-test-project"
+    assert '<script type="module" src="_static/mermaid-init-my-test-project-' in index
+    
+    # External file with sanitized name should exist
+    static_files = list((app.outdir / "_static").glob("mermaid-init-my-test-project-*.js"))
+    assert len(static_files) == 1

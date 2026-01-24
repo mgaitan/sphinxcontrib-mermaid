@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import codecs
 import errno
+import hashlib
 import os
 import posixpath
 import re
@@ -397,6 +398,43 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
+def add_js_file_or_inline(app, script_content, priority, use_external=False, filename_prefix=None):
+    """
+    Add JavaScript either as inline script or external file based on config.
+    
+    Args:
+        app: Sphinx application
+        script_content: JavaScript content to add
+        priority: Script loading priority
+        use_external: If True, write to external file instead of inline
+        filename_prefix: Optional prefix for external filename (defaults to project name)
+    """
+    if not use_external:
+        # Original behavior: inline script
+        app.add_js_file(None, body=script_content, priority=priority, type="module")
+        return
+    
+    # Generate content hash for cache invalidation
+    content_hash = hashlib.sha256(script_content.encode('utf-8')).hexdigest()[:12]
+    
+    # Sanitize prefix for filesystem safety
+    prefix = filename_prefix or app.config.project
+    safe_prefix = re.sub(r'[^a-z0-9]+', '-', prefix.lower()).strip('-')
+    if not safe_prefix:
+        safe_prefix = 'mermaid'
+    
+    filename = f"mermaid-init-{safe_prefix}-{content_hash}.js"
+    # Write directly to output _static directory (Sphinx's standard location for JS)
+    filepath = Path(app.outdir) / '_static' / filename
+    
+    # Write script to external file
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_text(script_content, encoding='utf-8')
+    
+    # Add reference to external file - Sphinx expects just the filename for static files
+    app.add_js_file(filename, priority=priority, type="module")
+
+
 def install_js(
     app: Sphinx,
     pagename,
@@ -469,6 +507,10 @@ def install_js(
         add_zoom=_has_zoom,
     )
 
+    # Check if external init file should be used (CSP compliance)
+    use_external_init = app.config.mermaid_external_init
+    filename_prefix = app.config.mermaid_init_filename_prefix
+
     if app.config.mermaid_output_format == "raw":
         if app.config.d3_use_local:
             _d3_js_url = app.config.d3_use_local
@@ -486,7 +528,11 @@ def install_js(
                     d3_node_count=-1,
                     **common_render_args,
                 )
-                app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+                add_js_file_or_inline(
+                    app, _d3_js_script, app.config.mermaid_js_priority,
+                    use_external=use_external_init,
+                    filename_prefix=filename_prefix
+                )
                 _wrote_mermaid_run = True
         elif doctree:
             mermaid_nodes = doctree.findall(mermaid)
@@ -508,7 +554,11 @@ def install_js(
                         d3_node_count=count,
                         **common_render_args,
                     )
-                    app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+                    add_js_file_or_inline(
+                        app, _d3_js_script, app.config.mermaid_js_priority,
+                        use_external=use_external_init,
+                        filename_prefix=filename_prefix
+                    )
                     _wrote_mermaid_run = True
 
     # Handle fullscreen feature
@@ -542,7 +592,11 @@ def install_js(
                 d3_node_count=count if _d3_selector else -1,
                 **common_render_args,
             )
-            app.add_js_file(None, body=_d3_js_script, priority=app.config.mermaid_js_priority, type="module")
+            add_js_file_or_inline(
+                app, _d3_js_script, app.config.mermaid_js_priority,
+                use_external=use_external_init,
+                filename_prefix=filename_prefix
+            )
             _wrote_mermaid_run = True
         else:
             # Fullscreen without zoom
@@ -555,20 +609,24 @@ def install_js(
                 d3_node_count=-1,  # ignored
                 **common_render_args,
             )
-            app.add_js_file(None, body=_fullscreen_js_script, priority=app.config.mermaid_js_priority, type="module")
+            add_js_file_or_inline(
+                app, _fullscreen_js_script, app.config.mermaid_js_priority,
+                use_external=use_external_init,
+                filename_prefix=filename_prefix
+            )
             _wrote_mermaid_run = True
 
     if not _wrote_mermaid_run and _mermaid_js_url:
-        app.add_js_file(
-            None,
-            body=template_js.render(
-                fullscreen_css="",
-                d3_selector="",  # ignored
-                d3_node_count=-1,  # ignored
-                **common_render_args,
-            ),
-            priority=app.config.mermaid_js_priority,
-            type="module",
+        _default_js_script = template_js.render(
+            fullscreen_css="",
+            d3_selector="",  # ignored
+            d3_node_count=-1,  # ignored
+            **common_render_args,
+        )
+        add_js_file_or_inline(
+            app, _default_js_script, app.config.mermaid_js_priority,
+            use_external=use_external_init,
+            filename_prefix=filename_prefix
         )
 
 
@@ -614,6 +672,10 @@ def setup(app):
     app.add_config_value("mermaid_fullscreen", True, "html")
     app.add_config_value("mermaid_fullscreen_button", "⛶", "html")
     app.add_config_value("mermaid_fullscreen_button_opacity", "50", "html")
+    
+    # CSP compliance options
+    app.add_config_value("mermaid_external_init", False, "html")
+    app.add_config_value("mermaid_init_filename_prefix", None, "html")
 
     app.connect("html-page-context", install_js)
 

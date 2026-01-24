@@ -301,6 +301,32 @@ Customizes the fullscreen button opacity, to avoid fully obscuring
 important chart content. Default is `50` (percent). You can use any
 value from 0 to 100. Button becomes fully opaque on hover.
 
+### `mermaid_external_init`
+
+**CSP Compliance**: When set to `True`, writes the mermaid initialization 
+script to an external JavaScript file instead of injecting it inline. This 
+enables Content Security Policy (CSP) compliance on sites that enforce 
+`script-src 'self'` without `'unsafe-inline'`. Default is `False` (inline script).
+
+Example:
+```python
+mermaid_external_init = True
+```
+
+### `mermaid_init_filename_prefix`
+
+Optional prefix for the external mermaid initialization filename. Defaults to 
+the project name from `project` config value. The filename will be 
+`mermaid-init-{prefix}-{hash}.js` where the hash is based on the script content.
+
+This is useful when hosting multiple documentation sets on the same domain to 
+prevent filename collisions.
+
+Example:
+```python
+mermaid_init_filename_prefix = "my-docs"
+```
+
 ## Markdown support
 
 You can include Mermaid diagrams in your Markdown documents in Sphinx.
