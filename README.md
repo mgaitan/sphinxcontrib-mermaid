@@ -167,7 +167,7 @@ either `'raw'` `'png'` or `'svg'`; the default is `'raw'`.
 The command name with which to invoke `mermaid-cli` program. The
 default is `'mmdc'`; you may need to set this to a full path if it's
 not in the executable search path. If a string is specified, it is
-split using [shlex.split]{.title-ref} to support multi-word commands.
+split using `shlex.split` to support multi-word commands.
 To avoid splitting, a list of strings can be specified. Examples:
 
 ```python
@@ -324,7 +324,7 @@ reStructuredTexts:
 ````
 
 For GitHub cross-support, you can omit the curly braces and configure
-myst to use the [mermaid]{.title-ref} code block as a myst directive.
+myst to use the `mermaid` code block as a myst directive.
 For example, in \`conf.py\`:
 
 ```python
