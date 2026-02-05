@@ -7,8 +7,7 @@
 
 ## 1.2.3 (November 25, 2025)
 
-- Fix issue with ELK charts by upgrading to ELK plugin
-  [0.2.0]{.title-ref}
+- Fix issue with ELK charts by upgrading to ELK plugin `0.2.0`
 
 ## 1.2.2 (November 23, 2025)
 
@@ -24,8 +23,8 @@
 - Normalize javascript across various configuration options
 - Make graph full width and avoid unused margins in graph image
 - Rename fullscreen container class from
-  [mermaid-fullscreen-content]{.title-ref} to
-  [mermaid-container-fullscreen]{.title-ref}
+  `mermaid-fullscreen-content` to
+  `mermaid-container-fullscreen`
 
 ## 1.1.0 (November 19, 2025)
 
@@ -83,7 +82,7 @@ changes](https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.7.1...0.8).
 ## 0.7 (May 31, 2021)
 
 - Add compatibility with Sphinx 4.0
-- [mermaid_init_js]{.title-ref} is now included in an standard way.
+- `mermaid_init_js` is now included in an standard way.
 - Documented how to use in Markdown documents
 
 ## 0.6.3 (February 21, 2021)
@@ -118,10 +117,10 @@ changes](https://github.com/mgaitan/sphinxcontrib-mermaid/compare/0.7.1...0.8).
 
 ## 0.4.0 (April 9, 2020)
 
-- Added [mermaid_params]{.title-ref}
+- Added `mermaid_params`
 - Added config file option
 - Improved latex integration
-- Added the [pdfcrop]{.title-ref} functionality
+- Added the `pdfcrop` functionality
 - Mermaid version is configurable
 - Several cleanups in the code
 

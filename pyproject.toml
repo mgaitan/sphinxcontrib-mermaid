@@ -41,7 +41,7 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/mgaitan/sphinxcontrib-mermaid"
 Homepage = "https://github.com/mgaitan/sphinxcontrib-mermaid"
-Changelog = "https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/CHANGELOG.rst"
+Changelog = "https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 test = [
