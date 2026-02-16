@@ -60,6 +60,7 @@ let modal = null;
 let modalContent = null;
 let previousScrollOffset = [window.scrollX, window.scrollY];
 let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
 
 const runMermaid = async (rerun) => {
     console.log("Running mermaid diagrams, rerun =", rerun);
@@ -75,6 +76,7 @@ const runMermaid = async (rerun) => {
 
         all_mermaids.forEach((el) => {
             el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
             if(!el.hasAttribute("data-original-code")) {
                 // store original code
                 // console.log(`Storing original code for first run: `, el.innerHTML);
@@ -99,6 +101,9 @@ const runMermaid = async (rerun) => {
         const visible = [];
         const hidden = [];
         all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
             if (el.offsetParent !== null || el.getClientRects().length > 0) {
                 visible.push(el);
             } else {
@@ -108,32 +113,49 @@ const runMermaid = async (rerun) => {
         });
 
         if (visible.length > 0) {
-            await mermaid.run({ nodes: visible });
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
         }
 
-        // Lazily render hidden elements when they become visible
-        if (hidden.length > 0 && typeof IntersectionObserver !== 'undefined') {
-            _lazyObserver = new IntersectionObserver((entries) => {
-                entries.forEach(async (entry) => {
-                    if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
-                        _lazyObserver.unobserve(entry.target);
-                        entry.target.removeAttribute('data-mermaid-deferred');
-                        try {
-                            await mermaid.run({ nodes: [entry.target] });
-                        } catch (e) {
-                            console.error("Mermaid deferred rendering failed:", e);
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
                         }
                     }
                 });
-            });
-            hidden.forEach((el) => _lazyObserver.observe(el));
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
         }
     }
 
     all_mermaids = document.querySelectorAll(".mermaid");
-    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
-    // Exclude deferred (hidden) elements from completion checks
-    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred])");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
 
     if ("{{ add_zoom }}" === "True") {
         const mermaids_to_add_zoom = {{ d3_node_count }} === -1 ? mermaids_active.length : {{ d3_node_count }};

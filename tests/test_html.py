@@ -172,3 +172,11 @@ def test_custom_fullscreen_button(index):
     """Test custom fullscreen button icon."""
     assert "mermaid.run(" in index
     assert "[+]" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic")
+def test_lazy_rendering_code_present(index):
+    """Test that lazy rendering code for hidden elements is present."""
+    assert "IntersectionObserver" in index
+    assert "data-mermaid-deferred" in index
+    assert "mermaids_active.length !== mermaids_processed.length" in index
