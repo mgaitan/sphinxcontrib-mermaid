@@ -84,12 +84,12 @@ imported from other modules).
 For example:
 
 ```rst
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
     :full:
 ```
 
 ```{eval-rst}
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
    :full:
 ```
 
