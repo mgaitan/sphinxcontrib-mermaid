@@ -7,7 +7,8 @@ name = "sphinxcontrib-mermaid"
 authors = [{name = "Martín Gaitán", email = "gaitan@gmail.com"}]
 description="Mermaid diagrams in your Sphinx-powered docs"
 readme = "docs/readme_pypa.md"
-license = { text = "BSD" }
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
 version = "2.0.0"
 requires-python = ">=3.10"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
@@ -18,7 +19,6 @@ classifiers = [
     "Environment :: Web Environment",
     "Framework :: Sphinx :: Extension",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
