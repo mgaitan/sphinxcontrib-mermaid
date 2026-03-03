@@ -15,7 +15,7 @@ copyright = "2017-2025, Martín Gaitán"
 author = "Martín Gaitán"
 
 version = "2.0"
-release = "2.0.0rc1"
+release = "2.0.0"
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = "sphinx"
