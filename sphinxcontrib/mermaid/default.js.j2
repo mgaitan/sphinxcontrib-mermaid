@@ -236,12 +236,12 @@ const load = async () => {
         const newDarkTheme = isDarkTheme();
         if (newDarkTheme !== darkTheme) {
             darkTheme = newDarkTheme;
-            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "{{ mermaid_dark_theme }}" : "{{ mermaid_light_theme }}", "theme");
             await mermaid.initialize(
                 {...JSON.parse(
                     `{{ mermaid_init_config }}`
                 ),
-                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                ...{ darkMode: darkTheme, theme: darkTheme ? '{{ mermaid_dark_theme }}' : '{{ mermaid_light_theme }}' },
                 }
             );
             await runMermaid(true);
@@ -268,12 +268,12 @@ mermaid.registerLayoutLoaders(elkLayouts);
 mermaid.registerExternalDiagrams([zenumlLayouts]);
 {% endif %}
 
-console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+console.log("Initializing mermaid with", darkTheme ? "{{ mermaid_dark_theme }}" : "{{ mermaid_light_theme }}", "theme");
 mermaid.initialize(
     {...JSON.parse(
         `{{ mermaid_init_config }}`
     ),
-    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    ...{ darkMode: darkTheme, theme: darkTheme ? '{{ mermaid_dark_theme }}' : '{{ mermaid_light_theme }}' },
     }
 );
 
