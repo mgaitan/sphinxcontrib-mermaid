@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add `mermaid_dark_theme` and `mermaid_light_theme` config options for configurable theme switching
+
 ## 2.0.1 (March 5, 2026)
 
 - Export `runMermaid` to window for hot reloading frontend
