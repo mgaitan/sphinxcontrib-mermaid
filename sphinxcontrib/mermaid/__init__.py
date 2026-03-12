@@ -455,6 +455,8 @@ def install_js(
     common_render_args = dict(
         mermaid_js_url=_mermaid_js_url,
         mermaid_init_config=dumps(app.config.mermaid_init_config),
+        mermaid_dark_theme=app.config.mermaid_dark_theme,
+        mermaid_light_theme=app.config.mermaid_light_theme,
         mermaid_include_elk=_mermaid_elk_js_url is not None,
         mermaid_include_zenuml=_mermaid_zenuml_js_url is not None,
         mermaid_elk_js_url=_mermaid_elk_js_url,
@@ -593,6 +595,8 @@ def setup(app):
     app.add_config_value("mermaid_sequence_config", False, "html")
 
     app.add_config_value("mermaid_init_config", {"startOnLoad": False}, "html")
+    app.add_config_value("mermaid_dark_theme", "dark", "html")
+    app.add_config_value("mermaid_light_theme", "default", "html")
     app.add_config_value("mermaid_version", "11.12.1", "html")
     app.add_config_value("mermaid_use_local", "", "html")
 

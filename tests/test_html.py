@@ -172,3 +172,21 @@ def test_custom_fullscreen_button(index):
     """Test custom fullscreen button icon."""
     assert "mermaid.run()" in index
     assert "[+]" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic")
+def test_mermaid_theme_defaults(index):
+    """Default theme values are 'dark' and 'default'."""
+    assert "theme: darkTheme ? 'dark' : 'default'" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral", "mermaid_light_theme": "neutral"})
+def test_mermaid_theme_both_custom(index):
+    """Both theme values can be overridden."""
+    assert "theme: darkTheme ? 'neutral' : 'neutral'" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral"})
+def test_mermaid_theme_dark_only(index):
+    """Only dark theme overridden, light stays default."""
+    assert "theme: darkTheme ? 'neutral' : 'default'" in index
