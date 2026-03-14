@@ -84,12 +84,12 @@ imported from other modules).
 For example:
 
 ```rst
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
     :full:
 ```
 
 ```{eval-rst}
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
    :full:
 ```
 
@@ -214,6 +214,23 @@ use this extra function.
 
 Optional override of arguments to `mermaid.initialize()`, passed in as
 a JSON. Defaults to `{ "startOnLoad": True}`.
+
+### `mermaid_dark_theme`
+
+The mermaid theme to use when dark mode is detected. Defaults to `"dark"`.
+Valid values are any [mermaid theme](https://mermaid.js.org/config/theming.html): `"default"`, `"neutral"`, `"dark"`, `"forest"`, `"base"`.
+
+### `mermaid_light_theme`
+
+The mermaid theme to use when light mode is detected. Defaults to `"default"`.
+Valid values are the same as for `mermaid_dark_theme`.
+
+For a theme that works well in both dark and light mode, set both to `"neutral"`:
+
+```python
+mermaid_dark_theme = "neutral"
+mermaid_light_theme = "neutral"
+```
 
 ### `mermaid_version`
 

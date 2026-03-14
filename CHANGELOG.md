@@ -1,6 +1,15 @@
 # Changelog
 
-## 2.0.0 (TBD)
+## Unreleased
+
+- Add `mermaid_dark_theme` and `mermaid_light_theme` config options for configurable theme switching
+
+## 2.0.1 (March 5, 2026)
+
+- Export `runMermaid` to window for hot reloading frontend
+- Small fixes for docs publishing
+
+## 2.0.0 (January 13, 2026)
 
 - Drop support for Python 3.8 and 3.9
 - Add support for dynamic theme changes

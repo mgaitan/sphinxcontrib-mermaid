@@ -180,3 +180,21 @@ def test_lazy_rendering_code_present(index):
     assert "IntersectionObserver" in index
     assert "data-mermaid-deferred" in index
     assert "mermaids_active.length !== mermaids_processed.length" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic")
+def test_mermaid_theme_defaults(index):
+    """Default theme values are 'dark' and 'default'."""
+    assert "theme: darkTheme ? 'dark' : 'default'" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral", "mermaid_light_theme": "neutral"})
+def test_mermaid_theme_both_custom(index):
+    """Both theme values can be overridden."""
+    assert "theme: darkTheme ? 'neutral' : 'neutral'" in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral"})
+def test_mermaid_theme_dark_only(index):
+    """Only dark theme overridden, light stays default."""
+    assert "theme: darkTheme ? 'neutral' : 'default'" in index
