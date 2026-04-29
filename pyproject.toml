@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools"]
-build-backend="setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "sphinxcontrib-mermaid"
@@ -79,9 +79,13 @@ section-order = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
 
-[tool.setuptools.packages.find]
-where = ["./"]
-include = ["sphinxcontrib.mermaid"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "sphinxcontrib/mermaid",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+]
 
-[tool.setuptools.package-data]
-"sphinxcontrib.mermaid" = ["*.css", "*.js"]
+[tool.hatch.build.targets.wheel]
+only-include = ["sphinxcontrib/mermaid"]
