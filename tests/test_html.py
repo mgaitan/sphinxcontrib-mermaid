@@ -75,13 +75,23 @@ def test_conf_mermaid_version(app, index):
 def test_conf_mermaid_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
+    assert 'import mermaid from "_static/test"' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_elk_use_local": "test"})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": True, "mermaid_elk_use_local": "test"})
 def test_conf_mermaid_elk_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
     assert "mermaid-layout-elk.esm.min.mjs" not in index
+    assert 'import elkLayouts from "_static/test"' in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_zenuml": True, "mermaid_zenuml_use_local": "test"})
+def test_conf_mermaid_zenuml_local(app, index):
+    assert "mermaid.run()" in index
+    assert "mermaid.min.js" not in index
+    assert "mermaid-zenuml.esm.min.mjs" not in index
+    assert 'import zenumlLayouts from "_static/test"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_version": "1.2.3", "mermaid_include_elk": False})
@@ -94,6 +104,10 @@ def test_conf_d3_version(app, index):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_use_local": "test"})
 def test_conf_d3_local(app, index):
     assert "cdn.jsdelivr.net/npm/d3" not in index
+    assert re.search(
+        r'<script src="[^"]*_static/test(?:\?[^"]*)?"></script>',
+        index,
+    )
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_init_config": {"startOnLoad": True}})
@@ -113,6 +127,15 @@ def test_mermaid_with_elk(app, index):
     assert "mermaid.run()" in index
     assert (
         'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"'
+        in index
+    )
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_zenuml": True, "mermaid_zenuml_version": "latest"})
+def test_mermaid_with_zenuml(app, index):
+    assert "mermaid.run()" in index
+    assert (
+        'import zenumlLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs"'
         in index
     )
 
