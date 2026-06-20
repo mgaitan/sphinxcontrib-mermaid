@@ -84,12 +84,12 @@ imported from other modules).
 For example:
 
 ```rst
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
     :full:
 ```
 
 ```{eval-rst}
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.util.ExtensionError
+.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
    :full:
 ```
 
@@ -215,6 +215,23 @@ use this extra function.
 Optional override of arguments to `mermaid.initialize()`, passed in as
 a JSON. Defaults to `{ "startOnLoad": True}`.
 
+### `mermaid_dark_theme`
+
+The mermaid theme to use when dark mode is detected. Defaults to `"dark"`.
+Valid values are any [mermaid theme](https://mermaid.js.org/config/theming.html): `"default"`, `"neutral"`, `"dark"`, `"forest"`, `"base"`.
+
+### `mermaid_light_theme`
+
+The mermaid theme to use when light mode is detected. Defaults to `"default"`.
+Valid values are the same as for `mermaid_dark_theme`.
+
+For a theme that works well in both dark and light mode, set both to `"neutral"`:
+
+```python
+mermaid_dark_theme = "neutral"
+mermaid_light_theme = "neutral"
+```
+
 ### `mermaid_version`
 
 The version of mermaid that will be used to parse `raw` output in HTML
@@ -224,8 +241,13 @@ The default is `"11.12.1"`.
 
 ### `mermaid_use_local`
 
-Optional path to a local installation of `mermaid.esm.min.mjs`. By
-default, we will pull from jsdelivr.
+Optional location of a local copy of `mermaid.esm.min.mjs`. By default,
+we will pull from jsdelivr.
+
+The value can be either an absolute URL or a path relative to
+`html_static_path` (e.g. `vendor/mermaid.esm.min.mjs` if the file is
+vendored at `_static/vendor/mermaid.esm.min.mjs`). The same applies to
+the other `*_use_local` options below.
 
 ### `mermaid_include_elk`
 
@@ -249,19 +271,18 @@ is `"0.2.2"`.
 
 ### `mermaid_elk_use_local`
 
-Optional path to a local installation of
-`mermaid-layout-elk.esm.min.mjs`. By default, we will pull from
-jsdelivr.
+Optional location of a local copy of `mermaid-layout-elk.esm.min.mjs`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `mermaid_zenuml_use_local`
 
-Optional path to a local installation of `mermaid-zenuml.esm.min.mjs`.
-By default, we will pull from jsdelivr.
+Optional location of a local copy of `mermaid-zenuml.esm.min.mjs`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `d3_use_local`
 
-Optional path to a local installation of `d3.min.js`. By default, we
-will pull from jsdelivr.
+Optional location of a local copy of `d3.min.js`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `d3_version`
 
