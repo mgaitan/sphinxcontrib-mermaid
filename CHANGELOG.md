@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Capture mmdc error message as string for nicer error display
+
 ## 2.0.2 (April 30, 2026)
 
 - Add `mermaid_dark_theme` and `mermaid_light_theme` config options for configurable theme switching
