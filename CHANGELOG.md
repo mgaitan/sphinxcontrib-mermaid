@@ -2,7 +2,10 @@
 
 ## Unreleased
 
+## 2.0.2 (April 30, 2026)
+
 - Add `mermaid_dark_theme` and `mermaid_light_theme` config options for configurable theme switching
+- Resolve local Mermaid/ELK/ZenUML/D3 JS paths under `html_static_path`
 
 ## 2.0.1 (March 5, 2026)
 
