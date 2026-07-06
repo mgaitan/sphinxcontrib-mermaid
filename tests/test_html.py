@@ -1,4 +1,6 @@
 import re
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -213,3 +215,23 @@ def test_mermaid_theme_both_custom(index):
 def test_mermaid_theme_dark_only(index):
     """Only dark theme overridden, light stays default."""
     assert "theme: darkTheme ? 'neutral' : 'default'" in index
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="invalid",
+    confoverrides={
+        # Call a fake mmdc script that always fails, to test error handling.
+        # mmdc_fake is written in Python to make the test work on Windows.
+        "mermaid_cmd": [
+            sys.executable,
+            str(Path(__file__).parent / "roots/test-invalid/mmdc_fake"),
+        ],
+        "mermaid_output_format": "svg",
+    },
+)
+def test_render_error_message(app):
+    """The stderr string from a failed mmdc run appears verbatim in the Sphinx warning."""
+    app.builder.build_all()
+    warnings = app._warning.getvalue()
+    assert "Mermaid exited with error:\n[stderr]\nError: bad syntax\nsomething else" in warnings
