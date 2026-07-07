@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add `mermaid_dark_theme` and `mermaid_light_theme` config options for configurable theme switching
+- Defer rendering of Mermaid diagrams hidden by a parent (e.g. Reveal.js slides, unopened tabs) until they become visible, fixing broken SVGs
 
 ## 2.0.1 (March 5, 2026)
 

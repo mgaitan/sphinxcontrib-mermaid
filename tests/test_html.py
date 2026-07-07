@@ -180,6 +180,12 @@ def test_lazy_rendering_code_present(index):
     assert "IntersectionObserver" in index
     assert "data-mermaid-deferred" in index
     assert "mermaids_active.length !== mermaids_processed.length" in index
+    # Zoom is applied through the idempotent helper so deferred diagrams can be
+    # zoomed on reveal, and the fixed-count SVG gate that looped forever when a
+    # zoomed diagram was hidden is gone.
+    assert "addZoomToSvgs" in index
+    assert "data-zoom-applied" in index
+    assert "svgs.size() !== mermaids_to_add_zoom" not in index
 
 
 @pytest.mark.sphinx("html", testroot="basic")
