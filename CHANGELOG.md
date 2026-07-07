@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Capture mmdc error message as string for nicer error display
+- Fix local JS module imports on root-level pages by ensuring a valid relative ES module specifier (#246)
 
 ## 2.0.2 (April 30, 2026)
 

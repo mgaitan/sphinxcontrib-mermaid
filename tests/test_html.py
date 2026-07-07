@@ -77,7 +77,7 @@ def test_conf_mermaid_version(app, index):
 def test_conf_mermaid_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
-    assert 'import mermaid from "_static/test"' in index
+    assert 'import mermaid from "./_static/test"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": True, "mermaid_elk_use_local": "test"})
@@ -85,7 +85,7 @@ def test_conf_mermaid_elk_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
     assert "mermaid-layout-elk.esm.min.mjs" not in index
-    assert 'import elkLayouts from "_static/test"' in index
+    assert 'import elkLayouts from "./_static/test"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_zenuml": True, "mermaid_zenuml_use_local": "test"})
@@ -93,7 +93,7 @@ def test_conf_mermaid_zenuml_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
     assert "mermaid-zenuml.esm.min.mjs" not in index
-    assert 'import zenumlLayouts from "_static/test"' in index
+    assert 'import zenumlLayouts from "./_static/test"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_version": "1.2.3", "mermaid_include_elk": False})
