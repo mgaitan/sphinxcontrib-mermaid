@@ -406,7 +406,14 @@ def _resolve_local_url(url: str, context: dict) -> str:
     """
     if not url or url.startswith(("http://", "https://", "//", "/")):
         return url
-    return context["pathto"]("_static/" + url, resource=True)
+    resolved = context["pathto"]("_static/" + url, resource=True)
+    # ``pathto`` omits the leading ``./`` when the target is at the same
+    # directory level as the current page. A bare relative path is an invalid
+    # ES module specifier (it is treated as a package name), so ensure the
+    # result is a valid relative import. See issue #246.
+    if not resolved.startswith(("./", "../", "/")):
+        resolved = "./" + resolved
+    return resolved
 
 
 def install_js(
