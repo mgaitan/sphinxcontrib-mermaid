@@ -1,11 +1,18 @@
-import mermaid from "{{ mermaid_js_url }}";
+{%- macro fix_import_url(url) -%}
+{%- if url.startswith(("https://", "http://", "//", "/", "../")) -%}
+{{ url }}
+{%- else -%}
+./{{ url }}
+{%- endif -%}
+{%- endmacro -%}
+import mermaid from "{{ fix_import_url(mermaid_js_url) }}";
 
 {% if mermaid_include_elk %}
-import elkLayouts from "{{ mermaid_elk_js_url }}"
+import elkLayouts from "{{ fix_import_url(mermaid_elk_js_url) }}"
 {% endif %}
 
 {% if mermaid_include_zenuml %}
-import zenumlLayouts from "{{ mermaid_zenuml_js_url }}"
+import zenumlLayouts from "{{ fix_import_url(mermaid_zenuml_js_url) }}"
 {% endif %}
 
 const initStyles = () => {
