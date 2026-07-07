@@ -241,8 +241,13 @@ The default is `"11.12.1"`.
 
 ### `mermaid_use_local`
 
-Optional path to a local installation of `mermaid.esm.min.mjs`. By
-default, we will pull from jsdelivr.
+Optional location of a local copy of `mermaid.esm.min.mjs`. By default,
+we will pull from jsdelivr.
+
+The value can be either an absolute URL or a path relative to
+`html_static_path` (e.g. `vendor/mermaid.esm.min.mjs` if the file is
+vendored at `_static/vendor/mermaid.esm.min.mjs`). The same applies to
+the other `*_use_local` options below.
 
 ### `mermaid_include_elk`
 
@@ -266,19 +271,18 @@ is `"0.2.2"`.
 
 ### `mermaid_elk_use_local`
 
-Optional path to a local installation of
-`mermaid-layout-elk.esm.min.mjs`. By default, we will pull from
-jsdelivr.
+Optional location of a local copy of `mermaid-layout-elk.esm.min.mjs`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `mermaid_zenuml_use_local`
 
-Optional path to a local installation of `mermaid-zenuml.esm.min.mjs`.
-By default, we will pull from jsdelivr.
+Optional location of a local copy of `mermaid-zenuml.esm.min.mjs`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `d3_use_local`
 
-Optional path to a local installation of `d3.min.js`. By default, we
-will pull from jsdelivr.
+Optional location of a local copy of `d3.min.js`.
+See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
 ### `d3_version`
 

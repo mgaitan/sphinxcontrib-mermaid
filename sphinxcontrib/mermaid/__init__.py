@@ -234,12 +234,12 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
             mm_args.extend(["--configFile", self.builder.config.mermaid_sequence_config])
 
         try:
-            p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+            p = Popen(mm_args, shell=mermaid_cmd_shell, stdout=PIPE, stdin=PIPE, stderr=PIPE, text=True)
         except FileNotFoundError:
             logger.warning("command %r cannot be run (needed for mermaid output), check the mermaid_cmd setting" % mermaid_cmd)
             return None, None
 
-        stdout, stderr = p.communicate(str.encode(code))
+        stdout, stderr = p.communicate(code)
         if self.builder.config.mermaid_verbose:
             logger.info(stdout)
 
@@ -397,6 +397,25 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
+def _resolve_local_url(url: str, context: dict) -> str:
+    """Resolve a *_use_local config value to a URL.
+
+    If the value is an absolute URL (``http://``, ``https://``, ``//``, ``/``),
+    it is returned unchanged. Otherwise it is treated as a path relative to
+    ``html_static_path`` and resolved to a URL relative to the current page.
+    """
+    if not url or url.startswith(("http://", "https://", "//", "/")):
+        return url
+    resolved = context["pathto"]("_static/" + url, resource=True)
+    # ``pathto`` omits the leading ``./`` when the target is at the same
+    # directory level as the current page. A bare relative path is an invalid
+    # ES module specifier (it is treated as a package name), so ensure the
+    # result is a valid relative import. See issue #246.
+    if not resolved.startswith(("./", "../", "/")):
+        resolved = "./" + resolved
+    return resolved
+
+
 def install_js(
     app: Sphinx,
     pagename,
@@ -410,7 +429,7 @@ def install_js(
 
     # Add required JavaScript
     if app.config.mermaid_use_local:
-        _mermaid_js_url = app.config.mermaid_use_local
+        _mermaid_js_url = _resolve_local_url(app.config.mermaid_use_local, context)
     elif app.config.mermaid_version == "latest":
         _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
     elif Version(app.config.mermaid_version) > Version("10.2.0"):
@@ -421,7 +440,7 @@ def install_js(
     _mermaid_elk_js_url = None
     if app.config.mermaid_include_elk:
         if app.config.mermaid_elk_use_local:
-            _mermaid_elk_js_url = app.config.mermaid_elk_use_local
+            _mermaid_elk_js_url = _resolve_local_url(app.config.mermaid_elk_use_local, context)
         elif app.config.mermaid_elk_version == "latest":
             _mermaid_elk_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"
         elif app.config.mermaid_elk_version:
@@ -432,7 +451,7 @@ def install_js(
     _mermaid_zenuml_js_url = None
     if app.config.mermaid_include_zenuml:
         if app.config.mermaid_zenuml_use_local:
-            _mermaid_zenuml_js_url = app.config.mermaid_zenuml_use_local
+            _mermaid_zenuml_js_url = _resolve_local_url(app.config.mermaid_zenuml_use_local, context)
         elif app.config.mermaid_zenuml_version == "latest":
             _mermaid_zenuml_js_url = "https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs"
         elif app.config.mermaid_zenuml_version:
