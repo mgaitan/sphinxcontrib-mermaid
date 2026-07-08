@@ -4,6 +4,7 @@
 
 - Capture mmdc error message as string for nicer error display
 - Fix local JS module imports on root-level pages by ensuring a valid relative ES module specifier (#246)
+- Defer rendering of Mermaid diagrams hidden by a parent (e.g. Reveal.js slides, unopened tabs) until they become visible, fixing broken SVGs
 
 ## 2.0.2 (April 30, 2026)
 
