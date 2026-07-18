@@ -263,3 +263,22 @@ def test_render_error_message(app):
     app.builder.build_all()
     warnings = app._warning.getvalue()
     assert "Mermaid exited with error:\n[stderr]\nError: bad syntax\nsomething else" in warnings
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"mermaid_output_format": "svg"},
+)
+def test_static_output_skips_javascript(app, monkeypatch):
+    monkeypatch.setattr(
+        "sphinxcontrib.mermaid.render_mm",
+        lambda *args, **kwargs: ("diagram.svg", app.outdir / "diagram.svg"),
+    )
+
+    app.builder.build_all()
+    index = (app.outdir / "index.html").read_text()
+
+    assert "cdn.jsdelivr.net/npm/mermaid" not in index
+    assert "cdn.jsdelivr.net/npm/d3" not in index
+    assert "mermaid.run(" not in index
