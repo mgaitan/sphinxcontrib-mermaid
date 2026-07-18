@@ -4,6 +4,14 @@ import mermaid from {{ mermaid_js_url }};
 import elkLayouts from {{ mermaid_elk_js_url }}
 {% endif %}
 
+{% if mermaid_include_icon_packs %}
+const iconPacks = {{ mermaid_icon_packs }};
+mermaid.registerIconPacks(Object.entries(iconPacks).map(([name, url]) => ({
+    name,
+    loader: () => fetch(url).then((response) => response.json()),
+})));
+{% endif %}
+
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
     defaultStyle.textContent = {{ common_css }};

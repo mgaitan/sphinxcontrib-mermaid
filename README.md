@@ -286,6 +286,25 @@ See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 Optional location of a local copy of `mermaid-zenuml.esm.min.mjs`.
 See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
 
+### `mermaid_icon_packs`
+
+Optional mapping of icon-pack names to
+[Iconify JSON URLs](https://mermaid.js.org/config/icons.html). Packs are
+registered lazily and fetched only when Mermaid uses an icon from them.
+Relative paths are resolved from `html_static_path`. This option applies to raw
+HTML output only.
+
+For example:
+
+```python
+mermaid_icon_packs = {
+    "logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json",
+}
+```
+
+Icons from the pack can then be referenced with the registered name, such as
+`logos:aws-lambda` in an architecture diagram.
+
 ### `d3_use_local`
 
 Optional location of a local copy of `d3.min.js`.
