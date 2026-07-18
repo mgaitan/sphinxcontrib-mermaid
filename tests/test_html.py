@@ -81,6 +81,16 @@ def test_conf_mermaid_version(app, index):
     )
 
 
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"mermaid_sequence_config": "mermaid.json"},
+)
+def test_conf_mermaid_sequence_config(app, index):
+    assert app.config.mermaid_sequence_config == "mermaid.json"
+    assert "defaults to `NoneType`" not in app._warning.getvalue()
+
+
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": False})
 def test_conf_mermaid_local(app, index):
     assert "mermaid.run(" in index

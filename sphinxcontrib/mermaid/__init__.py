@@ -578,7 +578,7 @@ def setup(app):
     app.add_config_value("mermaid_output_format", "raw", "html")
     app.add_config_value("mermaid_params", list(), "html")
     app.add_config_value("mermaid_verbose", False, "html")
-    app.add_config_value("mermaid_sequence_config", False, "html")
+    app.add_config_value("mermaid_sequence_config", None, "html")
     app.add_config_value("mermaid_config", None, "env")
 
     app.add_config_value("mermaid_init_config", {"startOnLoad": False}, "html")
