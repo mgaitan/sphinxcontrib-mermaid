@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.0 (July 18, 2026)
+
+- Add `mermaid_config` option for passing a global Mermaid configuration (#215)
+- Load the ZenUML plugin lazily, only on pages that contain a ZenUML diagram, and confine its injected stylesheet to the diagram subtree so it no longer restyles the host theme (#252)
+- Skip injecting the Mermaid JavaScript when the output format does not support it (#253)
+- Fix d3 zoom on nested SVGs (#179)
+- Fix fullscreen button positioning inconsistency (#225)
+- Fix interactions between the fullscreen, zoom, and lazy-render features (#254)
+
 ## 2.0.3 (July 7, 2026)
 
 - Capture mmdc error message as string for nicer error display
