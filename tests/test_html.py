@@ -41,7 +41,7 @@ def test_html_raw(index):
     )
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_fullscreen": False})
+@pytest.mark.sphinx("html", testroot="basic")
 def test_html_zoom_option(index, app):
     assert "mermaid.run(" in index
     assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
@@ -50,6 +50,7 @@ def test_html_zoom_option(index, app):
     assert 'd3.selectAll(".mermaid[data-zoom-id=' in zoom_page
     assert '] svg")' not in zoom_page
     assert 'return this.querySelector("svg");' in zoom_page
+    assert 'if ("True" === "True") {\n        const mermaids_to_add_zoom' in zoom_page
 
     # the first diagram has no id
     assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
@@ -102,14 +103,18 @@ def test_conf_mermaid_zenuml_local(app, index):
     assert 'import("./_static/test")' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_version": "1.2.3", "mermaid_include_elk": False})
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"d3_version": "1.2.3", "mermaid_d3_zoom": True, "mermaid_include_elk": False},
+)
 def test_conf_d3_version(app, index):
     assert "mermaid.run(" in index
     assert app.config.d3_version == "1.2.3"
     assert '<script src="https://cdn.jsdelivr.net/npm/d3@1.2.3/dist/d3.min.js"></script>' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_use_local": "test"})
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_use_local": "test", "mermaid_d3_zoom": True})
 def test_conf_d3_local(app, index):
     assert "cdn.jsdelivr.net/npm/d3" not in index
     assert re.search(
@@ -136,6 +141,7 @@ def test_mermaid_config(index):
     assert "config:\n  theme: base\n  themeVariables:\n    primaryColor: '#BB2528'" in index
     assert "config:\n  theme: forest" in index
     assert index.count("primaryColor: '#BB2528'") == 1
+    assert "cdn.jsdelivr.net/npm/d3" not in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True, "mermaid_elk_version": "latest"})
@@ -154,6 +160,7 @@ def test_mermaid_with_zenuml(app, index):
         'import("https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs")'
         in index
     )
+    assert '.replace(/^\\s*---\\s*\\n[^]*?\\n---\\s*/, "")' in index
 
 
 @pytest.mark.sphinx("html", testroot="markdown", confoverrides={"mermaid_include_elk": True})
@@ -191,6 +198,10 @@ def test_fullscreen_enabled(index):
     assert ".mermaid-fullscreen-btn:hover" in index
     assert ".mermaid-fullscreen-modal" in index
     assert "mermaid-fullscreen-close" in index
+    assert "previousScrollOffset = [window.scrollX, window.scrollY];" in index
+    assert "svg.style.display = 'block';" in index
+    assert "svg.style.sdisplay" not in index
+    assert index.count("document.addEventListener('keydown'") == 1
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_fullscreen": False})
