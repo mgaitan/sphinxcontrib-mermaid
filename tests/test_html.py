@@ -186,6 +186,8 @@ def test_html_raw_from_markdown(index):
 def test_fullscreen_enabled(index):
     """Test that fullscreen JavaScript is added when enabled."""
     assert "mermaid.run(" in index
+    assert ".mermaid-container {\n    position: relative;" in index
+    assert ".mermaid-fullscreen-btn {\n    position: absolute;" in index
     assert ".mermaid-fullscreen-btn:hover" in index
     assert ".mermaid-fullscreen-modal" in index
     assert "mermaid-fullscreen-close" in index
