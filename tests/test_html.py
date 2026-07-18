@@ -41,12 +41,15 @@ def test_html_raw(index):
     )
 
 
-@pytest.mark.sphinx("html", testroot="basic")
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_fullscreen": False})
 def test_html_zoom_option(index, app):
     assert "mermaid.run(" in index
     assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
     zoom_page = (app.outdir / "zoom.html").read_text().replace("<script >", "<script>")
     assert "svg.call(zoom);" in zoom_page
+    assert 'd3.selectAll(".mermaid[data-zoom-id=' in zoom_page
+    assert '] svg")' not in zoom_page
+    assert 'return this.querySelector("svg");' in zoom_page
 
     # the first diagram has no id
     assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
@@ -55,6 +58,9 @@ def test_html_zoom_option(index, app):
 def test_html_zoom_option_global(index):
     assert "mermaid.run(" in index
     assert 'if ("True" === "True") {\n        const mermaids_to_add_zoom' in index
+    assert 'd3.selectAll(".mermaid").select(function() {' in index
+    assert 'return this.querySelector("svg");' in index
+    assert 'd3.selectAll(".mermaid svg")' not in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": False})
