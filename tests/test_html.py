@@ -1,5 +1,6 @@
 import re
 import sys
+from json import dumps
 from pathlib import Path
 
 import pytest
@@ -44,13 +45,13 @@ def test_html_raw(index):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_html_zoom_option(index, app):
     assert "mermaid.run(" in index
-    assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
+    assert "if (false) {\n        const mermaids_to_add_zoom" in index
     zoom_page = (app.outdir / "zoom.html").read_text().replace("<script >", "<script>")
     assert "svg.call(zoom);" in zoom_page
     assert 'd3.selectAll(".mermaid[data-zoom-id=' in zoom_page
     assert '] svg")' not in zoom_page
     assert 'return this.querySelector("svg");' in zoom_page
-    assert 'if ("True" === "True") {\n        const mermaids_to_add_zoom' in zoom_page
+    assert "if (true) {\n        const mermaids_to_add_zoom" in zoom_page
 
     # the first diagram has no id
     assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
@@ -58,7 +59,7 @@ def test_html_zoom_option(index, app):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
 def test_html_zoom_option_global(index):
     assert "mermaid.run(" in index
-    assert 'if ("True" === "True") {\n        const mermaids_to_add_zoom' in index
+    assert "if (true) {\n        const mermaids_to_add_zoom" in index
     assert 'd3.selectAll(".mermaid").select(function() {' in index
     assert 'return this.querySelector("svg");' in index
     assert 'd3.selectAll(".mermaid svg")' not in index
@@ -67,7 +68,7 @@ def test_html_zoom_option_global(index):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": False})
 def test_html_no_zoom(index):
     assert "mermaid.run(" in index
-    assert 'if ("False" === "True") {\n        const mermaids_to_add_zoom' in index
+    assert "if (false) {\n        const mermaids_to_add_zoom" in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "10.3.0", "mermaid_include_elk": False})
@@ -193,8 +194,8 @@ def test_html_raw_from_markdown(index):
 def test_fullscreen_enabled(index):
     """Test that fullscreen JavaScript is added when enabled."""
     assert "mermaid.run(" in index
-    assert ".mermaid-container {\n    position: relative;" in index
-    assert ".mermaid-fullscreen-btn {\n    position: absolute;" in index
+    assert ".mermaid-container {\\n    position: relative;" in index
+    assert ".mermaid-fullscreen-btn {\\n    position: absolute;" in index
     assert ".mermaid-fullscreen-btn:hover" in index
     assert ".mermaid-fullscreen-modal" in index
     assert "mermaid-fullscreen-close" in index
@@ -243,19 +244,42 @@ def test_lazy_rendering_code_present(index):
 @pytest.mark.sphinx("html", testroot="basic")
 def test_mermaid_theme_defaults(index):
     """Default theme values are 'dark' and 'default'."""
-    assert "theme: darkTheme ? 'dark' : 'default'" in index
+    assert 'theme: darkTheme ? "dark" : "default"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral", "mermaid_light_theme": "neutral"})
 def test_mermaid_theme_both_custom(index):
     """Both theme values can be overridden."""
-    assert "theme: darkTheme ? 'neutral' : 'neutral'" in index
+    assert 'theme: darkTheme ? "neutral" : "neutral"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral"})
 def test_mermaid_theme_dark_only(index):
     """Only dark theme overridden, light stays default."""
-    assert "theme: darkTheme ? 'neutral' : 'default'" in index
+    assert 'theme: darkTheme ? "neutral" : "default"' in index
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="fullscreen",
+    confoverrides={
+        "mermaid_dark_theme": "dark'theme",
+        "mermaid_fullscreen_button": "'` ${button}</script>",
+        "mermaid_init_config": {"note": "` ${config}"},
+        "mermaid_light_theme": 'light"theme',
+    },
+)
+def test_javascript_config_values_are_escaped(index):
+    button_text = "'` ${button}</script>"
+    init_config = {"note": "` ${config}"}
+    dark_theme = "dark'theme"
+    light_theme = 'light"theme'
+    escaped_button = dumps(button_text).replace("<", "\\u003c")
+
+    assert f"fullscreenBtn.textContent = {escaped_button};" in index
+    assert "\\u003c/script>" in index
+    assert f"...{dumps(init_config)}" in index
+    assert f"darkTheme ? {dumps(dark_theme)} : {dumps(light_theme)}" in index
 
 
 @pytest.mark.sphinx(

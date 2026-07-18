@@ -51,6 +51,11 @@ _MERMAID_JS = (_MODULE_DIR / "default.js.j2").read_text(encoding="utf-8")
 mapname_re = re.compile(r'<map id="(.*?)"')
 
 
+def _dump_js(value):
+    """Serialize a value for use in an inline JavaScript module."""
+    return dumps(value).replace("<", "\\u003c")
+
+
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
     pass
 
@@ -493,22 +498,24 @@ def install_js(
     template_fullscreen_css = Template(_FULLSCREEN_CSS)
 
     common_render_args = dict(
-        mermaid_js_url=_mermaid_js_url,
-        mermaid_init_config=dumps(app.config.mermaid_init_config),
-        mermaid_dark_theme=app.config.mermaid_dark_theme,
-        mermaid_light_theme=app.config.mermaid_light_theme,
+        mermaid_js_url=_dump_js(_mermaid_js_url),
+        mermaid_init_config=_dump_js(app.config.mermaid_init_config),
+        mermaid_dark_theme=_dump_js(app.config.mermaid_dark_theme),
+        mermaid_light_theme=_dump_js(app.config.mermaid_light_theme),
         mermaid_include_elk=_mermaid_elk_js_url is not None,
         mermaid_include_zenuml=_mermaid_zenuml_js_url is not None,
-        mermaid_elk_js_url=_mermaid_elk_js_url,
-        mermaid_zenuml_js_url=_mermaid_zenuml_js_url,
-        common_css=template_css.render(
-            mermaid_width=_mermaid_width,
-            mermaid_height=_mermaid_height,
+        mermaid_elk_js_url=_dump_js(_mermaid_elk_js_url),
+        mermaid_zenuml_js_url=_dump_js(_mermaid_zenuml_js_url),
+        common_css=_dump_js(
+            template_css.render(
+                mermaid_width=_mermaid_width,
+                mermaid_height=_mermaid_height,
+            )
         ),
-        button_text=_button_text,  # ignored
-        button_opacity=_button_opacity,  # ignored
-        add_fullscreen=_has_fullscreen,
-        add_zoom=_has_zoom,
+        button_text=_dump_js(_button_text),  # ignored
+        button_opacity=_dump_js(f"{_button_opacity}%"),  # ignored
+        add_fullscreen=_dump_js(_has_fullscreen),
+        add_zoom=_dump_js(_has_zoom),
     )
 
     if _has_zoom:
@@ -522,15 +529,17 @@ def install_js(
 
     if _has_fullscreen or _has_zoom:
         _mermaid_js_script = template_js.render(
-            fullscreen_css=(
-                template_fullscreen_css.render(
-                    mermaid_width=_mermaid_width,
-                    mermaid_height=_mermaid_height,
+            fullscreen_css=_dump_js(
+                (
+                    template_fullscreen_css.render(
+                        mermaid_width=_mermaid_width,
+                        mermaid_height=_mermaid_height,
+                    )
+                    if _has_fullscreen
+                    else ""
                 )
-                if _has_fullscreen
-                else ""
             ),
-            d3_selector=_d3_selector,
+            d3_selector=_dump_js(_d3_selector),
             d3_node_count=_d3_node_count,
             **common_render_args,
         )
@@ -541,8 +550,8 @@ def install_js(
         app.add_js_file(
             None,
             body=template_js.render(
-                fullscreen_css="",
-                d3_selector="",  # ignored
+                fullscreen_css=_dump_js(""),
+                d3_selector=_dump_js(""),  # ignored
                 d3_node_count=-1,  # ignored
                 **common_render_args,
             ),
