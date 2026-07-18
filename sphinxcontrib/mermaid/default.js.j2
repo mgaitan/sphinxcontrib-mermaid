@@ -4,10 +4,6 @@ import mermaid from "{{ mermaid_js_url }}";
 import elkLayouts from "{{ mermaid_elk_js_url }}"
 {% endif %}
 
-{% if mermaid_include_zenuml %}
-import zenumlLayouts from "{{ mermaid_zenuml_js_url }}"
-{% endif %}
-
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
     defaultStyle.textContent = `{{ common_css }}`;
@@ -308,9 +304,24 @@ const runMermaid = async (rerun) => {
     });
 };
 
+{% if mermaid_include_zenuml %}
+// Resolves once the lazily-loaded zenuml plugin has registered (or immediately
+// when the page has no zenuml diagram). `load` awaits this before rendering.
+let zenumlReady = Promise.resolve();
+const pageHasZenuml = () => [...document.querySelectorAll(".mermaid")].some((el) => {
+    const code = el.getAttribute("data-original-code") || el.textContent || "";
+    return /^\s*(?:%%\{[^]*?\}%%\s*)?zenuml\b/i.test(code);
+});
+{% endif %}
+
 const load = async () => {
     initStyles();
 
+{% if mermaid_include_zenuml %}
+    // Wait for the zenuml plugin (loaded lazily below) to finish registering
+    // before rendering, so zenuml diagrams are recognised.
+    await zenumlReady;
+{% endif %}
     await runMermaid(true);
 
     const reRunIfThemeChanges = async () => {
@@ -346,7 +357,34 @@ mermaid.registerLayoutLoaders(elkLayouts);
 {% endif %}
 
 {% if mermaid_include_zenuml %}
-mermaid.registerExternalDiagrams([zenumlLayouts]);
+// Only load and register the zenuml plugin when the page actually contains a
+// zenuml diagram. This avoids fetching the (large) zenuml bundle on every page,
+// and avoids its side effects where they are not needed. The import is kept off
+// the module's top level (no top-level await) so the "load" listener below is
+// still registered synchronously; `load` awaits `zenumlReady` before rendering.
+if (pageHasZenuml()) {
+    // The zenuml bundle injects a stylesheet that declares generic design tokens
+    // (--background, --border, --white, ...) on :root, clobbering identically-named
+    // tokens in the host theme (sphinxawesome, shibuya, ...) and causing a flash of
+    // restyled page content. Confine those declarations to the zenuml diagram
+    // subtree so they no longer leak onto the host page.
+    const descopeZenumlStyle = (node) => {
+        if (!node || node.tagName !== "STYLE" || node.hasAttribute("data-zenuml-descoped")) return;
+        const css = node.textContent || "";
+        if (!css.includes("--occurance-border")) return; // zenuml stylesheet signature
+        node.setAttribute("data-zenuml-descoped", "true");
+        node.textContent = css.replace(/:root\b/g, ".zenuml");
+    };
+    new MutationObserver((records) => {
+        for (const rec of records) {
+            for (const node of rec.addedNodes) descopeZenumlStyle(node);
+        }
+    }).observe(document.head, { childList: true });
+
+    zenumlReady = import("{{ mermaid_zenuml_js_url }}").then(({ default: zenumlLayouts }) => {
+        mermaid.registerExternalDiagrams([zenumlLayouts]);
+    });
+}
 {% endif %}
 
 console.log("Initializing mermaid with", darkTheme ? "{{ mermaid_dark_theme }}" : "{{ mermaid_light_theme }}", "theme");
