@@ -208,6 +208,20 @@ use this extra function.
 Optional override of arguments to `mermaid.initialize()`, passed in as
 a JSON. Defaults to `{ "startOnLoad": True}`.
 
+### `mermaid_config`
+
+Optional default for each Mermaid directive's `config` frontmatter. Set it to
+a dictionary in `conf.py`:
+
+```python
+mermaid_config = {
+    "theme": "base",
+    "themeVariables": {"primaryColor": "#BB2528"},
+}
+```
+
+A directive's `:config:` option replaces this default for that diagram.
+
 ### `mermaid_dark_theme`
 
 The mermaid theme to use when dark mode is detected. Defaults to `"dark"`.

@@ -130,6 +130,14 @@ def test_mermaid_init_js(index):
         in index
     )
 
+
+@pytest.mark.sphinx("html", testroot="config")
+def test_mermaid_config(index):
+    assert "config:\n  theme: base\n  themeVariables:\n    primaryColor: '#BB2528'" in index
+    assert "config:\n  theme: forest" in index
+    assert index.count("primaryColor: '#BB2528'") == 1
+
+
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True, "mermaid_elk_version": "latest"})
 def test_mermaid_with_elk(app, index):
     assert "mermaid.run(" in index
