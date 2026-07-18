@@ -14,8 +14,8 @@ project = "sphinxcontrib-mermaid"
 copyright = "2017-2025, Martín Gaitán"
 author = "Martín Gaitán"
 
-version = "2.0.3"
-release = "2.0.3"
+version = "2.1.0"
+release = "2.1.0"
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = "sphinx"
