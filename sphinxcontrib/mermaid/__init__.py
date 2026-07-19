@@ -317,7 +317,7 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
 
 
 def html_visit_mermaid(self, node):
-    render_mm_html(self, node, node["code"], node["options"])
+    render_mm_html(self, node, node["code"], node["options"], imgcls="mermaid")
 
 
 def render_mm_latex(self, node, code, options, prefix="mermaid"):
