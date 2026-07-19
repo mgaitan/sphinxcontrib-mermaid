@@ -32,6 +32,7 @@ def test_html_raw(index):
         'mermaid.registerLayoutLoaders(elkLayouts);'
         in index
     )
+    assert "mermaid.registerIconPacks" not in index
     assert (
         '{"startOnLoad": false}'
         in index
@@ -112,6 +113,23 @@ def test_conf_mermaid_zenuml_local(app, index):
     assert "mermaid.min.js" not in index
     assert "mermaid-zenuml.esm.min.mjs" not in index
     assert 'import("./_static/test")' in index
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={
+        "mermaid_icon_packs": {
+            "logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json",
+            "local": "icons.json",
+        },
+    },
+)
+def test_conf_mermaid_icon_packs(index):
+    assert '"logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json"' in index
+    assert '"local": "./_static/icons.json"' in index
+    assert "mermaid.registerIconPacks(Object.entries(iconPacks)" in index
+    assert "loader: () => fetch(url).then((response) => response.json())" in index
 
 
 @pytest.mark.sphinx(

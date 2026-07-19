@@ -471,6 +471,8 @@ def install_js(
                 f"https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml@{app.config.mermaid_zenuml_version}/dist/mermaid-zenuml.esm.min.mjs"
             )
 
+    _mermaid_icon_packs = {name: _resolve_local_url(url, context) for name, url in app.config.mermaid_icon_packs.items()}
+
     _wrote_mermaid_run = False
     _d3_selector = ""
     _d3_node_count = 0
@@ -506,6 +508,8 @@ def install_js(
         mermaid_include_zenuml=_mermaid_zenuml_js_url is not None,
         mermaid_elk_js_url=_dump_js(_mermaid_elk_js_url),
         mermaid_zenuml_js_url=_dump_js(_mermaid_zenuml_js_url),
+        mermaid_include_icon_packs=bool(_mermaid_icon_packs),
+        mermaid_icon_packs=_dump_js(_mermaid_icon_packs),
         common_css=_dump_js(
             template_css.render(
                 mermaid_width=_mermaid_width,
@@ -594,6 +598,7 @@ def setup(app):
     app.add_config_value("mermaid_zenuml_version", "0.2.2", "html")
     app.add_config_value("mermaid_elk_use_local", "", "html")
     app.add_config_value("mermaid_zenuml_use_local", "", "html")
+    app.add_config_value("mermaid_icon_packs", {}, "html")
 
     app.add_config_value("d3_use_local", "", "html")
     app.add_config_value("d3_version", "7.9.0", "html")
