@@ -147,6 +147,18 @@ name: test
 - `config`: JSON to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html). **NOTE**: The mermaid documentation uses YAML, but we must use JSON because Markdown processing of frontmatter will interfere.
 - `title`: Title to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html)
 
+## Translations
+
+For translated diagrams, store Mermaid source in an external `.mmd` file and
+provide localized files using Sphinx's
+[`figure_language_filename`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-figure_language_filename)
+convention. For example, `diagram.mmd` and `diagram.de.mmd` can be referenced by
+the same directive, and Sphinx selects the file matching the active language.
+
+Mermaid captions are included in gettext catalogs and translated like other
+figure captions. Inline Mermaid source is not extracted as prose; use localized
+external files when diagram labels need translation.
+
 ## Config values
 
 ### `mermaid_output_format`
