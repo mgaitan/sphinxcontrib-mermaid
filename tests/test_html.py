@@ -319,3 +319,20 @@ def test_static_output_skips_javascript(app, monkeypatch):
     assert "cdn.jsdelivr.net/npm/mermaid" not in index
     assert "cdn.jsdelivr.net/npm/d3" not in index
     assert "mermaid.run(" not in index
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"mermaid_output_format": "png"},
+)
+def test_static_png_has_mermaid_class(app, monkeypatch):
+    monkeypatch.setattr(
+        "sphinxcontrib.mermaid.render_mm",
+        lambda *args, **kwargs: ("diagram.png", app.outdir / "diagram.png"),
+    )
+
+    app.builder.build_all()
+    index = (app.outdir / "index.html").read_text()
+
+    assert re.search(r'<img src="diagram\.png"[^>]* class="mermaid"', index)
