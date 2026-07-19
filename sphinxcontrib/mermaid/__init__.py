@@ -34,6 +34,7 @@ from sphinx.application import Sphinx
 from sphinx.locale import _
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
+from sphinx.util.nodes import set_source_info
 from sphinx.util.osutil import ensuredir
 from yaml import dump
 
@@ -68,8 +69,7 @@ def figure_wrapper(directive, node, caption):
     parsed = nodes.Element()
     directive.state.nested_parse(ViewList([caption], source=""), directive.content_offset, parsed)
     caption_node = nodes.caption(parsed[0].rawsource, "", *parsed[0].children)
-    caption_node.source = parsed[0].source
-    caption_node.line = parsed[0].line
+    set_source_info(directive, caption_node)
     figure_node += caption_node
     return figure_node
 
