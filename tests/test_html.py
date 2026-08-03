@@ -20,23 +20,11 @@ def index(app, build_all):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True})
 def test_html_raw(index):
     assert "mermaid.run(" in index
-    assert (
-        'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"'
-        in index
-    )
-    assert (
-        'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"'
-        in index
-    )
-    assert (
-        'mermaid.registerLayoutLoaders(elkLayouts);'
-        in index
-    )
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"' in index
+    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
+    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
     assert "mermaid.registerIconPacks" not in index
-    assert (
-        '{"startOnLoad": false}'
-        in index
-    )
+    assert '{"startOnLoad": false}' in index
     assert (
         '<pre id="participants" class="mermaid">\n        sequenceDiagram\n   participant Alice\n   participant Bob\n   Alice-&gt;John: Hello John, how are you?\n    </pre>'
         in index
@@ -57,6 +45,7 @@ def test_html_zoom_option(index, app):
     # the first diagram has no id
     assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
 
+
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
 def test_html_zoom_option_global(index):
     assert "mermaid.run(" in index
@@ -76,10 +65,7 @@ def test_html_no_zoom(index):
 def test_conf_mermaid_version(app, index):
     assert "mermaid.run(" in index
     assert app.config.mermaid_version == "10.3.0"
-    assert (
-        'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.esm.min.mjs"'
-        in index
-    )
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.esm.min.mjs"' in index
 
 
 @pytest.mark.sphinx(
@@ -99,7 +85,9 @@ def test_conf_mermaid_local(app, index):
     assert 'import mermaid from "./_static/test"' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": True, "mermaid_elk_use_local": "test"})
+@pytest.mark.sphinx(
+    "html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": True, "mermaid_elk_use_local": "test"}
+)
 def test_conf_mermaid_elk_local(app, index):
     assert "mermaid.run(" in index
     assert "mermaid.min.js" not in index
@@ -107,7 +95,9 @@ def test_conf_mermaid_elk_local(app, index):
     assert 'import elkLayouts from "./_static/test"' in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_zenuml": True, "mermaid_zenuml_use_local": "test"})
+@pytest.mark.sphinx(
+    "html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_zenuml": True, "mermaid_zenuml_use_local": "test"}
+)
 def test_conf_mermaid_zenuml_local(app, index):
     assert "mermaid.run()" in index
     assert "mermaid.min.js" not in index
@@ -155,14 +145,8 @@ def test_conf_d3_local(app, index):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_init_config": {"startOnLoad": True}})
 def test_mermaid_init_js(index):
     assert "mermaid.run(" in index
-    assert (
-        '{"startOnLoad": false}'
-        not in index
-    )
-    assert (
-        '{"startOnLoad": true}'
-        in index
-    )
+    assert '{"startOnLoad": false}' not in index
+    assert '{"startOnLoad": true}' in index
 
 
 @pytest.mark.sphinx("html", testroot="config")
@@ -176,19 +160,13 @@ def test_mermaid_config(index):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True, "mermaid_elk_version": "latest"})
 def test_mermaid_with_elk(app, index):
     assert "mermaid.run(" in index
-    assert (
-        'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"'
-        in index
-    )
+    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"' in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_zenuml": True, "mermaid_zenuml_version": "latest"})
 def test_mermaid_with_zenuml(app, index):
     assert "mermaid.run()" in index
-    assert (
-        'import("https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs")'
-        in index
-    )
+    assert 'import("https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs")' in index
     assert '.replace(/^\\s*---\\s*\\n[^]*?\\n---\\s*/, "")' in index
 
 
@@ -196,22 +174,10 @@ def test_mermaid_with_zenuml(app, index):
 def test_html_raw_from_markdown(index):
     assert "mermaid.run(" in index
     assert "mermaid.run(" in index
-    assert (
-        'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"'
-        in index
-    )
-    assert (
-        'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"'
-        in index
-    )
-    assert (
-        'mermaid.registerLayoutLoaders(elkLayouts);'
-        in index
-    )
-    assert (
-        '{"startOnLoad": false}'
-        in index
-    )
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"' in index
+    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
+    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
+    assert '{"startOnLoad": false}' in index
     assert (
         '<pre align="center" id="participants" class="mermaid align-center">\n            sequenceDiagram\n      participant Alice\n      participant Bob\n      Alice-&gt;John: Hello John, how are you?\n    </pre>'
         in index
