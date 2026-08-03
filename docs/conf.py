@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from pathlib import Path
 
 extensions = [
@@ -87,9 +86,9 @@ def run_convert_github_admonitions_to_rst(app, filename, lines):
         replacing = False
         for j, line in enumerate(orig_line_splits):
             # look for admonition key
-            for admonition_key in _GITHUB_ADMONITIONS:
+            for admonition_key, admonition_name in _GITHUB_ADMONITIONS.items():
                 if admonition_key in line:
-                    line = line.replace(admonition_key, ":::{" + _GITHUB_ADMONITIONS[admonition_key] + "}\n")
+                    line = line.replace(admonition_key, ":::{" + admonition_name + "}\n")
                     # start replacing quotes in subsequent lines
                     replacing = True
                     break

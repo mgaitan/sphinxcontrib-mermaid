@@ -108,10 +108,7 @@ Then add `sphinxcontrib.mermaid` in `extensions` list of your project's
 `conf.py`:
 
 ```python
-extensions = [
-    ...,
-    'sphinxcontrib.mermaid'
-]
+extensions = [..., "sphinxcontrib.mermaid"]
 ```
 
 ## Directive options
@@ -176,8 +173,8 @@ split using `shlex.split` to support multi-word commands.
 To avoid splitting, a list of strings can be specified. Examples:
 
 ```python
-mermaid_cmd = 'npx mmdc'
-mermeid_cmd = ['npx', '--no-install', 'mmdc']
+mermaid_cmd = "npx mmdc"
+mermeid_cmd = ["npx", "--no-install", "mmdc"]
 ```
 
 ### `mermaid_cmd_shell`
@@ -192,7 +189,7 @@ For individual parameters, a list of parameters can be added. Refer to
 [Examples](https://github.com/mermaid-js/mermaid-cli#usage):
 
 ```python
-mermaid_params = ['--theme', 'forest', '--width', '600', '--backgroundColor', 'transparent']
+mermaid_params = ["--theme", "forest", "--width", "600", "--backgroundColor", "transparent"]
 ```
 
 This will render the mermaid diagram with theme forest, 600px width
@@ -452,5 +449,5 @@ python:
 3. In your documentation `conf.py` file, add: :
 
 ```python
-mermaid_params = ['-p', 'puppeteer-config.json']
+mermaid_params = ["-p", "puppeteer-config.json"]
 ```
