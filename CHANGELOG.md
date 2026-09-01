@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 (July 19, 2026)
+
+- Preserve source metadata on generated Mermaid caption nodes so Sphinx extracts them into gettext catalogs and applies normal caption translations
+- Pass the existing mermaid image class through the HTML visitor so PNG output can be targeted consistently with CSS
+
 ## 2.1.0 (July 18, 2026)
 
 - Add `mermaid_config` option for passing a global Mermaid configuration (#215)
