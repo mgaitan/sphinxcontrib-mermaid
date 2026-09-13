@@ -451,3 +451,12 @@ python:
 ```python
 mermaid_params = ["-p", "puppeteer-config.json"]
 ```
+
+## Type checking
+
+The package includes inline type annotations and a `py.typed` marker for
+`sphinxcontrib.mermaid`. Downstream extensions can import the `mermaid` node,
+directives, visitors, and `setup` function in typed code. Node construction and
+attributes follow the Docutils `nodes.Element` interface. Install `types-docutils`
+in your type-checking environment to provide annotations for the inherited
+Docutils APIs.

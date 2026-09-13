@@ -18,12 +18,13 @@ import posixpath
 import re
 import shlex
 import uuid
+from collections.abc import Callable, Mapping
 from hashlib import sha1
 from json import dumps, loads
 from pathlib import Path
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, NoReturn
 
 import sphinx
 from docutils import nodes
@@ -39,8 +40,16 @@ from sphinx.util.nodes import set_source_info
 from sphinx.util.osutil import ensuredir
 from yaml import dump
 
-from .autoclassdiag import class_diagram
-from .exceptions import MermaidError
+from .autoclassdiag import class_diagram as class_diagram
+from .exceptions import MermaidError as MermaidError
+
+if TYPE_CHECKING:
+    from sphinx.util.typing import ExtensionMetadata
+    from sphinx.writers.html5 import HTML5Translator
+    from sphinx.writers.latex import LaTeXTranslator
+    from sphinx.writers.manpage import ManualPageTranslator
+    from sphinx.writers.texinfo import TexinfoTranslator
+    from sphinx.writers.text import TextTranslator
 
 logger = logging.getLogger(__name__)
 
@@ -53,16 +62,16 @@ _MERMAID_JS = (_MODULE_DIR / "default.js.j2").read_text(encoding="utf-8")
 mapname_re = re.compile(r'<map id="(.*?)"')
 
 
-def _dump_js(value):
+def _dump_js(value: Any) -> str:
     """Serialize a value for use in an inline JavaScript module."""
     return dumps(value).replace("<", "\\u003c")
 
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
-    pass
+    """A Mermaid diagram with the standard Docutils Element interface."""
 
 
-def figure_wrapper(directive, node, caption):
+def figure_wrapper(directive: Directive, node: mermaid, caption: str) -> nodes.figure:
     figure_node = nodes.figure("", node)
     if "align" in node:
         figure_node["align"] = node.attributes.pop("align")
@@ -75,7 +84,7 @@ def figure_wrapper(directive, node, caption):
     return figure_node
 
 
-def align_spec(argument):
+def align_spec(argument: str) -> str:
     return directives.choice(argument, ("left", "center", "right"))
 
 
@@ -88,7 +97,7 @@ class Mermaid(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = False
-    option_spec: ClassVar = {
+    option_spec: ClassVar[dict[str, Callable[[str], Any]] | None] = {
         # Sphinx directives
         "name": directives.unchanged,
         "alt": directives.unchanged,
@@ -100,7 +109,7 @@ class Mermaid(Directive):
         "title": directives.unchanged,
     }
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str | list[nodes.Node]:
         if self.arguments:
             # try to load mermaid code from an external file
             document = self.state.document
@@ -130,7 +139,7 @@ class Mermaid(Directive):
             mmcode = "\n".join(self.content)
         return mmcode
 
-    def run(self, **kwargs):
+    def run(self, **kwargs: Any) -> list[nodes.Node]:
         mmcode = self.get_mm_code()
         # mmcode is a list, so it's a system message, not content to be included in the
         # document.
@@ -147,7 +156,7 @@ class Mermaid(Directive):
             ]
 
         # Wrap the mermaid code into a code node.
-        node = mermaid()
+        node: mermaid | nodes.figure = mermaid()
         node["code"] = mmcode
         node["options"] = {}
         # Sphinx directives
@@ -197,7 +206,7 @@ class MermaidClassDiagram(Mermaid):
         }
     )
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str:
         return class_diagram(
             *self.arguments,
             full="full" in self.options,
@@ -206,7 +215,13 @@ class MermaidClassDiagram(Mermaid):
         )
 
 
-def render_mm(self, code, options, _fmt, prefix="mermaid"):
+def render_mm(
+    self: HTML5Translator | LaTeXTranslator | TexinfoTranslator,
+    code: str,
+    options: Mapping[str, Any],
+    _fmt: str,
+    prefix: str = "mermaid",
+) -> tuple[str, str] | tuple[None, None]:
     """Render mermaid code into a PNG or PDF output file."""
 
     if _fmt == "raw":
@@ -259,7 +274,15 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
         return relfn, outfn
 
 
-def _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
+def _render_mm_html_raw(
+    self: HTML5Translator,
+    node: mermaid,
+    code: str,
+    options: Mapping[str, Any],
+    prefix: str = "mermaid",
+    imgcls: str | None = None,
+    alt: str | None = None,
+) -> NoReturn:
     classes = ["mermaid"]
     attrs = {}
 
@@ -281,7 +304,15 @@ def _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None
     raise nodes.SkipNode
 
 
-def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
+def render_mm_html(
+    self: HTML5Translator,
+    node: mermaid,
+    code: str,
+    options: Mapping[str, Any],
+    prefix: str = "mermaid",
+    imgcls: str | None = None,
+    alt: str | None = None,
+) -> NoReturn:
     _fmt = self.builder.config.mermaid_output_format
     if _fmt == "raw":
         return _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None)
@@ -317,11 +348,11 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
     raise nodes.SkipNode
 
 
-def html_visit_mermaid(self, node):
+def html_visit_mermaid(self: HTML5Translator, node: mermaid) -> NoReturn:
     render_mm_html(self, node, node["code"], node["options"], imgcls="mermaid")
 
 
-def render_mm_latex(self, node, code, options, prefix="mermaid"):
+def render_mm_latex(self: LaTeXTranslator, node: mermaid, code: str, options: Mapping[str, Any], prefix: str = "mermaid") -> tuple[None, None]:
     try:
         fname, outfn = render_mm(self, code, options, "pdf", prefix)
     except MermaidError as exc:
@@ -371,11 +402,11 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
     raise nodes.SkipNode
 
 
-def latex_visit_mermaid(self, node):
+def latex_visit_mermaid(self: LaTeXTranslator, node: mermaid) -> None:
     render_mm_latex(self, node, node["code"], node["options"])
 
 
-def render_mm_texinfo(self, node, code, options, prefix="mermaid"):
+def render_mm_texinfo(self: TexinfoTranslator, node: mermaid, code: str, options: Mapping[str, Any], prefix: str = "mermaid") -> NoReturn:
     try:
         fname, _outfn = render_mm(self, code, options, "png", prefix)
     except MermaidError as exc:
@@ -386,11 +417,11 @@ def render_mm_texinfo(self, node, code, options, prefix="mermaid"):
     raise nodes.SkipNode
 
 
-def texinfo_visit_mermaid(self, node):
+def texinfo_visit_mermaid(self: TexinfoTranslator, node: mermaid) -> NoReturn:
     render_mm_texinfo(self, node, node["code"], node["options"])
 
 
-def text_visit_mermaid(self, node):
+def text_visit_mermaid(self: TextTranslator, node: mermaid) -> NoReturn:
     if "alt" in node.attributes:
         self.add_text(_("[graph: %s]") % node["alt"])
     else:
@@ -398,7 +429,7 @@ def text_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def man_visit_mermaid(self, node):
+def man_visit_mermaid(self: ManualPageTranslator, node: mermaid) -> NoReturn:
     if "alt" in node.attributes:
         self.body.append(_("[graph: %s]") % node["alt"])
     else:
@@ -406,7 +437,7 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def _resolve_local_url(url: str, context: dict) -> str:
+def _resolve_local_url(url: str, context: dict[str, Any]) -> str:
     """Resolve a *_use_local config value to a URL.
 
     If the value is an absolute URL (``http://``, ``https://``, ``//``, ``/``),
@@ -427,9 +458,9 @@ def _resolve_local_url(url: str, context: dict) -> str:
 
 def install_js(
     app: Sphinx,
-    pagename,
+    pagename: str,
     templatename: str,
-    context: dict,
+    context: dict[str, Any],
     doctree: nodes.document | None,
 ) -> None:
     # Build-time PNG and SVG output does not need client-side rendering.
@@ -563,7 +594,7 @@ def install_js(
         )
 
 
-def setup(app):
+def setup(app: Sphinx) -> ExtensionMetadata:
     app.add_node(
         mermaid,
         html=(html_visit_mermaid, None),

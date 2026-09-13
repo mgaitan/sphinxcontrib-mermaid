@@ -1,0 +1,6 @@
+{
+  "include": ["consumer.py"],
+  "typeCheckingMode": "strict",
+  "pythonVersion": "3.10",
+  "useLibraryCodeForTypes": false
+}
