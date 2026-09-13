@@ -33,6 +33,7 @@ jobs:
         run: |
           ruff format --check sphinxcontrib
           ruff check sphinxcontrib
+          pyright
 
       - name: Test
         run: |

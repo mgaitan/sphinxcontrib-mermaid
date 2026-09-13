@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266)
+
 ## 2.1.1 (July 19, 2026)
 
 - Preserve source metadata on generated Mermaid caption nodes so Sphinx extracts them into gettext catalogs and applies normal caption translations

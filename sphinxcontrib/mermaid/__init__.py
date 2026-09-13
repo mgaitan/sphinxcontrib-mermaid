@@ -18,17 +18,18 @@ import posixpath
 import re
 import shlex
 import uuid
+from collections.abc import Callable, Mapping
 from hashlib import sha1
 from json import dumps, loads
 from pathlib import Path
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
-from typing import ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, NoReturn
 
 import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
-from docutils.statemachine import ViewList
+from docutils.statemachine import StringList
 from jinja2 import Template
 from packaging.version import Version
 from sphinx.application import Sphinx
@@ -39,8 +40,16 @@ from sphinx.util.nodes import set_source_info
 from sphinx.util.osutil import ensuredir
 from yaml import dump
 
-from .autoclassdiag import class_diagram
-from .exceptions import MermaidError
+from .autoclassdiag import class_diagram as class_diagram
+from .exceptions import MermaidError as MermaidError
+
+if TYPE_CHECKING:
+    from sphinx.util.typing import ExtensionMetadata
+    from sphinx.writers.html5 import HTML5Translator
+    from sphinx.writers.latex import LaTeXTranslator
+    from sphinx.writers.manpage import ManualPageTranslator
+    from sphinx.writers.texinfo import TexinfoTranslator
+    from sphinx.writers.text import TextTranslator
 
 logger = logging.getLogger(__name__)
 
@@ -53,29 +62,31 @@ _MERMAID_JS = (_MODULE_DIR / "default.js.j2").read_text(encoding="utf-8")
 mapname_re = re.compile(r'<map id="(.*?)"')
 
 
-def _dump_js(value):
+def _dump_js(value: Any) -> str:
     """Serialize a value for use in an inline JavaScript module."""
     return dumps(value).replace("<", "\\u003c")
 
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
-    pass
+    """A Mermaid diagram with the standard Docutils Element interface."""
 
 
-def figure_wrapper(directive, node, caption):
+def figure_wrapper(directive: Directive, node: mermaid, caption: str) -> nodes.figure:
     figure_node = nodes.figure("", node)
     if "align" in node:
         figure_node["align"] = node.attributes.pop("align")
 
     parsed = nodes.Element()
-    directive.state.nested_parse(ViewList([caption], source=""), directive.content_offset, parsed)
-    caption_node = nodes.caption(parsed[0].rawsource, "", *parsed[0].children)
+    directive.state.nested_parse(StringList([caption], source=""), directive.content_offset, parsed)
+    caption_content = parsed[0]
+    assert isinstance(caption_content, nodes.Element)
+    caption_node = nodes.caption(caption_content.rawsource, "", *caption_content.children)
     set_source_info(directive, caption_node)
     figure_node += caption_node
     return figure_node
 
 
-def align_spec(argument):
+def align_spec(argument: str) -> str:
     return directives.choice(argument, ("left", "center", "right"))
 
 
@@ -88,7 +99,7 @@ class Mermaid(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = False
-    option_spec: ClassVar = {
+    option_spec: ClassVar[dict[str, Callable[[str], Any]] | None] = {
         # Sphinx directives
         "name": directives.unchanged,
         "alt": directives.unchanged,
@@ -100,7 +111,7 @@ class Mermaid(Directive):
         "title": directives.unchanged,
     }
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str | list[nodes.Node]:
         if self.arguments:
             # try to load mermaid code from an external file
             document = self.state.document
@@ -130,7 +141,7 @@ class Mermaid(Directive):
             mmcode = "\n".join(self.content)
         return mmcode
 
-    def run(self, **kwargs):
+    def run(self, **kwargs: Any) -> list[nodes.Node]:
         mmcode = self.get_mm_code()
         # mmcode is a list, so it's a system message, not content to be included in the
         # document.
@@ -147,7 +158,7 @@ class Mermaid(Directive):
             ]
 
         # Wrap the mermaid code into a code node.
-        node = mermaid()
+        node: mermaid | nodes.figure = mermaid()
         node["code"] = mmcode
         node["options"] = {}
         # Sphinx directives
@@ -188,7 +199,7 @@ class MermaidClassDiagram(Mermaid):
     has_content = False
     required_arguments = 1
     optional_arguments = 100
-    option_spec = Mermaid.option_spec.copy()
+    option_spec = (Mermaid.option_spec or {}).copy()
     option_spec.update(
         {
             "full": directives.flag,
@@ -197,7 +208,7 @@ class MermaidClassDiagram(Mermaid):
         }
     )
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str:
         return class_diagram(
             *self.arguments,
             full="full" in self.options,
@@ -206,7 +217,13 @@ class MermaidClassDiagram(Mermaid):
         )
 
 
-def render_mm(self, code, options, _fmt, prefix="mermaid"):
+def render_mm(
+    self: HTML5Translator | LaTeXTranslator | TexinfoTranslator,
+    code: str,
+    options: Mapping[str, Any],
+    _fmt: str,
+    prefix: str = "mermaid",
+) -> tuple[str, str] | tuple[None, None]:
     """Render mermaid code into a PNG or PDF output file."""
 
     if _fmt == "raw":
@@ -259,7 +276,15 @@ def render_mm(self, code, options, _fmt, prefix="mermaid"):
         return relfn, outfn
 
 
-def _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
+def _render_mm_html_raw(
+    self: HTML5Translator,
+    node: mermaid,
+    code: str,
+    options: Mapping[str, Any],
+    prefix: str = "mermaid",
+    imgcls: str | None = None,
+    alt: str | None = None,
+) -> NoReturn:
     classes = ["mermaid"]
     attrs = {}
 
@@ -281,7 +306,15 @@ def _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None
     raise nodes.SkipNode
 
 
-def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt=None):
+def render_mm_html(
+    self: HTML5Translator,
+    node: mermaid,
+    code: str,
+    options: Mapping[str, Any],
+    prefix: str = "mermaid",
+    imgcls: str | None = None,
+    alt: str | None = None,
+) -> NoReturn:
     _fmt = self.builder.config.mermaid_output_format
     if _fmt == "raw":
         return _render_mm_html_raw(self, node, code, options, prefix="mermaid", imgcls=None, alt=None)
@@ -317,15 +350,18 @@ def render_mm_html(self, node, code, options, prefix="mermaid", imgcls=None, alt
     raise nodes.SkipNode
 
 
-def html_visit_mermaid(self, node):
+def html_visit_mermaid(self: HTML5Translator, node: mermaid) -> NoReturn:
     render_mm_html(self, node, node["code"], node["options"], imgcls="mermaid")
 
 
-def render_mm_latex(self, node, code, options, prefix="mermaid"):
+def render_mm_latex(self: LaTeXTranslator, node: mermaid, code: str, options: Mapping[str, Any], prefix: str = "mermaid") -> tuple[None, None]:
     try:
         fname, outfn = render_mm(self, code, options, "pdf", prefix)
     except MermaidError as exc:
         logger.warning(f"mm code {code!r}: " + str(exc))
+        raise nodes.SkipNode
+
+    if fname is None or outfn is None:
         raise nodes.SkipNode
 
     if self.builder.config.mermaid_pdfcrop != "":
@@ -371,11 +407,11 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
     raise nodes.SkipNode
 
 
-def latex_visit_mermaid(self, node):
+def latex_visit_mermaid(self: LaTeXTranslator, node: mermaid) -> None:
     render_mm_latex(self, node, node["code"], node["options"])
 
 
-def render_mm_texinfo(self, node, code, options, prefix="mermaid"):
+def render_mm_texinfo(self: TexinfoTranslator, node: mermaid, code: str, options: Mapping[str, Any], prefix: str = "mermaid") -> NoReturn:
     try:
         fname, _outfn = render_mm(self, code, options, "png", prefix)
     except MermaidError as exc:
@@ -386,11 +422,11 @@ def render_mm_texinfo(self, node, code, options, prefix="mermaid"):
     raise nodes.SkipNode
 
 
-def texinfo_visit_mermaid(self, node):
+def texinfo_visit_mermaid(self: TexinfoTranslator, node: mermaid) -> NoReturn:
     render_mm_texinfo(self, node, node["code"], node["options"])
 
 
-def text_visit_mermaid(self, node):
+def text_visit_mermaid(self: TextTranslator, node: mermaid) -> NoReturn:
     if "alt" in node.attributes:
         self.add_text(_("[graph: %s]") % node["alt"])
     else:
@@ -398,7 +434,7 @@ def text_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def man_visit_mermaid(self, node):
+def man_visit_mermaid(self: ManualPageTranslator, node: mermaid) -> NoReturn:
     if "alt" in node.attributes:
         self.body.append(_("[graph: %s]") % node["alt"])
     else:
@@ -406,7 +442,7 @@ def man_visit_mermaid(self, node):
     raise nodes.SkipNode
 
 
-def _resolve_local_url(url: str, context: dict) -> str:
+def _resolve_local_url(url: str, context: dict[str, Any]) -> str:
     """Resolve a *_use_local config value to a URL.
 
     If the value is an absolute URL (``http://``, ``https://``, ``//``, ``/``),
@@ -427,9 +463,9 @@ def _resolve_local_url(url: str, context: dict) -> str:
 
 def install_js(
     app: Sphinx,
-    pagename,
+    pagename: str,
     templatename: str,
-    context: dict,
+    context: dict[str, Any],
     doctree: nodes.document | None,
 ) -> None:
     # Build-time PNG and SVG output does not need client-side rendering.
@@ -445,9 +481,9 @@ def install_js(
         _mermaid_js_url = _resolve_local_url(app.config.mermaid_use_local, context)
     elif app.config.mermaid_version == "latest":
         _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
-    elif Version(app.config.mermaid_version) > Version("10.2.0"):
+    elif app.config.mermaid_version and Version(app.config.mermaid_version) > Version("10.2.0"):
         _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
-    elif app.config.mermaid_version:
+    else:
         raise MermaidError("Requires mermaid js version 10.3.0 or later")
 
     _mermaid_elk_js_url = None
@@ -530,6 +566,8 @@ def install_js(
             _d3_js_url = "https://cdn.jsdelivr.net/npm/d3/dist/d3.min.js"
         elif app.config.d3_version:
             _d3_js_url = f"https://cdn.jsdelivr.net/npm/d3@{app.config.d3_version}/dist/d3.min.js"
+        else:
+            raise MermaidError("Set d3_version or d3_use_local when Mermaid zoom is enabled")
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
 
     if _has_fullscreen or _has_zoom:
@@ -563,7 +601,7 @@ def install_js(
         )
 
 
-def setup(app):
+def setup(app: Sphinx) -> ExtensionMetadata:
     app.add_node(
         mermaid,
         html=(html_visit_mermaid, None),
