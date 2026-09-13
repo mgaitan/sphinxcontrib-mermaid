@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, NoReturn
 import sphinx
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
-from docutils.statemachine import ViewList
+from docutils.statemachine import StringList
 from jinja2 import Template
 from packaging.version import Version
 from sphinx.application import Sphinx
@@ -77,8 +77,10 @@ def figure_wrapper(directive: Directive, node: mermaid, caption: str) -> nodes.f
         figure_node["align"] = node.attributes.pop("align")
 
     parsed = nodes.Element()
-    directive.state.nested_parse(ViewList([caption], source=""), directive.content_offset, parsed)
-    caption_node = nodes.caption(parsed[0].rawsource, "", *parsed[0].children)
+    directive.state.nested_parse(StringList([caption], source=""), directive.content_offset, parsed)
+    caption_content = parsed[0]
+    assert isinstance(caption_content, nodes.Element)
+    caption_node = nodes.caption(caption_content.rawsource, "", *caption_content.children)
     set_source_info(directive, caption_node)
     figure_node += caption_node
     return figure_node
@@ -197,7 +199,7 @@ class MermaidClassDiagram(Mermaid):
     has_content = False
     required_arguments = 1
     optional_arguments = 100
-    option_spec = Mermaid.option_spec.copy()
+    option_spec = (Mermaid.option_spec or {}).copy()
     option_spec.update(
         {
             "full": directives.flag,
@@ -359,6 +361,9 @@ def render_mm_latex(self: LaTeXTranslator, node: mermaid, code: str, options: Ma
         logger.warning(f"mm code {code!r}: " + str(exc))
         raise nodes.SkipNode
 
+    if fname is None or outfn is None:
+        raise nodes.SkipNode
+
     if self.builder.config.mermaid_pdfcrop != "":
         mm_args = [self.builder.config.mermaid_pdfcrop, outfn]
         try:
@@ -476,9 +481,9 @@ def install_js(
         _mermaid_js_url = _resolve_local_url(app.config.mermaid_use_local, context)
     elif app.config.mermaid_version == "latest":
         _mermaid_js_url = "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
-    elif Version(app.config.mermaid_version) > Version("10.2.0"):
+    elif app.config.mermaid_version and Version(app.config.mermaid_version) > Version("10.2.0"):
         _mermaid_js_url = f"https://cdn.jsdelivr.net/npm/mermaid@{app.config.mermaid_version}/dist/mermaid.esm.min.mjs"
-    elif app.config.mermaid_version:
+    else:
         raise MermaidError("Requires mermaid js version 10.3.0 or later")
 
     _mermaid_elk_js_url = None
@@ -561,6 +566,8 @@ def install_js(
             _d3_js_url = "https://cdn.jsdelivr.net/npm/d3/dist/d3.min.js"
         elif app.config.d3_version:
             _d3_js_url = f"https://cdn.jsdelivr.net/npm/d3@{app.config.d3_version}/dist/d3.min.js"
+        else:
+            raise MermaidError("Set d3_version or d3_use_local when Mermaid zoom is enabled")
         app.add_js_file(_d3_js_url, priority=app.config.mermaid_js_priority)
 
     if _has_fullscreen or _has_zoom:

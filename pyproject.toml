@@ -49,14 +49,22 @@ test = [
     "defusedxml",
     "myst-parser",
     "pytest",
+    "pyright",
     "ruff",
-    "sphinx"
+    "sphinx",
+    "types-docutils",
+    "types-PyYAML",
 ]
 
 [project.scripts]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
+
+[tool.pyright]
+include = ["sphinxcontrib"]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
 
 [tool.ruff]
 line-length = 150
