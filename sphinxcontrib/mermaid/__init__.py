@@ -425,6 +425,21 @@ def _resolve_local_url(url: str, context: dict) -> str:
     return resolved
 
 
+def _elk_is_bundled(config) -> bool:
+    """Whether the configured mermaid build already ships the ELK layouts.
+
+    Mermaid 12 bundles ELK (and uses it as the default layout), so the separate
+    ``@mermaid-js/layout-elk`` plugin must not be loaded on top of it. The
+    version of a local build is unknown, so the explicit configuration wins
+    there.
+    """
+    if config.mermaid_use_local or not config.mermaid_version:
+        return False
+    if config.mermaid_version == "latest":
+        return True
+    return Version(config.mermaid_version) >= Version("12.0.0")
+
+
 def install_js(
     app: Sphinx,
     pagename,
@@ -451,7 +466,7 @@ def install_js(
         raise MermaidError("Requires mermaid js version 10.3.0 or later")
 
     _mermaid_elk_js_url = None
-    if app.config.mermaid_include_elk:
+    if app.config.mermaid_include_elk and not _elk_is_bundled(app.config):
         if app.config.mermaid_elk_use_local:
             _mermaid_elk_js_url = _resolve_local_url(app.config.mermaid_elk_use_local, context)
         elif app.config.mermaid_elk_version == "latest":
@@ -587,7 +602,7 @@ def setup(app):
     app.add_config_value("mermaid_init_config", {"startOnLoad": False}, "html")
     app.add_config_value("mermaid_dark_theme", "dark", "html")
     app.add_config_value("mermaid_light_theme", "default", "html")
-    app.add_config_value("mermaid_version", "11.12.1", "html")
+    app.add_config_value("mermaid_version", "12.0.0", "html")
     app.add_config_value("mermaid_use_local", "", "html")
 
     # Plugins
