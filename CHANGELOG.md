@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Upgrade Mermaid to 12.0.0, which bundles the ELK layouts and uses ELK as the default layout algorithm (#269)
+- Skip loading the separate `@mermaid-js/layout-elk` plugin when the configured Mermaid version already bundles it
+
 ## 2.1.1 (July 19, 2026)
 
 - Preserve source metadata on generated Mermaid caption nodes so Sphinx extracts them into gettext catalogs and applies normal caption translations

@@ -253,7 +253,7 @@ mermaid_light_theme = "neutral"
 The version of mermaid that will be used to parse `raw` output in HTML
 files. This should match a version available on
 [https://www.jsdelivr.com/package/npm/mermaid](https://www.jsdelivr.com/package/npm/mermaid).
-The default is `"11.12.1"`.
+The default is `"12.0.0"`.
 
 ### `mermaid_use_local`
 
@@ -270,6 +270,11 @@ the other `*_use_local` options below.
 Whether to download and load the ELK JavaScript extensions. Defaults
 to False.
 
+Mermaid 12 bundles ELK and uses it as the default layout, so this
+option is ignored there. It only takes effect when `mermaid_version`
+is pinned below 12, or when `mermaid_use_local` points at a build that
+does not include ELK.
+
 ### `mermaid_include_zenuml`
 
 Whether to download and load the ZenuML JavaScript extensions.
@@ -278,7 +283,8 @@ Defaults to False.
 ### `mermaid_elk_version`
 
 The version of mermaid ELK renderer that will be used. The default is
-`"0.2.0"`.
+`"0.2.0"`. Only used when the ELK plugin is loaded separately, see
+[`mermaid_include_elk`](#mermaid_include_elk).
 
 ### `mermaid_zenuml_version`
 
