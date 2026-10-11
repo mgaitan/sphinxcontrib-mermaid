@@ -20,9 +20,10 @@ def index(app, build_all):
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True})
 def test_html_raw(index):
     assert "mermaid.run(" in index
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"' in index
-    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
-    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.esm.min.mjs"' in index
+    # Mermaid 12 bundles ELK, so the separate plugin is not loaded
+    assert "mermaid-layout-elk.esm.min.mjs" not in index
+    assert "mermaid.registerLayoutLoaders(elkLayouts);" not in index
     assert "mermaid.registerIconPacks" not in index
     assert '{"startOnLoad": false}' in index
     assert (
@@ -157,10 +158,30 @@ def test_mermaid_config(index):
     assert "cdn.jsdelivr.net/npm/d3" not in index
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True, "mermaid_elk_version": "latest"})
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"mermaid_version": "11.12.1", "mermaid_include_elk": True, "mermaid_elk_version": "latest"},
+)
 def test_mermaid_with_elk(app, index):
     assert "mermaid.run(" in index
     assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"' in index
+    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
+
+
+@pytest.mark.sphinx(
+    "html",
+    testroot="basic",
+    confoverrides={"mermaid_version": "11.12.1", "mermaid_include_elk": True},
+)
+def test_mermaid_with_elk_pinned_version(app, index):
+    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "latest", "mermaid_include_elk": True})
+def test_mermaid_latest_bundles_elk(app, index):
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"' in index
+    assert "mermaid-layout-elk.esm.min.mjs" not in index
 
 
 @pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_zenuml": True, "mermaid_zenuml_version": "latest"})
@@ -174,9 +195,9 @@ def test_mermaid_with_zenuml(app, index):
 def test_html_raw_from_markdown(index):
     assert "mermaid.run(" in index
     assert "mermaid.run(" in index
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs"' in index
-    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
-    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
+    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.esm.min.mjs"' in index
+    assert "mermaid-layout-elk.esm.min.mjs" not in index
+    assert "mermaid.registerLayoutLoaders(elkLayouts);" not in index
     assert '{"startOnLoad": false}' in index
     assert (
         '<pre align="center" id="participants" class="mermaid align-center">\n            sequenceDiagram\n      participant Alice\n      participant Bob\n      Alice-&gt;John: Hello John, how are you?\n    </pre>'
