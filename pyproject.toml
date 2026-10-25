@@ -49,9 +49,11 @@ test = [
     "defusedxml",
     "myst-parser",
     "pytest",
-    "pyright",
     "ruff",
     "sphinx",
+]
+typing = [
+    "pyright==1.1.414",
     "types-docutils",
     "types-PyYAML",
 ]

@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install -e .[test]
+          python -m pip install -e ".[test,typing]"
 
       - name: Lint
         run: |
