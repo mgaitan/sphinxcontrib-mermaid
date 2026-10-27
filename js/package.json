@@ -1,0 +1,28 @@
+{
+  "name": "sphinxcontrib-mermaid",
+  "version": "2.1.1",
+  "description": "Mermaid diagrams in your Sphinx-powered docs",
+  "repository": "git@github.com:mgaitan/sphinxcontrib-mermaid.git",
+  "author": "Martín Gaitán <gaitan@gmail.com>",
+  "license": "BSD-2-Clause",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs && tsc --noEmit",
+    "lint": "oxlint . && oxfmt --check .",
+    "fix": "oxlint --fix . && oxfmt --write .",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@mermaid-js/layout-tidy-tree": "1.0.1",
+    "@mermaid-js/mermaid-zenuml": "1.0.1",
+    "mermaid": "12.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "esbuild": "^0.28.2",
+    "oxfmt": "^0.72.0",
+    "oxlint": "^1.85.0",
+    "typescript": "^7.0.2"
+  }
+}

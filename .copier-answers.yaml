@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier
+_commit: 2d2a72d
+_src_path: https://github.com/python-project-templates/base.git
+add_docs: true
+add_extension: js
+add_wiki: false
+email: gaitan@gmail.com
+github: mgaitan
+project_description: Mermaid diagrams in your Sphinx-powered docs
+project_name: sphinxcontrib-mermaid
+python_version_primary: '3.10'
+team: Martín Gaitán

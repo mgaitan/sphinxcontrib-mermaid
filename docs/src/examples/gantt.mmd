@@ -1,0 +1,9 @@
+gantt
+    title Release plan
+    dateFormat YYYY-MM-DD
+    section Build
+    Bundle assets   :done, a1, 2026-01-05, 3d
+    Rewrite runtime :active, a2, after a1, 10d
+    section Ship
+    Documentation   :a3, after a2, 5d
+    Release         :milestone, after a3, 0d

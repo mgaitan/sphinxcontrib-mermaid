@@ -1,16 +1,20 @@
 [build-system]
-requires = ["hatchling"]
+requires = [
+    "hatchling",
+    "hatch-js",
+]
 build-backend = "hatchling.build"
 
 [project]
 name = "sphinxcontrib-mermaid"
-authors = [{name = "Martín Gaitán", email = "gaitan@gmail.com"}]
-description="Mermaid diagrams in your Sphinx-powered docs"
-readme = "docs/readme_pypa.md"
+authors = [
+    {name = "Martín Gaitán", email = "gaitan@gmail.com"},
+]
+description = "Mermaid diagrams in your Sphinx-powered docs"
+readme = "README.md"
 license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 version = "2.1.1"
-
 requires-python = ">=3.10"
 keywords = ["sphinx", "mermaid", "diagrams", "documentation"]
 
@@ -34,40 +38,155 @@ classifiers = [
 ]
 
 dependencies = [
-    "jinja2",
-    "sphinx",
+    "sphinx>=7.4",
     "pyyaml",
+    "packaging",
 ]
+
+[project.optional-dependencies]
+develop = [
+    "build",
+    "bump-my-version",
+    "check-dist",
+    "codespell",
+    "defusedxml",
+    "furo",
+    "hatch-js",
+    "hatchling",
+    "mdformat",
+    "mdformat-frontmatter",
+    "mdformat-tables>=1",
+    "myst-parser",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "twine",
+    "ty",
+    "uv",
+    "wheel",
+]
+
+[project.scripts]
 
 [project.urls]
 Repository = "https://github.com/mgaitan/sphinxcontrib-mermaid"
 Homepage = "https://github.com/mgaitan/sphinxcontrib-mermaid"
 Changelog = "https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/CHANGELOG.md"
 
-[project.optional-dependencies]
-test = [
-    "defusedxml",
-    "myst-parser",
-    "pytest",
-    "ruff",
-    "sphinx"
+[tool.bumpversion]
+current_version = "2.1.1"
+commit = true
+tag = true
+commit_args = "-s"
+pre_commit_hooks = [
+    "pnpm --dir js install --lockfile-only --no-frozen-lockfile --ignore-scripts",
+    "git add js/pnpm-lock.yaml",
 ]
 
-[project.scripts]
+[[tool.bumpversion.files]]
+filename = "sphinxcontrib/mermaid/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "js/package.json"
+search = '"version": "{current_version}"'
+replace = '"version": "{new_version}"'
+
+[tool.check-dist]
+present = [
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.css",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/versions.json",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/mermaid/mermaid.esm.min.mjs",
+]
+absent = ["node_modules", "docs/_build", ".github"]
+
+[tool.check-dist.sdist]
+present = ["js/src", "js/pnpm-lock.yaml"]
+
+[tool.check-dist.wheel]
+absent = ["js", "docs", "tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["sphinxcontrib/mermaid"]
+
+[tool.coverage.report]
+exclude_also = [
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+fail_under = 50
+
+[tool.hatch.build]
+artifacts = [
+    "sphinxcontrib/mermaid/_static",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/sphinxcontrib/mermaid",
+    "/js",
+    "/docs",
+    "/tests",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+]
+exclude = [
+    "/js/dist",
+    "/js/node_modules",
+    "/js/test-results",
+    "/js/playwright-report",
+    "/js/tests/site/_build*",
+    "/docs/_build",
+    "/docs/superpowers",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["sphinxcontrib"]
+only-include = ["sphinxcontrib/mermaid"]
+
+[tool.hatch.build.hooks.hatch-js]
+path = "js"
+build_cmd = "build"
+tool = "pnpm"
+targets = [
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.css",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/versions.json",
+    "sphinxcontrib/mermaid/_static/sphinxcontrib-mermaid/mermaid/mermaid.esm.min.mjs",
+]
 
 [tool.pytest.ini_options]
+addopts = [
+    "-vvv",
+    "--junitxml=junit.xml",
+]
 testpaths = "tests"
 
 [tool.ruff]
 line-length = 150
 
 [tool.ruff.lint]
-extend-select = ["I"]
+extend-select = [
+    "I",
+]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
 default-section = "third-party"
-known-first-party = ["sphinxcontrib.mermaid"]
+known-first-party = [
+    "sphinxcontrib.mermaid",
+]
 section-order = [
     "future",
     "standard-library",
@@ -77,15 +196,7 @@ section-order = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "sphinxcontrib/mermaid",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE",
+"__init__.py" = [
+    "F401",
+    "F403",
 ]
-
-[tool.hatch.build.targets.wheel]
-only-include = ["sphinxcontrib/mermaid"]

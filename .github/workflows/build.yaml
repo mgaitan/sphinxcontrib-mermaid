@@ -1,0 +1,130 @@
+name: Build Status
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+    paths-ignore:
+      - LICENSE
+      - README.md
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions-ext/python/setup@c8228d827a81b9f8c808825328af361c45461ba3
+        with:
+          version: "3.10"
+
+      - name: Setup Node.js
+        uses: actions-ext/node/setup@03c9f6b2d9c9fa2c26cfa22d0fa379a69329b319
+        with:
+          version: 22.x
+
+      - name: Install dependencies
+        run: make develop
+
+      - name: Lint
+        run: make lint
+
+      - name: Checks
+        run: make checks
+
+      - name: Build
+        run: make build
+
+      - name: Install Playwright browsers
+        run: pnpm --dir js exec playwright install --with-deps chromium
+
+      - name: Test
+        run: make coverage
+
+      - name: Upload test results
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: test-results
+          path: '**/junit.xml'
+        if: always()
+
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3  # v2.24.0
+        with:
+          files: '**/junit.xml'
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build distributions
+        run: make dist
+
+      - name: Test wheel
+        uses: actions-ext/python/test-wheel@c8228d827a81b9f8c808825328af361c45461ba3
+        with:
+          module: sphinxcontrib.mermaid
+
+      - name: Test source distribution
+        uses: actions-ext/python/test-sdist@c8228d827a81b9f8c808825328af361c45461ba3
+        with:
+          module: sphinxcontrib.mermaid
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: dist
+          path: dist
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions-ext/python/setup@c8228d827a81b9f8c808825328af361c45461ba3
+        with:
+          version: ${{ matrix.python-version }}
+
+      - name: Setup Node.js
+        uses: actions-ext/node/setup@03c9f6b2d9c9fa2c26cfa22d0fa379a69329b319
+        with:
+          version: 22.x
+
+      - name: Install and build
+        run: |
+          pnpm --dir js install --frozen-lockfile
+          python -m pip install -e .[develop]
+
+      - name: Test
+        run: python -m pytest tests

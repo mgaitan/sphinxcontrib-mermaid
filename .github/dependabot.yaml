@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "part: github_actions"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      python:
+        patterns:
+          - "*"
+    labels:
+      - "lang: python"
+      - "part: dependencies"
+
+  - package-ecosystem: "npm"
+    directory: "/js"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      javascript:
+        patterns:
+          - "*"
+    labels:
+      - "lang: javascript"
+      - "part: dependencies"

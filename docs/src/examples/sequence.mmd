@@ -1,0 +1,9 @@
+sequenceDiagram
+    participant Reader
+    participant Browser
+    participant Server
+    Reader->>Browser: Open page
+    Browser->>Server: GET /index.html
+    Server-->>Browser: HTML and assets
+    Browser->>Browser: Render diagrams
+    Browser-->>Reader: Page with diagrams

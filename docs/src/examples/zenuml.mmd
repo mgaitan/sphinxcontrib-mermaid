@@ -1,0 +1,6 @@
+zenuml
+    title Render a page
+    Browser->Server.get(page) {
+        return html
+    }
+    Browser->Mermaid.render(source)

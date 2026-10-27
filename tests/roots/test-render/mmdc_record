@@ -1,0 +1,13 @@
+"""Fake mmdc that records its arguments and the config file it was given."""
+
+import json
+import sys
+from pathlib import Path
+
+args = sys.argv[1:]
+out = Path(args[args.index("-o") + 1])
+record = {"args": args}
+if "--configFile" in args:
+    record["config"] = json.loads(Path(args[args.index("--configFile") + 1]).read_text())
+(out.parent / "mmdc-record.json").write_text(json.dumps(record))
+out.write_bytes(b"\x89PNG\r\n\x1a\n")

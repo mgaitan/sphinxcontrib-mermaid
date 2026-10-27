@@ -1,459 +1,57 @@
 # sphinxcontrib-mermaid
 
-[![test status](https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml/badge.svg)](https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/test.yml)
+[![build status](https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/build.yaml/badge.svg)](https://github.com/mgaitan/sphinxcontrib-mermaid/actions/workflows/build.yaml)
 [![version](https://img.shields.io/pypi/v/sphinxcontrib-mermaid)](https://pypi.org/project/sphinxcontrib-mermaid/)
-[![downloads](https://img.shields.io/pypi/dm/shbin)](https://libraries.io/pypi/sphinxcontrib-mermaid/)
+[![downloads](https://img.shields.io/pypi/dm/sphinxcontrib-mermaid)](https://libraries.io/pypi/sphinxcontrib-mermaid/)
 
-This extension allows you to embed [Mermaid](https://mermaid.js.org/)
-graphs in your documents, including general flowcharts, sequence
-diagrams, gantt diagrams and more.
+Embed [Mermaid](https://mermaid.js.org/) diagrams in Sphinx documents. HTML
+pages render diagrams in the browser with a bundled copy of Mermaid, sized to
+keep text readable, with pan, zoom, and a fullscreen view. LaTeX, texinfo, and
+static image output use [mermaid-cli](https://github.com/mermaid-js/mermaid-cli).
 
-It adds a directive to embed mermaid markup. For example:
+## Install
 
-```rst
-.. mermaid::
-
-    sequenceDiagram
-      participant Alice
-      participant Bob
-      Alice->John: Hello John, how are you?
-      loop Healthcheck
-          John->John: Fight against hypochondria
-      end
-      Note right of John: Rational thoughts <br/>prevail...
-      John-->Alice: Great!
-      John->Bob: How about you?
-      Bob-->John: Jolly good!
-```
-
-By default, the HTML builder will simply render this as a `div` tag with
-`class="mermaid"`, injecting the external javascript, css and
-initialization code to make mermaid works.
-
-For other builders (or if `mermaid_output_format` config variable is set
-differently), the extension will use
-[mermaid-cli](https://github.com/mermaid-js/mermaid-cli) to render as to
-a PNG or SVG image, and then used in the proper code.
-
-```mermaid
-sequenceDiagram
-  participant Alice
-  participant Bob
-  Alice->John: Hello John, how are you?
-  loop Healthcheck
-      John->John: Fight against hypochondria
-  end
-  Note right of John: Rational thoughts <br/>prevail...
-  John-->Alice: Great!
-  John->Bob: How about you?
-  Bob-->John: Jolly good!
-```
-
-You can also embed external mermaid files, by giving the file name as an
-argument to the directive and no additional content:
-
-```rst
-.. mermaid:: path/to/mermaid-gantt-code.mmd
-```
-
-As for all file references in Sphinx, if the filename is not absolute,
-it is taken as relative to the source directory.
-
-In addition, you can use mermaid to automatically generate a diagram to
-show the class inheritance using the directive `autoclasstree`. It
-accepts one or more fully qualified names to a class or a module. In the
-case of a module, all the class found will be included.
-
-Of course, these objects need to be importable to make its diagram.
-
-If an optional attribute `:full:` is given, it will show the complete
-hierarchy of each class.
-
-The option `:namespace: <value>` limits to the base classes that belongs
-to this namespace. Meanwhile, the flag `:strict:` only process the
-classes that are strictly defined in the given module (ignoring classes
-imported from other modules).
-
-For example:
-
-```rst
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
-    :full:
-```
-
-```{eval-rst}
-.. autoclasstree:: sphinx.util.DownloadFiles sphinx.errors.ExtensionError
-   :full:
-```
-
-Or directly the module:
-
-```rst
-.. autoclasstree:: sphinx.util
-```
-
-```{eval-rst}
-.. autoclasstree:: sphinx.util
-```
-
-## Installation
-
-You can install it using pip
-
-```bash
+```sh
 pip install sphinxcontrib-mermaid
 ```
 
-Then add `sphinxcontrib.mermaid` in `extensions` list of your project's
-`conf.py`:
-
 ```python
-extensions = [..., "sphinxcontrib.mermaid"]
+# conf.py
+extensions = ["sphinxcontrib.mermaid"]
 ```
 
-## Directive options
-
-`sphinxcontrib-mermaid` mermaid diagrams can be configured by `rst`/`md` frontmatter:
+## Use
 
 ```rst
 .. mermaid::
-   :name: test
+   :caption: Publishing flow
 
-   <diagram>
+   flowchart LR
+       Draft --> Review --> Published
 ```
 
-````markdown
-```mermaid
+In Markdown with [MyST](https://myst-parser.readthedocs.io/), use a
+```` ```{mermaid} ```` fence, or set `myst_fence_as_directive = ["mermaid"]` to render
+plain ```` ```mermaid ```` fences. Diagrams can also come from `.mmd` files:
+`.. mermaid:: diagrams/release.mmd`.
+
+Size and interaction options work as directive options or in the diagram's
+frontmatter:
+
+```text
 ---
-name: test
+title: Release
+height: 400px
+config:
+  layout: elk
 ---
-<diagram>
-````
-
-- `name`: determines the image's name for HTML output. **NOTE**: mermaid will use this as the `id` of the generated `svg` element, which can be useful for styling with custom css: `#mydiagram > svg { height: 1000px }`
-- `alt`: determines the image's alternate text for HTML output. If not given, the alternate text defaults to the mermaid code.
-- `align`: determines the image's position. Valid options are `'left'`, `'center'`, `'right'`
-- `caption`: can be used to give a caption to the diagram.
-- `zoom`: can be used to enable zooming the diagram. For a global config see `mermaid_d3_zoom` below.
-
-<figure class="align-center">
-<img src="https://user-images.githubusercontent.com/16781833/228022911-c26d1e01-7f71-4ab7-bb33-ce53056f8343.gif" alt="A preview after adding :zoom: option only to the first diagram example above:" />
-</figure>
-
-- `fullscreen`: can be used to enable fullscreen modal viewing of the diagram. For a global config see `mermaid_fullscreen` below.
-- `config`: JSON to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html). **NOTE**: The mermaid documentation uses YAML, but we must use JSON because Markdown processing of frontmatter will interfere.
-- `title`: Title to pass through to the [mermaid configuration](https://mermaid.js.org/config/configuration.html)
-
-## Translations
-
-For translated diagrams, store Mermaid source in an external `.mmd` file and
-provide localized files using Sphinx's
-[`figure_language_filename`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-figure_language_filename)
-convention. For example, `diagram.mmd` and `diagram.de.mmd` can be referenced by
-the same directive, and Sphinx selects the file matching the active language.
-
-Mermaid captions are included in gettext catalogs and translated like other
-figure captions. Inline Mermaid source is not extracted as prose; use localized
-external files when diagram labels need translation.
-
-## Config values
-
-### `mermaid_output_format`
-
-The output format for Mermaid when building HTML files. This must be
-either `'raw'` `'png'` or `'svg'`; the default is `'raw'`.
-`mermaid-cli` is required if it's not `raw`
-
-### `mermaid_cmd`
-
-The command name with which to invoke `mermaid-cli` program. The
-default is `'mmdc'`; you may need to set this to a full path if it's
-not in the executable search path. If a string is specified, it is
-split using `shlex.split` to support multi-word commands.
-To avoid splitting, a list of strings can be specified. Examples:
-
-```python
-mermaid_cmd = "npx mmdc"
-mermeid_cmd = ["npx", "--no-install", "mmdc"]
+flowchart TD
+    Tag --> Build --> Publish
 ```
 
-### `mermaid_cmd_shell`
-
-When set to true, the `shell=True` argument will be passed the process
-execution command. This allows commands other than binary executables
-to be executed on Windows. The default is false.
-
-### `mermaid_params`
-
-For individual parameters, a list of parameters can be added. Refer to
-[Examples](https://github.com/mermaid-js/mermaid-cli#usage):
-
-```python
-mermaid_params = ["--theme", "forest", "--width", "600", "--backgroundColor", "transparent"]
-```
-
-This will render the mermaid diagram with theme forest, 600px width
-and transparent background.
-
-### `mermaid_sequence_config`
-
-Allows overriding the sequence diagram configuration. It could be
-useful to increase the width between actors. It **needs to be a json
-file** Check options in the [documentation](https://mermaid-js.github.io/mermaid/#/mermaidAPI?id=configuration)
-
-### `mermaid_verbose`
-
-Use the verbose mode when call mermaid-cli, and show its output in the
-building process.
-
-### `mermaid_pdfcrop`
-
-If using latex output, it might be useful to crop the pdf just to the
-needed space. For this, `pdfcrop` can be used. State binary name to
-use this extra function.
-
-### `mermaid_init_config`
-
-Optional override of arguments to `mermaid.initialize()`, passed in as
-a JSON. Defaults to `{ "startOnLoad": True}`.
-
-### `mermaid_config`
-
-Optional default for each Mermaid directive's `config` frontmatter. Set it to
-a dictionary in `conf.py`:
-
-```python
-mermaid_config = {
-    "theme": "base",
-    "themeVariables": {"primaryColor": "#BB2528"},
-}
-```
-
-A directive's `:config:` option replaces this default for that diagram.
-
-### `mermaid_dark_theme`
-
-The mermaid theme to use when dark mode is detected. Defaults to `"dark"`.
-Valid values are any [mermaid theme](https://mermaid.js.org/config/theming.html): `"default"`, `"neutral"`, `"dark"`, `"forest"`, `"base"`.
-
-### `mermaid_light_theme`
-
-The mermaid theme to use when light mode is detected. Defaults to `"default"`.
-Valid values are the same as for `mermaid_dark_theme`.
-
-For a theme that works well in both dark and light mode, set both to `"neutral"`:
-
-```python
-mermaid_dark_theme = "neutral"
-mermaid_light_theme = "neutral"
-```
-
-### `mermaid_version`
-
-The version of mermaid that will be used to parse `raw` output in HTML
-files. This should match a version available on
-[https://www.jsdelivr.com/package/npm/mermaid](https://www.jsdelivr.com/package/npm/mermaid).
-The default is `"12.0.0"`.
-
-### `mermaid_use_local`
-
-Optional location of a local copy of `mermaid.esm.min.mjs`. By default,
-we will pull from jsdelivr.
-
-The value can be either an absolute URL or a path relative to
-`html_static_path` (e.g. `vendor/mermaid.esm.min.mjs` if the file is
-vendored at `_static/vendor/mermaid.esm.min.mjs`). The same applies to
-the other `*_use_local` options below.
-
-### `mermaid_include_elk`
-
-Whether to download and load the ELK JavaScript extensions. Defaults
-to False.
-
-Mermaid 12 bundles ELK and uses it as the default layout, so this
-option is ignored there. It only takes effect when `mermaid_version`
-is pinned below 12, or when `mermaid_use_local` points at a build that
-does not include ELK.
-
-### `mermaid_include_zenuml`
-
-Whether to download and load the ZenuML JavaScript extensions.
-Defaults to False.
-
-### `mermaid_elk_version`
-
-The version of mermaid ELK renderer that will be used. The default is
-`"0.2.0"`. Only used when the ELK plugin is loaded separately, see
-[`mermaid_include_elk`](#mermaid_include_elk).
-
-### `mermaid_zenuml_version`
-
-The version of mermaid ZenuML renderer that will be used. The default
-is `"0.2.2"`.
-
-### `mermaid_elk_use_local`
-
-Optional location of a local copy of `mermaid-layout-elk.esm.min.mjs`.
-See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
-
-### `mermaid_zenuml_use_local`
-
-Optional location of a local copy of `mermaid-zenuml.esm.min.mjs`.
-See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
-
-### `mermaid_icon_packs`
-
-Optional mapping of icon-pack names to
-[Iconify JSON URLs](https://mermaid.js.org/config/icons.html). Packs are
-registered lazily and fetched only when Mermaid uses an icon from them.
-Relative paths are resolved from `html_static_path`. This option applies to raw
-HTML output only.
-
-For example:
-
-```python
-mermaid_icon_packs = {
-    "logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json",
-}
-```
-
-Icons from the pack can then be referenced with the registered name, such as
-`logos:aws-lambda` in an architecture diagram.
-
-### `d3_use_local`
-
-Optional location of a local copy of `d3.min.js`.
-See [`mermaid_use_local`](#mermaid_use_local) for accepted values.
-
-### `d3_version`
-
-The version of d3 that will be used to provide zoom functionality on
-mermaid graphs. The default is `"7.9.0"`.
-
-### `mermaid_d3_zoom`
-
-Enables zooming in all the generated Mermaid diagrams.
-
-### `mermaid_width`
-
-Sets the default diagram width within its container. Default to 100%.
-
-### `mermaid_height`
-
-Sets the default diagram height within its container. Default to
-500px.
-
-### `mermaid_fullscreen`
-
-Enables fullscreen modal viewing for all Mermaid diagrams. When
-enabled, a fullscreen button appears in the top-right corner of each
-diagram. Clicking it opens the diagram in a fullscreen modal overlay.
-The modal can be closed by pressing ESC, clicking outside the diagram,
-or clicking the close button. This feature is theme-agnostic and works
-with any Sphinx theme.
-
-### `mermaid_fullscreen_button`
-
-Customizes the fullscreen button icon/text. Default is `"⛶"`. You can
-use any Unicode character or emoji, for example `"🔍"` or `"⛶"`.
-
-### `mermaid_fullscreen_button_opacity`
-
-Customizes the fullscreen button opacity, to avoid fully obscuring
-important chart content. Default is `50` (percent). You can use any
-value from 0 to 100. Button becomes fully opaque on hover.
-
-## Markdown support
-
-You can include Mermaid diagrams in your Markdown documents in Sphinx.
-You just need to setup the [markdown support in
-Sphinx](https://www.sphinx-doc.org/en/master/usage/markdown.html) via
-[myst-parser](https://myst-parser.readthedocs.io/) . See a [minimal
-configuration from the
-tests](https://github.com/mgaitan/sphinxcontrib-mermaid/blob/master/tests/roots/test-markdown/conf.py).
-
-Then in your `.md` documents include a code block as in
-reStructuredTexts:
-
-````markdown
-```{mermaid}
-
-    sequenceDiagram
-      participant Alice
-      participant Bob
-      Alice->John: Hello John, how are you?
-```
-````
-
-For GitHub cross-support, you can omit the curly braces and configure
-myst to use the `mermaid` code block as a myst directive.
-For example, in \`conf.py\`:
-
-```python
-myst_fence_as_directive = ["mermaid"]
-```
-
-## Building PDFs on readthedocs.io
-
-In order to have Mermaid diagrams build properly in PDFs generated on
-readthedocs.io, you will need a few extra configurations.
-
-1. In your `.readthedocs.yaml` file (which should be in the root of your repository) include a `post-install` command to the Mermaid CLI:
-
-```yaml
-        build:
-          os: ubuntu-20.04
-          tools:
-            python: "3.8"
-            nodejs: "16"
-          jobs:
-            post_install:
-              - npm install -g @mermaid-js/mermaid-cli
-```
-
-Note that if you previously did not have a `.readthedocs.yaml` file,
-you will also need to specify all targets you wish to build and other
-basic configuration options. A minimal example of a complete file is:
-
-```yaml
-# .readthedocs.yaml
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-# Required
-version: 2
-# Set the version of Python and other tools you might need
-build:
-  os: ubuntu-24.04
-  apt_packages:
-    - libasound2t64
-  tools:
-    python: "3.11"
-    nodejs: "20"
-  jobs:
-    post_install:
-      - npm install -g @mermaid-js/mermaid-cli
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-   configuration: docs/conf.py
-# If using Sphinx, optionally build your docs in additional formats such as PDF
-formats:
-  - epub
-  - pdf
-python:
-   install:
-   - requirements: docs/requirements.txt
-```
-
-2. In your documentation directory add file `puppeteer-config.json` with contents: :
-
-```json
-{
- "args": ["--no-sandbox"]
-}
-```
-
-3. In your documentation `conf.py` file, add: :
-
-```python
-mermaid_params = ["-p", "puppeteer-config.json"]
-```
+## Documentation
+
+- [Tutorial](docs/src/tutorial.md)
+- [Configuration reference](docs/src/configuration.md)
+- [Upgrading from 2.x](docs/src/migration.md)
+- [Diagram gallery](docs/src/examples.md)
