@@ -50,13 +50,23 @@ test = [
     "myst-parser",
     "pytest",
     "ruff",
-    "sphinx"
+    "sphinx",
+]
+typing = [
+    "pyright==1.1.414",
+    "types-docutils",
+    "types-PyYAML",
 ]
 
 [project.scripts]
 
 [tool.pytest.ini_options]
 testpaths = "tests"
+
+[tool.pyright]
+include = ["sphinxcontrib"]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
 
 [tool.ruff]
 line-length = 150

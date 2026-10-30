@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266)
+- Raise clear extension errors for a missing Mermaid version or missing D3 configuration when zoom is enabled, and skip LaTeX PDF cropping when Mermaid rendering produces no output
 - Upgrade Mermaid to 12.0.0, which bundles the ELK layouts and uses ELK as the default layout algorithm (#269)
 - Skip loading the separate `@mermaid-js/layout-elk` plugin when the configured Mermaid version already bundles it
 
