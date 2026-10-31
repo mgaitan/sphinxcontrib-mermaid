@@ -1,0 +1,12 @@
+---
+config:
+  layout: elk
+---
+flowchart TD
+    Source --> Parse
+    Parse --> Directive
+    Parse --> Frontmatter
+    Directive --> Node
+    Frontmatter --> Node
+    Node --> HTML
+    Node --> LaTeX

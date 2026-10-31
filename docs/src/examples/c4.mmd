@@ -1,0 +1,7 @@
+C4Context
+    title Documentation site
+    Person(reader, "Reader")
+    System(docs, "Docs site", "Sphinx HTML with diagrams")
+    System_Ext(cdn, "jsdelivr", "Optional CDN")
+    Rel(reader, docs, "Reads")
+    Rel(docs, cdn, "Loads Mermaid from", "when mermaid_base_url is set")

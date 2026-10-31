@@ -1,0 +1,7 @@
+stateDiagram-v2
+    [*] --> Pending
+    Pending --> Rendered: visible
+    Pending --> Error: invalid source
+    Rendered --> Rendered: theme change
+    Rendered --> [*]
+    Error --> [*]

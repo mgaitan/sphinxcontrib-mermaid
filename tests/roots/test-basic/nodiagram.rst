@@ -1,0 +1,4 @@
+No diagram
+----------
+
+Just text.

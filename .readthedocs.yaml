@@ -12,10 +12,12 @@ build:
     - libasound2t64
   tools:
     python: "3"
-    nodejs: "20"
+    nodejs: "22"
   jobs:
     post_install:
-      - npm install -g @mermaid-js/mermaid-cli
+      - npm install -g pnpm @mermaid-js/mermaid-cli
+      - pnpm --dir js install --frozen-lockfile
+      - python -m pip install .[develop]
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
@@ -29,5 +31,3 @@ formats:
 python:
    install:
    - requirements: docs/requirements.txt
-   - method: pip
-     path: .

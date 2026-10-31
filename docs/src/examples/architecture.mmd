@@ -1,0 +1,7 @@
+architecture-beta
+    group site(cloud)[Docs site]
+    service html(server)[HTML] in site
+    service static(disk)[Static assets] in site
+    service browser(internet)[Browser]
+    browser:R --> L:html
+    html:R --> L:static

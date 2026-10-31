@@ -1,0 +1,11 @@
+requirementDiagram
+    requirement offline {
+        id: 1
+        text: Diagrams render without network access.
+        risk: medium
+        verifymethod: test
+    }
+    element bundle {
+        type: assets
+    }
+    bundle - satisfies -> offline

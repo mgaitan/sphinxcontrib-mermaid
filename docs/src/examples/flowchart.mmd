@@ -1,0 +1,8 @@
+---
+title: Publishing a page
+---
+flowchart LR
+    Draft[Write a draft] --> Review{Review}
+    Review -->|Changes| Draft
+    Review -->|Approved| Build[sphinx-build]
+    Build --> Publish((Publish))

@@ -1,0 +1,183 @@
+.mermaid-diagram,
+.mermaid-fullscreen {
+  --mermaid-bg: var(
+    --mermaid-theme-bg,
+    var(
+      --color-background-primary,
+      var(--pst-color-background, var(--color-fd-background, Canvas))
+    )
+  );
+  --mermaid-fg: var(
+    --mermaid-theme-fg,
+    var(
+      --color-foreground-primary,
+      var(--pst-color-text-base, var(--color-fd-foreground, CanvasText))
+    )
+  );
+  --mermaid-border: var(
+    --mermaid-theme-border,
+    var(
+      --color-background-border,
+      var(--pst-color-border, var(--color-fd-border, rgb(128 128 128 / 40%)))
+    )
+  );
+  --mermaid-toolbar-bg: var(--mermaid-bg);
+  --mermaid-overlay-bg: var(--mermaid-bg);
+}
+
+.mermaid-diagram {
+  position: relative;
+  max-width: 100%;
+  margin-block: 1rem;
+  margin-inline: auto;
+}
+
+.mermaid-viewport {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mermaid-diagram.align-left > .mermaid-viewport {
+  justify-content: flex-start;
+}
+
+.mermaid-diagram.align-right > .mermaid-viewport {
+  justify-content: flex-end;
+}
+
+.mermaid-diagram.align-left {
+  margin-left: 0;
+}
+
+.mermaid-diagram.align-right {
+  margin-right: 0;
+}
+
+.mermaid-viewport > svg {
+  display: block;
+  flex: none;
+}
+
+.mermaid-diagram[data-mermaid-overflow="true"] > .mermaid-viewport {
+  justify-content: flex-start;
+  overflow: auto;
+}
+
+.mermaid-scratch {
+  position: absolute;
+  inset: 0 0 auto;
+  visibility: hidden;
+  overflow: hidden;
+}
+
+.mermaid-error {
+  white-space: pre-wrap;
+}
+
+.mermaid-diagram[data-mermaid-zoom="true"] > .mermaid-viewport {
+  overflow: hidden;
+  cursor: grab;
+  /* Vertical swipes scroll the page; horizontal drags and pinches pan/zoom. */
+  touch-action: pan-y;
+}
+
+.mermaid-viewport[data-mermaid-dragging] {
+  cursor: grabbing;
+}
+
+.mermaid-toolbar {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--mermaid-border);
+  border-radius: 6px;
+  background: var(--mermaid-toolbar-bg);
+  color: var(--mermaid-fg);
+  transition: opacity 0.15s;
+}
+
+.mermaid-toolbar[data-mode="always"] {
+  opacity: 0.55;
+}
+
+.mermaid-toolbar[data-mode="hover"] {
+  opacity: 0;
+  /* Hidden buttons must not catch clicks or taps. */
+  pointer-events: none;
+}
+
+.mermaid-diagram:focus-within > .mermaid-toolbar,
+.mermaid-diagram[data-touched] > .mermaid-toolbar,
+.mermaid-fullscreen .mermaid-toolbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Touch screens report :hover after a tap; reveal on hover only with a real pointer. */
+@media (hover: hover) {
+  .mermaid-diagram:hover > .mermaid-toolbar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.mermaid-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mermaid-toolbar-button:hover,
+.mermaid-toolbar-button:focus-visible {
+  background: rgb(128 128 128 / 20%);
+}
+
+@media print {
+  .mermaid-toolbar {
+    display: none;
+  }
+}
+
+.mermaid-fullscreen {
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 24px;
+  border: 0;
+  background: var(--mermaid-overlay-bg);
+  color: var(--mermaid-fg);
+}
+
+.mermaid-fullscreen::backdrop {
+  background: Canvas;
+}
+
+.mermaid-fullscreen > .mermaid-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.mermaid-fullscreen > .mermaid-toolbar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+}

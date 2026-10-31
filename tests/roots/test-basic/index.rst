@@ -20,3 +20,6 @@ Empty class diagram should not fail
 .. toctree::
 
    zoom.rst
+   nodiagram.rst
+   sub/nested.rst
+   a11y.rst

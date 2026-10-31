@@ -1,6 +1,8 @@
+import hashlib
+import html
+import json
 import re
 import sys
-from json import dumps
 from pathlib import Path
 
 import pytest
@@ -13,288 +15,128 @@ def build_all(app):
 
 @pytest.fixture
 def index(app, build_all):
-    # normalize script tag for compat to Sphinx<4
-    return (app.outdir / "index.html").read_text().replace("<script >", "<script>")
+    return (app.outdir / "index.html").read_text()
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_elk": True})
-def test_html_raw(index):
-    assert "mermaid.run(" in index
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.esm.min.mjs"' in index
-    # Mermaid 12 bundles ELK, so the separate plugin is not loaded
-    assert "mermaid-layout-elk.esm.min.mjs" not in index
-    assert "mermaid.registerLayoutLoaders(elkLayouts);" not in index
-    assert "mermaid.registerIconPacks" not in index
-    assert '{"startOnLoad": false}' in index
-    assert (
-        '<pre id="participants" class="mermaid">\n        sequenceDiagram\n   participant Alice\n   participant Bob\n   Alice-&gt;John: Hello John, how are you?\n    </pre>'
-        in index
-    )
+def _config(app):
+    return json.loads((app.outdir / "_static/sphinxcontrib-mermaid/config.json").read_text())
+
+
+def _options(page):
+    return [json.loads(html.unescape(v)) for v in re.findall(r'data-mermaid-options="([^"]+)"', page)]
 
 
 @pytest.mark.sphinx("html", testroot="basic")
-def test_html_zoom_option(index, app):
-    assert "mermaid.run(" in index
-    assert "if (false) {\n        const mermaids_to_add_zoom" in index
-    zoom_page = (app.outdir / "zoom.html").read_text().replace("<script >", "<script>")
-    assert "svg.call(zoom);" in zoom_page
-    assert 'd3.selectAll(".mermaid[data-zoom-id=' in zoom_page
-    assert '] svg")' not in zoom_page
-    assert 'return this.querySelector("svg");' in zoom_page
-    assert "if (true) {\n        const mermaids_to_add_zoom" in zoom_page
-
-    # the first diagram has no id
-    assert '<pre id="participants" class="mermaid">\n        sequenceDiagram' in zoom_page
+def test_markup_and_assets(app, index):
+    assert '<div class="mermaid-diagram" id="participants"' in index
+    assert '<pre class="mermaid">sequenceDiagram' in index
+    assert "Alice-&gt;John" in index
+    tag = re.search(r"<script[^>]*sphinxcontrib-mermaid\.js[^>]*>", index).group(0)
+    assert 'type="module"' in tag
+    assert re.search(r'src="_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid\.js(\?v=[^"]+)?"', tag)
+    assert "_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.css" in index
+    assert _options(index)[0] == {"fit": "auto", "zoom": "auto", "fullscreen": True, "width": None, "height": None, "fontSize": None}
+    assert (app.outdir / "_static/sphinxcontrib-mermaid/mermaid/mermaid.esm.min.mjs").is_file()
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": True})
-def test_html_zoom_option_global(index):
-    assert "mermaid.run(" in index
-    assert "if (true) {\n        const mermaids_to_add_zoom" in index
-    assert 'd3.selectAll(".mermaid").select(function() {' in index
-    assert 'return this.querySelector("svg");' in index
-    assert 'd3.selectAll(".mermaid svg")' not in index
+@pytest.mark.sphinx("html", testroot="basic")
+def test_no_inline_scripts(app, build_all):
+    for page in ["index.html", "zoom.html", "sub/nested.html"]:
+        text = (app.outdir / page).read_text()
+        inline = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", text, re.DOTALL)
+        assert not [body for body in inline if "mermaid" in body.lower()], page
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_d3_zoom": False})
-def test_html_no_zoom(index):
-    assert "mermaid.run(" in index
-    assert "if (false) {\n        const mermaids_to_add_zoom" in index
+@pytest.mark.sphinx("html", testroot="basic")
+def test_per_diagram_zoom_option(app, build_all):
+    assert [o["zoom"] for o in _options((app.outdir / "zoom.html").read_text())] == ["auto", True]
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "10.3.0", "mermaid_include_elk": False})
-def test_conf_mermaid_version(app, index):
-    assert "mermaid.run(" in index
-    assert app.config.mermaid_version == "10.3.0"
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.3.0/dist/mermaid.esm.min.mjs"' in index
+@pytest.mark.sphinx("html", testroot="basic")
+def test_nested_page_assets(app, build_all):
+    assert "../_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js" in (app.outdir / "sub/nested.html").read_text()
 
 
-@pytest.mark.sphinx(
-    "html",
-    testroot="basic",
-    confoverrides={"mermaid_sequence_config": "mermaid.json"},
-)
-def test_conf_mermaid_sequence_config(app, index):
-    assert app.config.mermaid_sequence_config == "mermaid.json"
-    assert "defaults to `NoneType`" not in app._warning.getvalue()
+@pytest.mark.sphinx("html", testroot="basic")
+def test_page_without_diagram_has_no_assets(app, build_all):
+    assert "sphinxcontrib-mermaid.js" not in (app.outdir / "nodiagram.html").read_text()
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": False})
-def test_conf_mermaid_local(app, index):
-    assert "mermaid.run(" in index
-    assert "mermaid.min.js" not in index
-    assert 'import mermaid from "./_static/test"' in index
+@pytest.mark.sphinx("html", testroot="basic")
+def test_site_config_bundled(app, build_all):
+    cfg = _config(app)
+    assert cfg == {
+        "mermaid": "mermaid/mermaid.esm.min.mjs",
+        "layouts": ["mermaid-layout-tidy-tree/mermaid-layout-tidy-tree.esm.min.mjs"],
+        "diagrams": ["mermaid-zenuml/mermaid-zenuml.esm.min.mjs"],
+        "extensions": [],
+        "iconPacks": {},
+        "config": {},
+        "lightTheme": "default",
+        "darkTheme": "dark",
+        "toolbar": "always",
+        "maxHeight": "70vh",
+        "minFontScale": 0.7,
+    }
 
 
-@pytest.mark.sphinx(
-    "html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_elk": True, "mermaid_elk_use_local": "test"}
-)
-def test_conf_mermaid_elk_local(app, index):
-    assert "mermaid.run(" in index
-    assert "mermaid.min.js" not in index
-    assert "mermaid-layout-elk.esm.min.mjs" not in index
-    assert 'import elkLayouts from "./_static/test"' in index
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_base_url": "https://cdn.jsdelivr.net/npm", "mermaid_version": "12.1.0"})
+def test_site_config_remote(app, build_all):
+    cfg = _config(app)
+    assert cfg["mermaid"] == "https://cdn.jsdelivr.net/npm/mermaid@12.1.0/dist/mermaid.esm.min.mjs"
+    assert cfg["diagrams"] == ["https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml@1.0.1/dist/mermaid-zenuml.esm.min.mjs"]
+    assert cfg["layouts"] == ["https://cdn.jsdelivr.net/npm/@mermaid-js/layout-tidy-tree@1.0.1/dist/mermaid-layout-tidy-tree.esm.min.mjs"]
 
 
-@pytest.mark.sphinx(
-    "html", testroot="basic", confoverrides={"mermaid_use_local": "test", "mermaid_include_zenuml": True, "mermaid_zenuml_use_local": "test"}
-)
-def test_conf_mermaid_zenuml_local(app, index):
-    assert "mermaid.run()" in index
-    assert "mermaid.min.js" not in index
-    assert "mermaid-zenuml.esm.min.mjs" not in index
-    assert 'import("./_static/test")' in index
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_base_url": "https://unpkg.com/"})
+def test_site_config_other_cdn(app, build_all):
+    cfg = _config(app)
+    assert cfg["mermaid"] == "https://unpkg.com/mermaid@12.2.0/dist/mermaid.esm.min.mjs"
+    assert cfg["diagrams"] == ["https://unpkg.com/@mermaid-js/mermaid-zenuml@1.0.1/dist/mermaid-zenuml.esm.min.mjs"]
+    assert cfg["layouts"] == ["https://unpkg.com/@mermaid-js/layout-tidy-tree@1.0.1/dist/mermaid-layout-tidy-tree.esm.min.mjs"]
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_base_url": "https://cdn.jsdelivr.net/npm", "mermaid_version": "latest"})
+def test_site_config_remote_latest(app, build_all):
+    assert _config(app)["mermaid"] == "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"
+
+
+@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_base_url": "vendor/node_modules"})
+def test_site_config_local(app, build_all):
+    cfg = _config(app)
+    assert cfg["mermaid"] == "../vendor/node_modules/mermaid/dist/mermaid.esm.min.mjs"
+    assert cfg["diagrams"] == ["../vendor/node_modules/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs"]
+    assert cfg["layouts"] == ["../vendor/node_modules/@mermaid-js/layout-tidy-tree/dist/mermaid-layout-tidy-tree.esm.min.mjs"]
 
 
 @pytest.mark.sphinx(
     "html",
     testroot="basic",
     confoverrides={
-        "mermaid_icon_packs": {
-            "logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json",
-            "local": "icons.json",
-        },
+        "mermaid_extensions": ["ext/x.mjs", "https://e.example/y.mjs"],
+        "mermaid_icon_packs": {"local": "icons.json", "logos": "https://x/icons.json"},
     },
 )
-def test_conf_mermaid_icon_packs(index):
-    assert '"logos": "https://cdn.jsdelivr.net/npm/@iconify-json/logos@1/icons.json"' in index
-    assert '"local": "./_static/icons.json"' in index
-    assert "mermaid.registerIconPacks(Object.entries(iconPacks)" in index
-    assert "loader: () => fetch(url).then((response) => response.json())" in index
+def test_url_resolution(app, build_all):
+    cfg = _config(app)
+    assert cfg["extensions"] == ["../ext/x.mjs", "https://e.example/y.mjs"]
+    assert cfg["iconPacks"] == {"local": "../icons.json", "logos": "https://x/icons.json"}
 
 
 @pytest.mark.sphinx(
     "html",
     testroot="basic",
-    confoverrides={"d3_version": "1.2.3", "mermaid_d3_zoom": True, "mermaid_include_elk": False},
+    confoverrides={"mermaid_config": {"note": "</script><x>"}, "mermaid_zoom": True, "mermaid_fit": "contain", "mermaid_height": "300px"},
 )
-def test_conf_d3_version(app, index):
-    assert "mermaid.run(" in index
-    assert app.config.d3_version == "1.2.3"
-    assert '<script src="https://cdn.jsdelivr.net/npm/d3@1.2.3/dist/d3.min.js"></script>' in index
+def test_values_escaped_and_defaults(app, index):
+    assert "</script><x>" not in index
+    assert _config(app)["config"] == {"note": "</script><x>"}
+    assert _options(index)[0] == {"fit": "contain", "zoom": True, "fullscreen": True, "width": None, "height": "300px", "fontSize": None}
 
 
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"d3_use_local": "test", "mermaid_d3_zoom": True})
-def test_conf_d3_local(app, index):
-    assert "cdn.jsdelivr.net/npm/d3" not in index
-    assert re.search(
-        r'<script src="[^"]*_static/test(?:\?[^"]*)?"></script>',
-        index,
-    )
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_init_config": {"startOnLoad": True}})
-def test_mermaid_init_js(index):
-    assert "mermaid.run(" in index
-    assert '{"startOnLoad": false}' not in index
-    assert '{"startOnLoad": true}' in index
-
-
-@pytest.mark.sphinx("html", testroot="config")
-def test_mermaid_config(index):
-    assert "config:\n  theme: base\n  themeVariables:\n    primaryColor: '#BB2528'" in index
-    assert "config:\n  theme: forest" in index
-    assert index.count("primaryColor: '#BB2528'") == 1
-    assert "cdn.jsdelivr.net/npm/d3" not in index
-
-
-@pytest.mark.sphinx(
-    "html",
-    testroot="basic",
-    confoverrides={"mermaid_version": "11.12.1", "mermaid_include_elk": True, "mermaid_elk_version": "latest"},
-)
-def test_mermaid_with_elk(app, index):
-    assert "mermaid.run(" in index
-    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs"' in index
-    assert "mermaid.registerLayoutLoaders(elkLayouts);" in index
-
-
-@pytest.mark.sphinx(
-    "html",
-    testroot="basic",
-    confoverrides={"mermaid_version": "11.12.1", "mermaid_include_elk": True},
-)
-def test_mermaid_with_elk_pinned_version(app, index):
-    assert 'import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"' in index
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_version": "latest", "mermaid_include_elk": True})
-def test_mermaid_latest_bundles_elk(app, index):
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"' in index
-    assert "mermaid-layout-elk.esm.min.mjs" not in index
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_include_zenuml": True, "mermaid_zenuml_version": "latest"})
-def test_mermaid_with_zenuml(app, index):
-    assert "mermaid.run()" in index
-    assert 'import("https://cdn.jsdelivr.net/npm/@mermaid-js/mermaid-zenuml/dist/mermaid-zenuml.esm.min.mjs")' in index
-    assert '.replace(/^\\s*---\\s*\\n[^]*?\\n---\\s*/, "")' in index
-
-
-@pytest.mark.sphinx("html", testroot="markdown", confoverrides={"mermaid_include_elk": True})
-def test_html_raw_from_markdown(index):
-    assert "mermaid.run(" in index
-    assert "mermaid.run(" in index
-    assert 'import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.esm.min.mjs"' in index
-    assert "mermaid-layout-elk.esm.min.mjs" not in index
-    assert "mermaid.registerLayoutLoaders(elkLayouts);" not in index
-    assert '{"startOnLoad": false}' in index
-    assert (
-        '<pre align="center" id="participants" class="mermaid align-center">\n            sequenceDiagram\n      participant Alice\n      participant Bob\n      Alice-&gt;John: Hello John, how are you?\n    </pre>'
-        in index
-    )
-
-
-@pytest.mark.sphinx("html", testroot="fullscreen")
-def test_fullscreen_enabled(index):
-    """Test that fullscreen JavaScript is added when enabled."""
-    assert "mermaid.run(" in index
-    assert ".mermaid-container {\\n    position: relative;" in index
-    assert ".mermaid-fullscreen-btn {\\n    position: absolute;" in index
-    assert ".mermaid-fullscreen-btn:hover" in index
-    assert ".mermaid-fullscreen-modal" in index
-    assert "mermaid-fullscreen-close" in index
-    assert "previousScrollOffset = [window.scrollX, window.scrollY];" in index
-    assert "svg.style.display = 'block';" in index
-    assert "svg.style.sdisplay" not in index
-    assert index.count("document.addEventListener('keydown'") == 1
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_fullscreen": False})
-def test_fullscreen_disabled(index):
-    """Test that fullscreen is not added when disabled."""
-    assert "mermaid.run(" in index
-    assert ".mermaid-fullscreen-btn:hover" not in index
-
-
-@pytest.mark.sphinx("html", testroot="fullscreen", confoverrides={"mermaid_d3_zoom": True})
-def test_fullscreen_with_zoom(index):
-    """Test that fullscreen works with D3 zoom."""
-    assert "mermaid.run(" in index
-    assert ".mermaid-fullscreen-btn" in index
-    assert "d3.zoom" in index
-
-
-@pytest.mark.sphinx("html", testroot="fullscreen", confoverrides={"mermaid_fullscreen_button": "[+]"})
-def test_custom_fullscreen_button(index):
-    """Test custom fullscreen button icon."""
-    assert "mermaid.run(" in index
-    assert "[+]" in index
-
-
-@pytest.mark.sphinx("html", testroot="basic")
-def test_lazy_rendering_code_present(index):
-    """Test that lazy rendering code for hidden elements is present."""
-    assert "IntersectionObserver" in index
-    assert "data-mermaid-deferred" in index
-    assert "mermaids_active.length !== mermaids_processed.length" in index
-    # Zoom is applied through the idempotent helper so deferred diagrams can be
-    # zoomed on reveal, and the fixed-count SVG gate that looped forever when a
-    # zoomed diagram was hidden is gone.
-    assert "addZoomToSvgs" in index
-    assert "data-zoom-applied" in index
-    assert "svgs.size() !== mermaids_to_add_zoom" not in index
-
-
-@pytest.mark.sphinx("html", testroot="basic")
-def test_mermaid_theme_defaults(index):
-    """Default theme values are 'dark' and 'default'."""
-    assert 'theme: darkTheme ? "dark" : "default"' in index
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral", "mermaid_light_theme": "neutral"})
-def test_mermaid_theme_both_custom(index):
-    """Both theme values can be overridden."""
-    assert 'theme: darkTheme ? "neutral" : "neutral"' in index
-
-
-@pytest.mark.sphinx("html", testroot="basic", confoverrides={"mermaid_dark_theme": "neutral"})
-def test_mermaid_theme_dark_only(index):
-    """Only dark theme overridden, light stays default."""
-    assert 'theme: darkTheme ? "neutral" : "default"' in index
-
-
-@pytest.mark.sphinx(
-    "html",
-    testroot="fullscreen",
-    confoverrides={
-        "mermaid_dark_theme": "dark'theme",
-        "mermaid_fullscreen_button": "'` ${button}</script>",
-        "mermaid_init_config": {"note": "` ${config}"},
-        "mermaid_light_theme": 'light"theme',
-    },
-)
-def test_javascript_config_values_are_escaped(index):
-    button_text = "'` ${button}</script>"
-    init_config = {"note": "` ${config}"}
-    dark_theme = "dark'theme"
-    light_theme = 'light"theme'
-    escaped_button = dumps(button_text).replace("<", "\\u003c")
-
-    assert f"fullscreenBtn.textContent = {escaped_button};" in index
-    assert "\\u003c/script>" in index
-    assert f"...{dumps(init_config)}" in index
-    assert f"darkTheme ? {dumps(dark_theme)} : {dumps(light_theme)}" in index
+@pytest.mark.sphinx("html", testroot="markdown")
+def test_html_from_markdown(index):
+    assert '<div class="mermaid-diagram align-center" id="participants"' in index
 
 
 @pytest.mark.sphinx(
@@ -324,16 +166,15 @@ def test_render_error_message(app):
 )
 def test_static_output_skips_javascript(app, monkeypatch):
     monkeypatch.setattr(
-        "sphinxcontrib.mermaid.render_mm",
+        "sphinxcontrib.mermaid.render.render_mm",
         lambda *args, **kwargs: ("diagram.svg", app.outdir / "diagram.svg"),
     )
 
     app.builder.build_all()
     index = (app.outdir / "index.html").read_text()
 
-    assert "cdn.jsdelivr.net/npm/mermaid" not in index
-    assert "cdn.jsdelivr.net/npm/d3" not in index
-    assert "mermaid.run(" not in index
+    assert "sphinxcontrib-mermaid.js" not in index
+    assert "sphinxcontrib-mermaid.css" not in index
 
 
 @pytest.mark.sphinx(
@@ -343,7 +184,7 @@ def test_static_output_skips_javascript(app, monkeypatch):
 )
 def test_static_png_has_mermaid_class(app, monkeypatch):
     monkeypatch.setattr(
-        "sphinxcontrib.mermaid.render_mm",
+        "sphinxcontrib.mermaid.render.render_mm",
         lambda *args, **kwargs: ("diagram.png", app.outdir / "diagram.png"),
     )
 
@@ -351,3 +192,30 @@ def test_static_png_has_mermaid_class(app, monkeypatch):
     index = (app.outdir / "index.html").read_text()
 
     assert re.search(r'<img src="diagram\.png"[^>]* class="mermaid"', index)
+
+
+@pytest.mark.sphinx("html", testroot="thirdparty")
+def test_node_without_options_renders(app, index):
+    assert _options(index) == [{"fit": "auto", "zoom": "auto", "fullscreen": True, "width": None, "height": None, "fontSize": None}]
+
+
+@pytest.mark.sphinx("epub", testroot="basic", freshenv=True)
+def test_epub_gets_no_runtime_assets(app):
+    app.build(force_all=True)
+    assert "unknown mimetype" not in app._warning.getvalue()
+    assert not (app.outdir / "_static/sphinxcontrib-mermaid").exists()
+
+
+@pytest.mark.sphinx("html", testroot="basic")
+def test_alt_uses_group_role_and_font_size_option(app, build_all):
+    page = (app.outdir / "a11y.html").read_text()
+    assert 'role="group" aria-label="A &quot;quoted&quot; &lt;label&gt;"' in page
+    assert _options(page)[0]["fontSize"] == 32
+
+
+@pytest.mark.sphinx("html", testroot="basic")
+def test_runtime_tag_has_config_version(app, index):
+    tag = re.search(r"<script[^>]*sphinxcontrib-mermaid\.js[^>]*>", index).group(0)
+    match = re.search(r'data-mermaid-config="([0-9a-f]{12})"', tag)
+    assert match
+    assert hashlib.sha1((app.outdir / "_static/sphinxcontrib-mermaid/config.json").read_bytes()).hexdigest()[:12] == match.group(1)

@@ -4,15 +4,26 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.a
+*.o
+*.dSYM
 *.so
+*.obj
+*.dll
+*.exp
+*.lib
+
+# vcpkg
+vcpkg/
+vcpkg_installed/
+
+# Rust
+target
+target-capi
 
 # Distribution / packaging
 .Python
-env/
 build/
-_build/
-_static/
-_templates/
 develop-eggs/
 dist/
 downloads/
@@ -23,13 +34,15 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -40,51 +53,49 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+junit.xml
+*.cover
+*.py,cover
 .hypothesis/
+.pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
+# Django
 *.log
 local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/index.md
-docs/_build/
-
-# PyBuilder
-target/
-
-# IPython Notebook
-.ipynb_checkpoints
+# IPython
+profile_default/
+ipython_config.py
 
 # pyenv
 .python-version
 
-# celery beat schedule file
+# pipenv
+Pipfile.lock
+
+# Celery
 celerybeat-schedule
+celerybeat.pid
 
-# dotenv
+# Airspeed Velocity
+.asv
+
+# Environments
 .env
-
-# virtualenv
+.venv
+env/
 venv/
 ENV/
+env.bak/
+venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -93,9 +104,69 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# IDEA project settings
-.idea
+# mkdocs documentation
+/site
 
-# Test directories (for manual theme testing)
-test-fullscreen/
-theme-tests/
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Documentation
+/site
+index.md
+docs/_build/
+docs/api
+docs/html
+docs/index.md
+docs/jupyter_execute
+docs/src/_build/
+docs/superpowers
+index.md
+
+# JS
+js/coverage
+js/dist
+js/lib
+js/node_modules
+js/test-results
+js/playwright-report
+js/*.tgz
+
+# Jupyter
+.ipynb_checkpoints
+.autoversion
+Untitled*.ipynb
+sphinxcontrib/mermaid/_static
+
+# Emscripten SDK (locally installed)
+emsdk
+.pyodide_build/
+
+# Mac
+.DS_Store
+
+# Hydra
+/outputs/
+/multirun/
+
+# AI
+ROADMAP.md
+AGENTS.md
+.github/hooks/sdlc.json
+.superpowers
+
+# Tests
+js/tests/site/_build*
+
+# Translations
+*.mo
+*.pot
+
+# IDE
+.idea
+!docs/index.md
+!tests/roots/**/index.md

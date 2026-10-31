@@ -1,0 +1,13 @@
+Accessibility
+-------------
+
+.. mermaid::
+   :name: labelled
+   :alt: A "quoted" <label>
+
+   ---
+   config:
+     fontSize: 32
+   ---
+   graph TD
+      a --> b
