@@ -1,0 +1,10 @@
+classDiagram
+    class Directive {
+        +run() list
+    }
+    class Mermaid {
+        +get_mm_code() str
+    }
+    class MermaidClassDiagram
+    Directive <|-- Mermaid
+    Mermaid <|-- MermaidClassDiagram

@@ -15,6 +15,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node.js
+        uses: actions-ext/node/setup@03c9f6b2d9c9fa2c26cfa22d0fa379a69329b319
+        with:
+          version: 22.x
+      - name: install javascript dependencies
+        run: pnpm --dir js install --frozen-lockfile
       - name: install build
         run: python -m pip install --upgrade build
       - name: build

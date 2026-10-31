@@ -1,9 +1,32 @@
 # Changelog
 
-## Unreleased
+## Unreleased (3.0)
 
-- Upgrade Mermaid to 12.0.0, which bundles the ELK layouts and uses ELK as the default layout algorithm (#269)
-- Skip loading the separate `@mermaid-js/layout-elk` plugin when the configured Mermaid version already bundles it
+Breaking changes:
+
+- Replace the templated inline JavaScript with a bundled TypeScript runtime loaded from `_static` (CSP-compatible, #222)
+- Bundle Mermaid 12.2.0, ZenUML, and the tidy-tree layout in the package; `mermaid_base_url` loads them from any npm CDN or a local `node_modules` copy instead (#29, #64, #110, #114)
+- Remove `mermaid_init_config`, `mermaid_d3_zoom`, `d3_version`, `d3_use_local`, the `mermaid_include_elk`/`mermaid_elk_*` and `mermaid_include_zenuml`/`mermaid_zenuml_*` settings, `mermaid_fullscreen_button`, `mermaid_fullscreen_button_opacity`, `mermaid_js_priority`, `mermaid_include_mindmap`, and `mermaid_use_local`; each now raises an error naming its replacement
+- Pass `mermaid_config` to `mermaid.initialize` instead of copying it into each diagram's frontmatter
+- `mermaid_version` only applies with a remote `mermaid_base_url` and must be 12.0.0 or later
+- Render diagrams into `<div class="mermaid-diagram">`; drop the fixed 500px height
+- Replace `window.runMermaid` with `window.sphinxcontribMermaid.render()`; expose the Mermaid module as `window.mermaid` (#233)
+- Require Sphinx 7.4; building from source requires Node.js 22+ and pnpm
+
+New:
+
+- Size diagrams to keep text readable, with a capped scrolling view for oversized diagrams, `fit: contain`, and per-diagram `width`/`height` (#123, #104, #251)
+- Accept sizing and interaction options as top-level frontmatter keys as well as directive options
+- Built-in pan and zoom (drag, Ctrl/⌘+wheel, pinch, keyboard) without d3 (#178)
+- Toolbar with zoom and fullscreen buttons, always visible or shown on hover (`mermaid_toolbar`, #224)
+- Fullscreen overlay with pan and zoom
+- Follow light and dark mode in Furo, pydata-sphinx-theme, sphinx-fuma, and sphinxawesome-theme; an explicit Mermaid `theme` is never overridden (#228, #163, #205)
+- `mermaid_extensions` registers external diagrams and layouts from ES modules
+- `:config:` accepts YAML, and nested frontmatter works in MyST fences (#186)
+- Render diagrams in hidden tabs and slides when they become visible (#126, #238)
+- Parse diagram source from text content, so search highlighting no longer breaks diagrams (#136)
+- Resolve local asset paths correctly from pages at any depth (#246)
+- Apply `width`/`height` and `mermaid_config` to mermaid-cli output
 
 ## 2.1.1 (July 19, 2026)
 

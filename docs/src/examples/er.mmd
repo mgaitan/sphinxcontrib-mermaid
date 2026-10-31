@@ -1,0 +1,8 @@
+erDiagram
+    PROJECT ||--o{ PAGE : contains
+    PAGE ||--o{ DIAGRAM : embeds
+    DIAGRAM }o--|| THEME : uses
+    PROJECT {
+        string name
+        string version
+    }
