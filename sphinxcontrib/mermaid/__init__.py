@@ -19,6 +19,7 @@ from .render import (
     html_visit_mermaid,
     latex_visit_mermaid,
     man_visit_mermaid,
+    markdown_visit_mermaid,
     render_mm,
     render_mm_html,
     render_mm_latex,
@@ -38,6 +39,7 @@ def setup(app):
         texinfo=(texinfo_visit_mermaid, None),
         text=(text_visit_mermaid, None),
         man=(man_visit_mermaid, None),
+        markdown=(markdown_visit_mermaid, None),
     )
     app.add_directive("mermaid", Mermaid)
     app.add_directive("autoclasstree", MermaidClassDiagram)
