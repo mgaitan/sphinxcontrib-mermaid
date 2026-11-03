@@ -224,3 +224,11 @@ def man_visit_mermaid(self, node):
     else:
         self.body.append(_("[graph]"))
     raise nodes.SkipNode
+
+
+def markdown_visit_mermaid(self, node):
+    node["language"] = "mermaid"
+    self.visit_literal_block(node)
+    self.add(node.attributes["code"])
+    self.depart_literal_block(node)
+    raise nodes.SkipNode
