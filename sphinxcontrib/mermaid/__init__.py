@@ -11,26 +11,39 @@ documents inline.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+from sphinx.application import Sphinx
+
 from .config import register
-from .directives import Mermaid, MermaidClassDiagram, align_spec, figure_wrapper, mermaid
-from .exceptions import MermaidError
+from .directives import (
+    Mermaid as Mermaid,
+    MermaidClassDiagram as MermaidClassDiagram,
+    align_spec as align_spec,
+    figure_wrapper as figure_wrapper,
+    mermaid as mermaid,
+)
+from .exceptions import MermaidError as MermaidError
 from .html import add_assets, add_static_path, write_site_config
 from .render import (
-    html_visit_mermaid,
-    latex_visit_mermaid,
-    man_visit_mermaid,
-    render_mm,
-    render_mm_html,
-    render_mm_latex,
-    render_mm_texinfo,
-    texinfo_visit_mermaid,
-    text_visit_mermaid,
+    html_visit_mermaid as html_visit_mermaid,
+    latex_visit_mermaid as latex_visit_mermaid,
+    man_visit_mermaid as man_visit_mermaid,
+    render_mm as render_mm,
+    render_mm_html as render_mm_html,
+    render_mm_latex as render_mm_latex,
+    render_mm_texinfo as render_mm_texinfo,
+    texinfo_visit_mermaid as texinfo_visit_mermaid,
+    text_visit_mermaid as text_visit_mermaid,
 )
+
+if TYPE_CHECKING:
+    from sphinx.util.typing import ExtensionMetadata
 
 __version__ = "2.1.1"
 
 
-def setup(app):
+def setup(app: Sphinx) -> ExtensionMetadata:
     app.add_node(
         mermaid,
         html=(html_visit_mermaid, None),

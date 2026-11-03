@@ -6,12 +6,16 @@ import hashlib
 import html
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING, NoReturn
 
 from docutils import nodes
 
 from .config import ASSETS, bundled_versions, is_remote
 from .directives import mermaid
 from .options import split_frontmatter
+
+if TYPE_CHECKING:
+    from sphinx.writers.html5 import HTML5Translator
 
 _PACKAGES = {
     "mermaid": ("mermaid", "mermaid", "mermaid"),
@@ -90,7 +94,7 @@ def diagram_options(node, config) -> dict:
     }
 
 
-def render_raw(self, node, code):
+def render_raw(self: HTML5Translator, node: mermaid, code: str) -> NoReturn:
     """Emit the ``mermaid-diagram`` placeholder the runtime renders into."""
     classes = ["mermaid-diagram", *([f"align-{node['align']}"] if "align" in node else []), *node.get("classes", [])]
     attrs = {"class": " ".join(classes)}

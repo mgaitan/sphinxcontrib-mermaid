@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import re
 import textwrap
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, ClassVar
 
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
-from docutils.statemachine import ViewList
+from docutils.statemachine import StringList
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.nodes import set_source_info
@@ -48,23 +50,25 @@ def _fence_frontmatter(lines, i, content):
 
 
 class mermaid(nodes.General, nodes.Inline, nodes.Element):
-    pass
+    """A Mermaid diagram with the standard Docutils Element interface."""
 
 
-def figure_wrapper(directive, node, caption):
+def figure_wrapper(directive: Directive, node: mermaid, caption: str) -> nodes.figure:
     figure_node = nodes.figure("", node)
     if "align" in node:
         figure_node["align"] = node.attributes.pop("align")
 
     parsed = nodes.Element()
-    directive.state.nested_parse(ViewList([caption], source=""), directive.content_offset, parsed)
-    caption_node = nodes.caption(parsed[0].rawsource, "", *parsed[0].children)
+    directive.state.nested_parse(StringList([caption], source=""), directive.content_offset, parsed)
+    caption_content = parsed[0]
+    assert isinstance(caption_content, nodes.Element)
+    caption_node = nodes.caption(caption_content.rawsource, "", *caption_content.children)
     set_source_info(directive, caption_node)
     figure_node += caption_node
     return figure_node
 
 
-def align_spec(argument):
+def align_spec(argument: str) -> str:
     return directives.choice(argument, ("left", "center", "right"))
 
 
@@ -77,7 +81,7 @@ class Mermaid(Directive):
     required_arguments = 0
     optional_arguments = 1
     final_argument_whitespace = False
-    option_spec = {  # noqa: RUF012 - Docutils defines directive options on the class.
+    option_spec: ClassVar[dict[str, Callable[[str], Any]] | None] = {
         # Sphinx directives
         "name": directives.unchanged,
         "class": directives.class_option,
@@ -96,7 +100,7 @@ class Mermaid(Directive):
         "displayMode": directives.unchanged,
     }
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str | list[nodes.Node]:
         if self.arguments:
             # try to load mermaid code from an external file
             document = self.state.document
@@ -166,7 +170,7 @@ class Mermaid(Directive):
                     pass
         return result
 
-    def run(self, **kwargs):
+    def run(self, **kwargs: Any) -> list[nodes.Node]:
         mmcode = self.get_mm_code()
         # mmcode is a list, so it's a system message, not content to be included in the
         # document.
@@ -195,7 +199,7 @@ class Mermaid(Directive):
             options = {key: value for key, value in options.items() if key not in recovered}
             frontmatter = deep_merge(recovered, frontmatter)
 
-        node = mermaid()
+        node: mermaid | nodes.figure = mermaid()
         node["options"] = self._sphinx_options(
             {**{k: v for k, v in frontmatter.items() if k in SPHINX_KEYS}, **{k: v for k, v in options.items() if k in SPHINX_KEYS}}
         )
@@ -241,7 +245,7 @@ class MermaidClassDiagram(Mermaid):
     has_content = False
     required_arguments = 1
     optional_arguments = 100
-    option_spec = Mermaid.option_spec.copy()
+    option_spec = (Mermaid.option_spec or {}).copy()
     option_spec.update(
         {
             "full": directives.flag,
@@ -250,7 +254,7 @@ class MermaidClassDiagram(Mermaid):
         }
     )
 
-    def get_mm_code(self):
+    def get_mm_code(self) -> str:
         return class_diagram(
             *self.arguments,
             full="full" in self.options,

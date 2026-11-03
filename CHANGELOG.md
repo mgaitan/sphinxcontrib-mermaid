@@ -15,6 +15,8 @@ Breaking changes:
 
 New:
 
+- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266)
+- Skip LaTeX PDF cropping when Mermaid rendering produces no output
 - Size diagrams to keep text readable, with a capped scrolling view for oversized diagrams, `fit: contain`, and per-diagram `width`/`height` (#123, #104, #251)
 - Accept sizing and interaction options as top-level frontmatter keys as well as directive options
 - Built-in pan and zoom (drag, Ctrl/⌘+wheel, pinch, keyboard) without d3 (#178)

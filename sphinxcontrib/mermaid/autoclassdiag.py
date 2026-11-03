@@ -1,4 +1,6 @@
 import inspect
+from collections.abc import Iterator
+from typing import Any
 
 from sphinx.errors import ExtensionError
 from sphinx.util import import_object
@@ -6,7 +8,7 @@ from sphinx.util import import_object
 from .exceptions import MermaidError
 
 
-def get_classes(*cls_or_modules, strict=False):
+def get_classes(*cls_or_modules: str, strict: bool = False) -> Iterator[type[Any]]:
     """
     given one or several fully qualified names, yield class instances found.
 
@@ -30,10 +32,10 @@ def get_classes(*cls_or_modules, strict=False):
             raise MermaidError(f"{cls_or_module} is not a class nor a module")
 
 
-def class_diagram(*cls_or_modules, full=False, strict=False, namespace=None):
-    inheritances = set()
+def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False, namespace: str | None = None) -> str:
+    inheritances: set[tuple[str, str]] = set()
 
-    def get_tree(cls):
+    def get_tree(cls: type[Any]) -> None:
         for base in cls.__bases__:
             if base.__name__ == "object":
                 continue
