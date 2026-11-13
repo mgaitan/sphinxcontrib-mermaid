@@ -12,6 +12,7 @@ from hashlib import sha1
 from pathlib import Path
 from subprocess import PIPE, Popen
 from tempfile import TemporaryDirectory
+from typing import NoReturn
 
 from docutils import nodes
 from sphinx.locale import _
@@ -141,7 +142,7 @@ def html_visit_mermaid(self, node):
     render_mm_html(self, node, node["code"], node.get("options", {}), imgcls="mermaid")
 
 
-def render_mm_latex(self, node, code, options, prefix="mermaid"):
+def render_mm_latex(self, node, code, options, prefix="mermaid") -> NoReturn:
     try:
         fname, outfn = render_mm(self, code, options, "pdf", prefix)
     except MermaidError as exc:
@@ -156,7 +157,7 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
             if err.errno != errno.ENOENT:  # No such file or directory
                 raise
             logger.warning(f"command {self.builder.config.mermaid_pdfcrop!r} cannot be run (needed to crop pdf), check the mermaid_cmd setting")
-            return None, None
+            raise nodes.SkipNode
 
         stdout, stderr = p.communicate()
         if self.builder.config.mermaid_verbose:
@@ -191,7 +192,7 @@ def render_mm_latex(self, node, code, options, prefix="mermaid"):
     raise nodes.SkipNode
 
 
-def latex_visit_mermaid(self, node):
+def latex_visit_mermaid(self, node) -> NoReturn:
     render_mm_latex(self, node, node["code"], node.get("options", {}))
 
 
