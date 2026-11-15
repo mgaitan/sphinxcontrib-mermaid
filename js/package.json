@@ -1,6 +1,6 @@
 {
   "name": "sphinxcontrib-mermaid",
-  "version": "2.1.1",
+  "version": "3.0.0a0",
   "description": "Mermaid diagrams in your Sphinx-powered docs",
   "repository": "git@github.com:mgaitan/sphinxcontrib-mermaid.git",
   "author": "Martín Gaitán <gaitan@gmail.com>",

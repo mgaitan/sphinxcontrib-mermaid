@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (3.0)
+## 3.0.0a0 (November 14, 2026)
 
 Breaking changes:
 
