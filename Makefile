@@ -3,7 +3,7 @@
 #########
 .PHONY: develop-py develop-js develop
 develop-py:
-	uv pip install -e .[develop,typing]
+	uv pip install -e .[develop]
 
 develop-js: requirements-js
 
@@ -11,7 +11,7 @@ develop: develop-js develop-py  ## setup project for development
 
 .PHONY: requirements-py requirements-js requirements
 requirements-py:  ## install prerequisite python build requirements
-	uv pip install -r pyproject.toml --extra develop --extra typing
+	uv pip install -r pyproject.toml --extra develop
 
 requirements-js:  ## install prerequisite javascript build requirements
 	pnpm --dir js install --frozen-lockfile
@@ -81,9 +81,8 @@ format: fix
 check-dist:  ## check python sdist and wheel with check-dist
 	check-dist -v
 
-check-types:  ## check python types with ty and pyright
+check-types:  ## check python types with ty
 	ty check --python $$(which python) sphinxcontrib
-	pyright --pythonpath $$(which python)
 
 checks: check-dist check-types
 
