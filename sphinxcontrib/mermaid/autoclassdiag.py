@@ -1,4 +1,5 @@
 import inspect
+import sys
 from collections.abc import Iterator
 from typing import Any
 
@@ -32,7 +33,15 @@ def get_classes(*cls_or_modules: str, strict: bool = False) -> Iterator[type[Any
             raise MermaidError(f"{cls_or_module} is not a class nor a module")
 
 
-def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False, namespace: str | None = None) -> str:
+def class_graph(
+    *cls_or_modules: str, full: bool = False, strict: bool = False, namespace: str | None = None
+) -> tuple[dict[str, type[Any]], set[tuple[str, str]]]:
+    """
+    Return the classes to draw, by name, and the ``(base, subclass)`` name pairs between them.
+
+    Classes named directly, and module members under ``strict``, are kept even without bases.
+    """
+    classes: dict[str, type[Any]] = {}
     inheritances: set[tuple[str, str]] = set()
 
     def get_tree(cls: type[Any]) -> None:
@@ -41,17 +50,32 @@ def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False
                 continue
             if namespace and not base.__module__.startswith(namespace):
                 continue
+            classes.setdefault(base.__name__, base)
+            classes.setdefault(cls.__name__, cls)
             inheritances.add((base.__name__, cls.__name__))
             if full:
                 get_tree(base)
 
-    for cls in get_classes(*cls_or_modules, strict=strict):
-        get_tree(cls)
+    for cls_or_module in cls_or_modules:
+        for cls in get_classes(cls_or_module, strict=strict):
+            if strict or cls_or_module not in sys.modules:
+                classes.setdefault(cls.__name__, cls)
+            get_tree(cls)
 
-    if not inheritances:
+    return classes, inheritances
+
+
+def format_class_diagram(classes: dict[str, type[Any]], inheritances: set[tuple[str, str]]) -> str:
+    if not classes:
         return ""
+    related = {name for pair in inheritances for name in pair}
+    lines = [f"  class {name}" for name in sorted(classes) if name not in related]
+    lines += [f"  {a} <|-- {b}" for a, b in sorted(inheritances)]
+    return "classDiagram\n" + "\n".join(lines)
 
-    return "classDiagram\n" + "\n".join(f"  {a} <|-- {b}" for a, b in sorted(inheritances))
+
+def class_diagram(*cls_or_modules: str, full: bool = False, strict: bool = False, namespace: str | None = None) -> str:
+    return format_class_diagram(*class_graph(*cls_or_modules, full=full, strict=strict, namespace=namespace))
 
 
 if __name__ == "__main__":
