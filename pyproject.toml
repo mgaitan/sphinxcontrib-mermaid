@@ -62,6 +62,8 @@ develop = [
     "ruff",
     "twine",
     "ty",
+    "types-docutils",
+    "types-PyYAML",
     "uv",
     "wheel",
 ]

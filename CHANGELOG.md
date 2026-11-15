@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+New:
+
+- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266)
+
+Fixed:
+
+- Skip LaTeX PDF cropping when Mermaid rendering produces no output
+
 ## 3.0.0a0 (November 14, 2026)
 
 Breaking changes:
