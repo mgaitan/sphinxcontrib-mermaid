@@ -22,6 +22,7 @@ from .directives import (
     align_spec as align_spec,
     figure_wrapper as figure_wrapper,
     mermaid as mermaid,
+    resolve_class_links,
 )
 from .exceptions import MermaidError as MermaidError
 from .html import add_assets, add_static_path, write_site_config
@@ -59,5 +60,6 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     app.connect("builder-inited", add_static_path)
     app.connect("html-page-context", add_assets)
     app.connect("html-collect-pages", write_site_config)
+    app.connect("doctree-resolved", resolve_class_links)
 
     return {"version": __version__, "parallel_read_safe": True, "parallel_write_safe": True}

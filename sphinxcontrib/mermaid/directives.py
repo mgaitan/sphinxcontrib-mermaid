@@ -6,17 +6,22 @@ import re
 import textwrap
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from docutils.statemachine import StringList
+from sphinx import addnodes
+from sphinx.errors import NoUri
 from sphinx.util import logging
 from sphinx.util.i18n import search_image_for_language
 from sphinx.util.nodes import set_source_info
 
-from .autoclassdiag import class_diagram
+from .autoclassdiag import class_graph, format_class_diagram
 from .options import SPHINX_KEYS, build_source, deep_merge, parse_config, split_frontmatter, validate_sphinx_options
+
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
 
 logger = logging.getLogger(__name__)
 
@@ -249,15 +254,50 @@ class MermaidClassDiagram(Mermaid):
     option_spec.update(
         {
             "full": directives.flag,
+            "links": directives.flag,
             "namespace": directives.unchanged,
             "strict": directives.flag,
         }
     )
 
     def get_mm_code(self) -> str:
-        return class_diagram(
+        classes, inheritances = class_graph(
             *self.arguments,
             full="full" in self.options,
             strict="strict" in self.options,
             namespace=self.options.get("namespace"),
         )
+        self.class_links = [(name, f"{cls.__module__}.{cls.__qualname__}") for name, cls in sorted(classes.items())]
+        return format_class_diagram(classes, inheritances)
+
+    def run(self, **kwargs: Any) -> list[nodes.Node]:
+        result = super().run(**kwargs)
+        if "links" in self.options:
+            for node in result:
+                for diagram in node.findall(mermaid):
+                    diagram["class_links"] = self.class_links
+        return result
+
+
+def resolve_class_links(app: Sphinx, doctree: nodes.document, docname: str) -> None:
+    """Link ``autoclasstree :links:`` classes to their Python domain or intersphinx entries."""
+    if app.builder.format != "html":
+        return
+    domain = app.env.get_domain("py")
+    for diagram in doctree.findall(mermaid):
+        lines = []
+        for name, target in diagram.get("class_links", ()):
+            xref = addnodes.pending_xref("", refdomain="py", reftype="class", reftarget=target, refexplicit=False)
+            content = nodes.literal(target, target)
+            ref = domain.resolve_xref(app.env, docname, app.builder, "class", target, xref, content)
+            if ref is None:
+                try:
+                    ref = app.emit_firstresult("missing-reference", app.env, xref, content, allowed_exceptions=(NoUri,))
+                except NoUri:
+                    ref = None
+            if ref is None:
+                continue
+            uri = ref.get("refuri") or f"#{ref['refid']}"
+            lines.append(f'  link {name} "{uri}" _self')
+        if lines:
+            diagram["code"] += "\n" + "\n".join(lines)

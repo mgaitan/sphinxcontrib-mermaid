@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+New:
+
+- Add an `autoclasstree` `:links:` option that links each class to its Python domain or intersphinx entry (#217)
+
+Fixed:
+
+- Show `autoclasstree` classes that have no base classes when they are named directly or belong to a `:strict:` module (#118, #217)
+
 ## 3.0.0a1 (November 14, 2026)
 
 New:
