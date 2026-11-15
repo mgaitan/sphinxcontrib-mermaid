@@ -28,6 +28,10 @@ New:
 - Resolve local asset paths correctly from pages at any depth (#246)
 - Apply `width`/`height` and `mermaid_config` to mermaid-cli output
 
+Fixed:
+
+- Skip the LaTeX Mermaid node after warning when the configured `mermaid_pdfcrop` executable is missing (#272)
+
 ## 2.1.1 (July 19, 2026)
 
 - Preserve source metadata on generated Mermaid caption nodes so Sphinx extracts them into gettext catalogs and applies normal caption translations
