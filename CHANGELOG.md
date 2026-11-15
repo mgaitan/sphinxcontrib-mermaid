@@ -1,16 +1,16 @@
 # Changelog
 
-## Unreleased
+## 3.0.0a1 (November 14, 2026)
 
 New:
 
-- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266)
-- Color diagrams from the Furo, pydata-sphinx-theme, sphinx-fuma, and sphinxawesome-theme palettes when using the default Mermaid themes
+- Add PEP 561 typing metadata and annotations for public extension APIs, including the Mermaid node, directives, visitors, and setup function (#266, #267)
+- Color diagrams from the Furo, pydata-sphinx-theme, sphinx-fuma, and sphinxawesome-theme palettes when using the default Mermaid themes (#280)
 
 Fixed:
 
-- Skip LaTeX PDF cropping when Mermaid rendering produces no output
-- Make pie, mindmap, timeline, treemap, radar, kanban, sankey, and ZenUML diagrams readable in dark mode
+- Skip LaTeX PDF cropping when Mermaid rendering produces no output (#267)
+- Make pie, mindmap, timeline, treemap, radar, kanban, sankey, and ZenUML diagrams readable in dark mode (#280)
 
 ## 3.0.0a0 (November 14, 2026)
 

@@ -40,7 +40,7 @@ from .render import (
 if TYPE_CHECKING:
     from sphinx.util.typing import ExtensionMetadata
 
-__version__ = "3.0.0a0"
+__version__ = "3.0.0a1"
 
 
 def setup(app: Sphinx) -> ExtensionMetadata:
