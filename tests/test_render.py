@@ -83,3 +83,18 @@ def test_other_pdfcrop_oserror_propagates(app, monkeypatch):
     monkeypatch.setattr(render, "Popen", run)
     with pytest.raises(PermissionError):
         app.build(force_all=True)
+
+
+@pytest.mark.sphinx(
+    "latex",
+    testroot="render",
+    srcdir="render-missing-mmdc",
+    freshenv=True,
+    confoverrides={"mermaid_cmd": "sphinxcontrib-mermaid-missing-mmdc", "mermaid_pdfcrop": "pdfcrop"},
+)
+def test_missing_mmdc_skips_pdfcrop(app):
+    app.build(force_all=True)
+    assert "needed for mermaid output" in app.warning.getvalue()
+    tex_files = list(app.outdir.glob("*.tex"))
+    assert len(tex_files) == 1
+    assert r"\sphinxincludegraphics{mermaid-" not in tex_files[0].read_text()
