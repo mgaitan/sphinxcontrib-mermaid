@@ -1,3 +1,4 @@
+import { themeVariables } from "./theme";
 import type { Diagram, DiagramOptions, Mermaid, SiteConfig } from "./types";
 
 let mermaid: Mermaid;
@@ -34,7 +35,10 @@ export function diagrams(): Diagram[] {
   return [...registry.values()];
 }
 
-export function initializeMermaid(dark: boolean): void {
+let dark = false;
+
+export function initializeMermaid(isDark: boolean): void {
+  dark = isDark;
   mermaid.initialize({
     ...site.config,
     startOnLoad: false,
@@ -42,6 +46,34 @@ export function initializeMermaid(dark: boolean): void {
     theme: (site.config.theme ??
       (dark ? site.darkTheme : site.lightTheme)) as never,
   });
+}
+
+const FRONTMATTER = /^\s*---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
+
+/** The diagram sets its own theme or theme variables in frontmatter or a directive. */
+function ownsTheme(source: string): boolean {
+  const front = source.match(FRONTMATTER);
+  if (front && /^\s+theme(?:Variables)?\s*:/m.test(front[1])) return true;
+  return /%%\{\s*init(?:ialize)?\s*:[\s\S]*?["']?\btheme(?:Variables)?["']?\s*:/.test(
+    source,
+  );
+}
+
+/**
+ * Add the page's theme variables to one diagram as an init directive. A
+ * directive, unlike mermaid.initialize, leaves diagrams that pick their own
+ * theme alone and keeps any config set at runtime.
+ */
+function withPageColors(source: string): string {
+  if (site.config.theme !== undefined || ownsTheme(source)) return source;
+  const variables = {
+    ...themeVariables(dark ? site.darkTheme : site.lightTheme),
+    ...(site.config.themeVariables as Record<string, unknown> | undefined),
+  };
+  if (!Object.keys(variables).length) return source;
+  const directive = `%%{init: ${JSON.stringify({ themeVariables: variables })}}%%\n`;
+  const front = source.match(FRONTMATTER)?.[0] ?? "";
+  return front + directive + source.slice(front.length);
 }
 
 function isVisible(el: HTMLElement): boolean {
@@ -77,7 +109,7 @@ async function draw(d: Diagram): Promise<void> {
     d.el.append(scratch);
     let result;
     try {
-      result = await mermaid.render(id, d.source, scratch);
+      result = await mermaid.render(id, withPageColors(d.source), scratch);
     } finally {
       scratch.remove();
     }
@@ -95,6 +127,7 @@ async function draw(d: Diagram): Promise<void> {
     d.el.querySelector(":scope > pre.mermaid")?.remove();
     d.el.querySelector(":scope > .mermaid-error")?.remove();
     d.svg = viewport.querySelector("svg");
+    d.svg?.classList.toggle("mermaid-dark", dark);
     const alt = d.el.getAttribute("aria-label");
     if (alt) d.svg?.setAttribute("aria-label", alt);
     bindFunctions?.(viewport);

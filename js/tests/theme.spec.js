@@ -108,3 +108,56 @@ test("dark html background with a transparent body is detected", async ({
   });
   await expect.poll(() => theme(page)).toBe("dark");
 });
+
+const nodeStroke = (page, id) =>
+  page
+    .locator(`#${id} > .mermaid-viewport > svg .node rect`)
+    .first()
+    .evaluate((el) => getComputedStyle(el).stroke);
+
+test("furo colors reach diagrams without their own theme", async ({ page }) => {
+  await ready(page);
+  expect(await nodeFill(page, "small")).toBe("rgb(236, 236, 255)");
+  const forest = await nodeFill(page, "forest");
+  await page.evaluate(() => {
+    const style = document.body.style;
+    style.setProperty("--color-background-primary", "#ffffff");
+    style.setProperty("--color-background-secondary", "rgb(1, 2, 3)");
+    style.setProperty("--color-brand-primary", "rgb(10, 75, 255)");
+    return window.sphinxcontribMermaid.render();
+  });
+  expect(await nodeFill(page, "small")).toBe("rgb(1, 2, 3)");
+  expect(await nodeStroke(page, "small")).toBe("rgb(10, 75, 255)");
+  expect(await nodeFill(page, "forest")).toBe(forest);
+  await page.evaluate(() => (document.body.dataset.theme = "dark"));
+  await expect.poll(() => theme(page)).toBe("dark");
+  await expect.poll(() => nodeFill(page, "small")).toBe("rgb(1, 2, 3)");
+});
+
+test("sphinxawesome bare hsl colors are converted", async ({ page }) => {
+  await ready(page);
+  await page.evaluate(() => {
+    const style = document.documentElement.style;
+    style.setProperty("--background", "0 0% 100%");
+    style.setProperty("--primary", "0 100% 50%");
+    return window.sphinxcontribMermaid.render();
+  });
+  expect(await nodeStroke(page, "small")).toBe("rgb(255, 0, 0)");
+});
+
+test("dark mode uses readable category colors", async ({ page }) => {
+  await ready(page, "/colors.html");
+  const slices = () =>
+    page
+      .locator("#pie path.pieCircle")
+      .evaluateAll((els) => els.map((el) => getComputedStyle(el).fill).sort());
+  const blend = () =>
+    page
+      .locator("#sankey .link")
+      .first()
+      .evaluate((el) => getComputedStyle(el).mixBlendMode);
+  expect(await blend()).toBe("multiply");
+  await page.evaluate(() => (document.body.dataset.theme = "dark"));
+  await expect.poll(slices).toEqual(["rgb(194, 106, 27)", "rgb(59, 110, 165)"]);
+  expect(await blend()).toBe("normal");
+});
