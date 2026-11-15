@@ -9,6 +9,7 @@ Diagrams
    errors
    sizing
    explicit-theme
+   colors
 
 .. mermaid::
    :name: small

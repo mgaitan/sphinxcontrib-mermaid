@@ -59,6 +59,16 @@
   flex: none;
 }
 
+/* Mermaid blends sankey links with multiply, which turns them black on a dark page. */
+svg.mermaid-dark[aria-roledescription="sankey"] .link {
+  mix-blend-mode: normal !important;
+}
+
+/* ZenUML has no dark theme. */
+svg.mermaid-dark[aria-roledescription="zenuml"] {
+  filter: invert(0.9) hue-rotate(180deg);
+}
+
 .mermaid-diagram[data-mermaid-overflow="true"] > .mermaid-viewport {
   justify-content: flex-start;
   overflow: auto;
