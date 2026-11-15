@@ -4,8 +4,9 @@
 
 Breaking changes:
 
-- Replace the templated inline JavaScript with a bundled TypeScript runtime loaded from `_static` (CSP-compatible, #222)
+- Replace the templated inline JavaScript with a bundled TypeScript runtime loaded from `_static`; diagram options and site settings are written as escaped JSON instead of inline script (CSP-compatible, #222, #255)
 - Bundle Mermaid 12.2.0, ZenUML, and the tidy-tree layout in the package; `mermaid_base_url` loads them from any npm CDN or a local `node_modules` copy instead (#29, #64, #110, #114)
+- Mermaid 12 includes the ELK layouts and uses ELK as its default layout, so flowcharts may lay out differently than in 2.x (#207, #269)
 - Remove `mermaid_init_config`, `mermaid_d3_zoom`, `d3_version`, `d3_use_local`, the `mermaid_include_elk`/`mermaid_elk_*` and `mermaid_include_zenuml`/`mermaid_zenuml_*` settings, `mermaid_fullscreen_button`, `mermaid_fullscreen_button_opacity`, `mermaid_js_priority`, `mermaid_include_mindmap`, and `mermaid_use_local`; each now raises an error naming its replacement
 - Pass `mermaid_config` to `mermaid.initialize` instead of copying it into each diagram's frontmatter
 - `mermaid_version` only applies with a remote `mermaid_base_url` and must be 12.0.0 or later
@@ -15,9 +16,9 @@ Breaking changes:
 
 New:
 
-- Size diagrams to keep text readable, with a capped scrolling view for oversized diagrams, `fit: contain`, and per-diagram `width`/`height` (#123, #104, #251)
+- Size diagrams to keep text readable, with a capped scrolling view for oversized diagrams, `fit: contain`, and per-diagram `width`/`height`; set site-wide defaults with `mermaid_fit`, `mermaid_max_height`, and `mermaid_min_font_scale` (#123, #104, #251)
 - Accept sizing and interaction options as top-level frontmatter keys as well as directive options
-- Built-in pan and zoom (drag, Ctrl/⌘+wheel, pinch, keyboard) without d3 (#178)
+- Built-in pan and zoom (drag, Ctrl/⌘+wheel, pinch, keyboard) without d3, enabled with `mermaid_zoom` (#178)
 - Toolbar with zoom and fullscreen buttons, always visible or shown on hover (`mermaid_toolbar`, #224)
 - Fullscreen overlay with pan and zoom
 - Follow light and dark mode in Furo, pydata-sphinx-theme, sphinx-fuma, and sphinxawesome-theme; an explicit Mermaid `theme` is never overridden (#228, #163, #205)
