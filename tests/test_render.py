@@ -47,9 +47,13 @@ def test_static_alt_escaped(app):
     assert 'alt="a &quot;b&quot; &lt;c&gt;"' in index
 
 
-@pytest.mark.sphinx("latex", testroot="render", freshenv=True, confoverrides={"mermaid_cmd": RECORD})
-def test_missing_pdfcrop_skips_latex_node(app, tmp_path):
-    app.config.mermaid_pdfcrop = str(tmp_path / "missing-pdfcrop")
+@pytest.mark.sphinx(
+    "latex",
+    testroot="render",
+    freshenv=True,
+    confoverrides={"mermaid_cmd": RECORD, "mermaid_pdfcrop": "sphinxcontrib-mermaid-missing-pdfcrop"},
+)
+def test_missing_pdfcrop_skips_latex_node(app):
     app.build(force_all=True)
     assert "needed to crop pdf" in app.warning.getvalue()
     assert len(list(app.outdir.glob("mermaid-*.pdf"))) == 1
@@ -67,9 +71,8 @@ def test_latex_render_without_pdfcrop(app):
     assert "cannot be run" not in app.warning.getvalue()
 
 
-@pytest.mark.sphinx("latex", testroot="render", freshenv=True, confoverrides={"mermaid_cmd": RECORD})
+@pytest.mark.sphinx("latex", testroot="render", freshenv=True, confoverrides={"mermaid_cmd": RECORD, "mermaid_pdfcrop": "pdfcrop"})
 def test_other_pdfcrop_oserror_propagates(app, monkeypatch):
-    app.config.mermaid_pdfcrop = "pdfcrop"
     popen = render.Popen
 
     def run(args, **kwargs):
