@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, NoReturn
 
 from docutils import nodes
+from sphinx.environment.collectors import EnvironmentCollector
 
 from .config import ASSETS, bundled_versions, is_remote
 from .directives import mermaid
@@ -111,27 +112,27 @@ def render_raw(self: HTML5Translator, node: mermaid, code: str) -> NoReturn:
 
 
 def _diagram_docs(env) -> set[str]:
-    """The documents with a diagram. The runtime assets are only copied when there is one."""
     if not hasattr(env, "mermaid_diagram_docs"):
         env.mermaid_diagram_docs = set()
     return env.mermaid_diagram_docs
 
 
-def note_diagram_doc(app, doctree) -> None:
-    if doctree.next_node(mermaid):
-        _diagram_docs(app.env).add(app.env.docname)
+class DiagramCollector(EnvironmentCollector):
+    """Record the documents with a diagram, so the runtime assets are only copied when there is one."""
 
+    def process_doc(self, app, doctree) -> None:
+        if doctree.next_node(mermaid):
+            _diagram_docs(app.env).add(app.env.docname)
 
-def purge_diagram_doc(app, env, docname) -> None:
-    _diagram_docs(env).discard(docname)
+    def clear_doc(self, app, env, docname) -> None:
+        _diagram_docs(env).discard(docname)
 
-
-def merge_diagram_docs(app, env, docnames, other) -> None:
-    _diagram_docs(env).update(_diagram_docs(other))
+    def merge_other(self, app, env, docnames, other) -> None:
+        _diagram_docs(env).update(_diagram_docs(other))
 
 
 def add_static_path(app, env) -> None:
-    # Runs after every document is read, so a project without a diagram gets no copy of the assets.
+    # On env-updated, after every document is read and before the static files are copied.
     if not _client_side(app) or not _diagram_docs(env):
         return
     bundled_versions()

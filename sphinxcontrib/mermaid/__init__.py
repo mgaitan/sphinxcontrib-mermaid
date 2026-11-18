@@ -24,7 +24,7 @@ from .directives import (
     mermaid as mermaid,
 )
 from .exceptions import MermaidError as MermaidError
-from .html import add_assets, add_static_path, merge_diagram_docs, note_diagram_doc, purge_diagram_doc, write_site_config
+from .html import DiagramCollector, add_assets, add_static_path, write_site_config
 from .render import (
     html_visit_mermaid as html_visit_mermaid,
     latex_visit_mermaid as latex_visit_mermaid,
@@ -56,13 +56,10 @@ def setup(app: Sphinx) -> ExtensionMetadata:
     app.add_directive("autoclasstree", MermaidClassDiagram)
 
     register(app)
-    app.connect("doctree-read", note_diagram_doc)
-    app.connect("env-purge-doc", purge_diagram_doc)
-    app.connect("env-merge-info", merge_diagram_docs)
+    app.add_env_collector(DiagramCollector)
     app.connect("env-updated", add_static_path)
     app.connect("html-page-context", add_assets)
     app.connect("html-collect-pages", write_site_config)
 
-    # Bump when the data stored on the environment changes, so Sphinx rereads every document
-    # instead of reusing an environment pickled without it.
+    # Bump when DiagramCollector's data changes, so Sphinx rereads environments pickled without it.
     return {"version": __version__, "env_version": 1, "parallel_read_safe": True, "parallel_write_safe": True}
