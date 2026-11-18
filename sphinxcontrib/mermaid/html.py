@@ -110,8 +110,29 @@ def render_raw(self: HTML5Translator, node: mermaid, code: str) -> NoReturn:
     raise nodes.SkipNode
 
 
-def add_static_path(app) -> None:
-    if not _client_side(app):
+def _diagram_docs(env) -> set[str]:
+    """The documents with a diagram. The runtime assets are only copied when there is one."""
+    if not hasattr(env, "mermaid_diagram_docs"):
+        env.mermaid_diagram_docs = set()
+    return env.mermaid_diagram_docs
+
+
+def note_diagram_doc(app, doctree) -> None:
+    if doctree.next_node(mermaid):
+        _diagram_docs(app.env).add(app.env.docname)
+
+
+def purge_diagram_doc(app, env, docname) -> None:
+    _diagram_docs(env).discard(docname)
+
+
+def merge_diagram_docs(app, env, docnames, other) -> None:
+    _diagram_docs(env).update(_diagram_docs(other))
+
+
+def add_static_path(app, env) -> None:
+    # Runs after every document is read, so a project without a diagram gets no copy of the assets.
+    if not _client_side(app) or not _diagram_docs(env):
         return
     bundled_versions()
     app.config.html_static_path = [*app.config.html_static_path, str(ASSETS.parent)]
@@ -134,7 +155,7 @@ def _config_version(app) -> str:
 
 
 def write_site_config(app):
-    if not _client_side(app):
+    if not _client_side(app) or not _diagram_docs(app.env):
         return []
     out = Path(app.outdir) / "_static" / "sphinxcontrib-mermaid"
     out.mkdir(parents=True, exist_ok=True)

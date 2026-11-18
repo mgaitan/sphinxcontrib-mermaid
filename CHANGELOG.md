@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+Fixed:
+
+- Copy the bundled runtime assets and `config.json` only when a document contains a diagram, so projects that load the extension without using it don't ship the 8.6 MB of assets. The first build after upgrading rereads every document
+
 ## 3.0.0a1 (November 14, 2026)
 
 New:
