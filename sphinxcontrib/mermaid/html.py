@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, NoReturn
 
 from docutils import nodes
+from sphinx.environment.collectors import EnvironmentCollector
 
 from .config import ASSETS, bundled_versions, is_remote
 from .directives import mermaid
@@ -110,8 +111,29 @@ def render_raw(self: HTML5Translator, node: mermaid, code: str) -> NoReturn:
     raise nodes.SkipNode
 
 
-def add_static_path(app) -> None:
-    if not _client_side(app):
+def _diagram_docs(env) -> set[str]:
+    if not hasattr(env, "mermaid_diagram_docs"):
+        env.mermaid_diagram_docs = set()
+    return env.mermaid_diagram_docs
+
+
+class DiagramCollector(EnvironmentCollector):
+    """Record the documents with a diagram, so the runtime assets are only copied when there is one."""
+
+    def process_doc(self, app, doctree) -> None:
+        if doctree.next_node(mermaid):
+            _diagram_docs(app.env).add(app.env.docname)
+
+    def clear_doc(self, app, env, docname) -> None:
+        _diagram_docs(env).discard(docname)
+
+    def merge_other(self, app, env, docnames, other) -> None:
+        _diagram_docs(env).update(_diagram_docs(other))
+
+
+def add_static_path(app, env) -> None:
+    # On env-updated, after every document is read and before the static files are copied.
+    if not _client_side(app) or not _diagram_docs(env):
         return
     bundled_versions()
     app.config.html_static_path = [*app.config.html_static_path, str(ASSETS.parent)]
@@ -134,7 +156,7 @@ def _config_version(app) -> str:
 
 
 def write_site_config(app):
-    if not _client_side(app):
+    if not _client_side(app) or not _diagram_docs(app.env):
         return []
     out = Path(app.outdir) / "_static" / "sphinxcontrib-mermaid"
     out.mkdir(parents=True, exist_ok=True)

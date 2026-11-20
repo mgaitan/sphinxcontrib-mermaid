@@ -1,11 +1,15 @@
 import hashlib
 import html
 import json
+import pickle
 import re
+import shutil
 import sys
 from pathlib import Path
 
 import pytest
+
+from sphinxcontrib.mermaid.config import ASSETS
 
 
 @pytest.fixture
@@ -219,3 +223,41 @@ def test_runtime_tag_has_config_version(app, index):
     match = re.search(r'data-mermaid-config="([0-9a-f]{12})"', tag)
     assert match
     assert hashlib.sha1((app.outdir / "_static/sphinxcontrib-mermaid/config.json").read_bytes()).hexdigest()[:12] == match.group(1)
+
+
+@pytest.mark.sphinx("html", testroot="nodiagram")
+def test_project_without_diagram_has_no_runtime_assets(app, build_all):
+    assert not (app.outdir / "_static/sphinxcontrib-mermaid").exists()
+
+
+@pytest.mark.sphinx("html", testroot="basic", srcdir="rebuild-without-diagrams")
+def test_rebuild_without_diagrams_drops_runtime_assets(app, build_all, make_app):
+    for source in Path(app.srcdir).rglob("*.rst"):
+        source.write_text("Title\n-----\n\nNo diagram.\n")
+
+    rebuilt = make_app("html", srcdir=app.srcdir)
+    rebuilt.build()
+
+    assert str(ASSETS.parent) not in rebuilt.config.html_static_path
+
+
+@pytest.mark.sphinx("html", testroot="parallel", parallel=2)
+def test_parallel_build_copies_assets_for_diagram_read_in_worker(app, build_all):
+    assert (app.outdir / "_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js").is_file()
+
+
+# Tests that change their project get their own copy: Sphinx < 8.2 copies a test root only once per session.
+@pytest.mark.sphinx("html", testroot="basic", srcdir="older-environment")
+def test_environment_from_older_version_is_reread(app, build_all, make_app):
+    # An environment pickled before the extension recorded its diagram documents.
+    pickled = Path(app.doctreedir) / "environment.pickle"
+    env = pickle.loads(pickled.read_bytes())
+    del env.mermaid_diagram_docs
+    env.version = {name: version for name, version in env.version.items() if name != "sphinxcontrib.mermaid"}
+    pickled.write_bytes(pickle.dumps(env, pickle.HIGHEST_PROTOCOL))
+    shutil.rmtree(app.outdir / "_static/sphinxcontrib-mermaid")
+
+    rebuilt = make_app("html", srcdir=app.srcdir)
+    rebuilt.build()
+
+    assert (rebuilt.outdir / "_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js").is_file()
