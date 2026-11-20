@@ -230,7 +230,7 @@ def test_project_without_diagram_has_no_runtime_assets(app, build_all):
     assert not (app.outdir / "_static/sphinxcontrib-mermaid").exists()
 
 
-@pytest.mark.sphinx("html", testroot="basic")
+@pytest.mark.sphinx("html", testroot="basic", srcdir="rebuild-without-diagrams")
 def test_rebuild_without_diagrams_drops_runtime_assets(app, build_all, make_app):
     for source in Path(app.srcdir).rglob("*.rst"):
         source.write_text("Title\n-----\n\nNo diagram.\n")
@@ -246,7 +246,8 @@ def test_parallel_build_copies_assets_for_diagram_read_in_worker(app, build_all)
     assert (app.outdir / "_static/sphinxcontrib-mermaid/sphinxcontrib-mermaid.js").is_file()
 
 
-@pytest.mark.sphinx("html", testroot="basic")
+# Tests that change their project get their own copy: Sphinx < 8.2 copies a test root only once per session.
+@pytest.mark.sphinx("html", testroot="basic", srcdir="older-environment")
 def test_environment_from_older_version_is_reread(app, build_all, make_app):
     # An environment pickled before the extension recorded its diagram documents.
     pickled = Path(app.doctreedir) / "environment.pickle"
